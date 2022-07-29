@@ -105,7 +105,13 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 
 		if ( $term ) {
 			$authorization_code = array();
-			foreach ( array_keys( $this->authorization_code_data ) as $key ) {
+			foreach ( array(
+				'client_id',
+				'user_id',
+				'expires',
+				'redirect_uri',
+				'scope',
+			) as $key ) {
 				$authorization_code[$key] = get_term_meta( $term->term_id, $key, true );
 			}
 
