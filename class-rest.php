@@ -50,7 +50,7 @@ class Rest {
 		}
 
 		// The initial OIDC request will come without a nonce, thus unauthenticated.
-		if ( ! is_user_logged_in() || ! current_user_can( apply_filters( 'oidc_minimal_capability', 'contributor' ) ) ) {
+		if ( ! is_user_logged_in() || ! current_user_can( apply_filters( 'oidc_minimal_capability', 'edit_posts' ) ) ) {
 			// This is handled in the main plugin file and will display a form asking the user to confirm.
 			wp_safe_redirect( add_query_arg( $request->getAllQueryParameters(), home_url( '/openid-connect/authenticate' ) ) );
 			exit;
