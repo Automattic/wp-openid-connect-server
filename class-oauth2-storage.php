@@ -153,7 +153,6 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 				'expires' => $expires,
 				'scope' => $scope,
 				'id_token' => $id_token,
-				''
 			) as $key => $value ) {
 				add_term_meta(  $term['term_id'], $key, $value );
 			}
