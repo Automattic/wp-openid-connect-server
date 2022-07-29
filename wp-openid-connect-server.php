@@ -20,7 +20,3 @@ require_once __DIR__ . '/class-openid-connect-server.php';
 add_action( 'wp_loaded', function() {
 	new OpenIDConnectServer();
 } );
-
-
-
-

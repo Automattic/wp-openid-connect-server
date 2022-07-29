@@ -3,13 +3,67 @@ namespace OpenIDConnectServer;
 use OAuth2;
 
 class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\ClientCredentialsInterface, OAuth2\OpenID\Storage\AuthorizationCodeInterface, OAuth2\OpenID\Storage\UserClaimsInterface {
-	const OPTION_PREFIX = 'oauth2_code_';
+	const TAXONOMY = 'oicd-authorization-code';
+	private $authorization_code_data = array(
+		'code' => 'string',         // authorization code.
+		'client_id' => 'string',    // client identifier.
+		'user_id' => 'int',         // The WordPress user id.
+		'redirect_uri' => 'string', // redirect URI.
+		'expires' => 'int',         // expires as unix timestamp.
+		'scope' => 'string',        // scope as space-separated string.
+		'id_token' => 'string',     // The OpenID Connect id_token.
+	);
 
 	private static $clients;
 
 	public function __construct() {
 		self::$clients = function_exists( '\oidc_clients' ) ? \oidc_clients() : array();
-		// TODO: Initialize storage, likely a taxonomy.
+
+		// Store the authorization codes in a taxonomy.
+		register_taxonomy( self::TAXONOMY, null );
+		foreach ( $this->authorization_code_data as $key => $type ) {
+			register_term_meta(
+				self::TAXONOMY,
+				$key,
+				array(
+					'type'              => $type,
+					'single'            => true,
+					'sanitize_callback' => array( __CLASS__, 'validate_' . $key ),
+				)
+			);
+		}
+	}
+
+	public static function validate_string_length( $string, $length ) {
+		return substr( $string, 0, $length );
+	}
+
+	public static function validate_code( $code ) {
+		return self::validate_string_length( $code, 40 );
+	}
+
+	public static function validate_client_id( $client_id ) {
+		return self::validate_string_length( $client_id, 200 );
+	}
+
+	public static function validate_redirect_uri( $redirect_uri ) {
+		return self::validate_string_length( $redirect_uri, 2000 );
+	}
+
+	public static function validate_scope( $scope ) {
+		return self::validate_string_length( $scope, 100 );
+	}
+
+	public static function validate_id_token( $id_token ) {
+		return self::validate_string_length( $id_token, 2000 );
+	}
+
+	public static function validate_user_id( $user_id ) {
+		return intval( $user_id );
+	}
+
+	public static function validate_expires( $expires ) {
+		return intval( $expires );
 	}
 
 	public static function getClientName( $client_id ) {
@@ -47,8 +101,15 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 	 * @ingroup oauth2_section_4
 	 */
 	public function getAuthorizationCode( $code ) {
-		if ( $code && get_option( self::OPTION_PREFIX . $code ) ) { // TODO: this is not a viable storage, just for testing!
-			return get_option( self::OPTION_PREFIX . $code );
+		$term = get_term_by( 'slug', $code, self::TAXONOMY );
+
+		if ( $term ) {
+			$authorization_code = array();
+			foreach ( array_keys( $this->authorization_code_data ) as $key ) {
+				$authorization_code[$key] = get_term_meta( $term->term_id, $key, true );
+			}
+
+			return $authorization_code;
 		}
 
 		return null;
@@ -77,8 +138,25 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 	 */
 	public function setAuthorizationCode( $code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null ) {
 		if ( $code ) {
-			// TODO: store the user_id more sustainably.
-			update_option( self::OPTION_PREFIX . $code, compact( 'code', 'client_id', 'user_id', 'redirect_uri', 'expires', 'scope', 'id_token' ) );
+			$this->expireAuthorizationCode( $code );
+
+			$term = wp_insert_term( $code, self::TAXONOMY );
+			if ( is_wp_error( $term ) || ! isset( $term['term_id'] ) ) {
+				status_header( 500 );
+				exit;
+			}
+
+			foreach ( array(
+				'client_id' => $client_id,
+				'user_id' => $user_id,
+				'redirect_uri' => $redirect_uri,
+				'expires' => $expires,
+				'scope' => $scope,
+				'id_token' => $id_token,
+				''
+			) as $key => $value ) {
+				add_term_meta(  $term['term_id'], $key, $value );
+			}
 		}
 	}
 
@@ -95,7 +173,11 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 	 *
 	 */
 	public function expireAuthorizationCode( $code ) {
-		delete_option( self::OPTION_PREFIX . $code );
+		$term = get_term_by( 'slug', $code, self::TAXONOMY );
+
+		if ( $term ) {
+			wp_delete_term( $term->term_id, self::TAXONOMY );
+		}
 	}
 
 	/**
