@@ -12,10 +12,10 @@ class Rest {
 
 	public function add_rest_routes() {
 		register_rest_route(
-			'openid-connect',
+			self::NAMESPACE,
 			'token',
 			array(
-				'methods'             => 'GET,POST',
+				'methods'             => 'POST', // MUST support POST only
 				'callback'            => array( $this, 'token' ),
 				'permission_callback' => '__return_true',
 			)
@@ -24,7 +24,7 @@ class Rest {
 			self::NAMESPACE,
 			'authorize',
 			array(
-				'methods'             => 'GET,POST',
+				'methods'             => 'GET,POST', // MUST support both GET and POST
 				'callback'            => array( $this, 'authorize' ),
 				'permission_callback' => '__return_true',
 			)
@@ -33,7 +33,7 @@ class Rest {
 			self::NAMESPACE,
 			'userinfo',
 			array(
-				'methods'             => 'GET,POST',
+				'methods'             => 'GET,POST',  // MUST support both GET and POST
 				'callback'            => array( $this, 'userinfo' ),
 				'permission_callback' => '__return_true',
 			)
