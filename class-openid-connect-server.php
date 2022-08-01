@@ -221,15 +221,18 @@ class OpenIDConnectServer {
 		header( 'Content-type: application/json' );
 		header( 'Access-Control-Allow-Origin: *' );
 
-		$options = array(
+		$keySet = new \Strobotti\JWK\KeySet();
+		$keyFactory = new \Strobotti\JWK\KeyFactory();
+		$key = $keyFactory->createFromPem( OIDC_PUBLIC_KEY, array(
 			'use' => 'sig',
 			'alg' => 'RS256',
-		);
+			'kid' => 'omvbxdf', // key ID (just needs to be random and unique), useful in key rotations
+		) );
+		$keySet->add( $key );
 
-		$keyFactory = new \Strobotti\JWK\KeyFactory();
-		echo '{"keys":[';
-		echo $keyFactory->createFromPem( OIDC_PUBLIC_KEY, $options );
-		echo ']}';
+		$response = new OAuth2\Response();
+		$response->setParameter( 'keys', $keySet->getKeys() );
+		$response->send();
 		exit;
 	}
 
