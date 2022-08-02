@@ -5,6 +5,7 @@
  * Author: Automattic
  * Author URI: https://automattic.com/
  * Plugin URI: https://github.com/Automattic/wp-openid-connect-server
+ * GitHub Plugin URI: Automattic/wp-openid-connect-server
  * Version: 1.0
  */
 namespace OpenIDConnectServer;
