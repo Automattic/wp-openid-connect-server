@@ -10,8 +10,6 @@
 namespace OpenIDConnectServer;
 
 require_once __DIR__ . '/vendor/autoload.php';
-// Override to incorporate this fix: https://github.com/bshaffer/oauth2-server-php/issues/449#issuecomment-227531175
-require_once __DIR__ . '/class-authorization-controller.php';
 
 require_once __DIR__ . '/class-rest.php';
 require_once __DIR__ . '/class-site-status-tests.php';

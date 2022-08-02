@@ -6,9 +6,10 @@ Use OpenID Connect to log in to other webservices using your own WordPress.
 **Tags:** oidc, openid, connect, server
 **Requires at least:** 5.0
 **Tested up to:** 6.1
-**Requires PHP:** 5.6
+**Requires PHP:** 7.1
 **License:** [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)
 **Stable tag:** trunk
+**GitHub Plugin URI:** https://github.com/Automattic/wp-openid-connect-server
 
 ## Description
 

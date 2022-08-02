@@ -4,7 +4,7 @@ use OAuth2;
 
 class OpenIDConnectServer {
 	public function __construct() {
-		add_filter( 'site_status_tests', array( SiteStatusTests, 'register_site_status_tests' ) );
+		add_filter( 'site_status_tests', array( 'SiteStatusTests', 'register_site_status_tests' ) );
 
 		// Please follow the instructions in the readme for defining these.
 		$public_key = defined( 'OIDC_PUBLIC_KEY' ) ? OIDC_PUBLIC_KEY : false;
