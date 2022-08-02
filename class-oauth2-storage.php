@@ -68,7 +68,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 
 	public static function getClientName( $client_id ) {
 		if ( empty( self::$clients[$client_id]['name'] ) ) {
-			return __( 'Unknown Client', 'wp-openid-connect-server' );
+			return null;
 		}
 
 		return self::$clients[$client_id]['name'];
