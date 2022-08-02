@@ -14,6 +14,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/class-authorization-controller.php';
 
 require_once __DIR__ . '/class-rest.php';
+require_once __DIR__ . '/class-site-status-tests.php';
 require_once __DIR__ . '/class-oauth2-storage.php';
 require_once __DIR__ . '/class-openid-connect-server.php';
 
