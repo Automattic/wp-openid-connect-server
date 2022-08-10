@@ -299,6 +299,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 							$claims[ $key ] = $user->$value;
 						}
 					}
+					$claims['picture'] = \get_avatar_url( $user->user_email );
 				}
 			}
 		}
