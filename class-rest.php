@@ -61,7 +61,13 @@ class Rest {
 			exit;
 		}
 
-		$this->server->handleAuthorizeRequest( $request, $response, true, get_current_user_id() );
+		$user = wp_get_current_user();
+		if ( ! $user ) {
+			$response->send();
+			exit;
+		}
+
+		$this->server->handleAuthorizeRequest( $request, $response, true, $user->user_login );
 
 		$response->send();
 		exit;
