@@ -287,7 +287,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 
 		foreach ( explode( ' ', $scope ) as $s ) {
 			if ( $s === 'profile') {
-				$user = \get_user_by( 'user_login', $user_login );
+				$user = \get_user_by( 'login', $user_login );
 				if ( $user ) {
 					foreach ( array(
 						'username' => 'user_login',
