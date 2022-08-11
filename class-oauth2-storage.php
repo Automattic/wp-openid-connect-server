@@ -28,41 +28,41 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 				array(
 					'type'              => $type,
 					'single'            => true,
-					'sanitize_callback' => array( __CLASS__, 'validate_' . $key ),
+					'sanitize_callback' => array( __CLASS__, 'sanitize_' . $key ),
 				)
 			);
 		}
 	}
 
-	public static function validate_string_length( $string, $length ) {
+	public static function sanitize_string_length( $string, $length ) {
 		return substr( $string, 0, $length );
 	}
 
-	public static function validate_code( $code ) {
-		return self::validate_string_length( $code, 40 );
+	public static function sanitize_code( $code ) {
+		return self::sanitize_string_length( $code, 40 );
 	}
 
-	public static function validate_client_id( $client_id ) {
-		return self::validate_string_length( $client_id, 200 );
+	public static function sanitize_client_id( $client_id ) {
+		return self::sanitize_string_length( $client_id, 200 );
 	}
 
-	public static function validate_redirect_uri( $redirect_uri ) {
-		return self::validate_string_length( $redirect_uri, 2000 );
+	public static function sanitize_redirect_uri( $redirect_uri ) {
+		return self::sanitize_string_length( $redirect_uri, 2000 );
 	}
 
-	public static function validate_scope( $scope ) {
-		return self::validate_string_length( $scope, 100 );
+	public static function sanitize_scope( $scope ) {
+		return self::sanitize_string_length( $scope, 100 );
 	}
 
-	public static function validate_id_token( $id_token ) {
-		return self::validate_string_length( $id_token, 2000 );
+	public static function sanitize_id_token( $id_token ) {
+		return self::sanitize_string_length( $id_token, 2000 );
 	}
 
-	public static function validate_user_login( $user_login ) {
-		return self::validate_string_length( $user_login, 60 );
+	public static function sanitize_user_login( $user_login ) {
+		return self::sanitize_string_length( $user_login, 60 );
 	}
 
-	public static function validate_expires( $expires ) {
+	public static function sanitize_expires( $expires ) {
 		return intval( $expires );
 	}
 
