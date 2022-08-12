@@ -7,7 +7,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 	private $authorization_code_data = array(
 		'code' => 'string',         // authorization code.
 		'client_id' => 'string',    // client identifier.
-		'user_id' => 'int',         // The WordPress user id.
+		'user_login' => 'string',         // The WordPress user id.
 		'redirect_uri' => 'string', // redirect URI.
 		'expires' => 'int',         // expires as unix timestamp.
 		'scope' => 'string',        // scope as space-separated string.
@@ -28,41 +28,41 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 				array(
 					'type'              => $type,
 					'single'            => true,
-					'sanitize_callback' => array( __CLASS__, 'validate_' . $key ),
+					'sanitize_callback' => array( __CLASS__, 'sanitize_' . $key ),
 				)
 			);
 		}
 	}
 
-	public static function validate_string_length( $string, $length ) {
+	public static function sanitize_string_length( $string, $length ) {
 		return substr( $string, 0, $length );
 	}
 
-	public static function validate_code( $code ) {
-		return self::validate_string_length( $code, 40 );
+	public static function sanitize_code( $code ) {
+		return self::sanitize_string_length( $code, 40 );
 	}
 
-	public static function validate_client_id( $client_id ) {
-		return self::validate_string_length( $client_id, 200 );
+	public static function sanitize_client_id( $client_id ) {
+		return self::sanitize_string_length( $client_id, 200 );
 	}
 
-	public static function validate_redirect_uri( $redirect_uri ) {
-		return self::validate_string_length( $redirect_uri, 2000 );
+	public static function sanitize_redirect_uri( $redirect_uri ) {
+		return self::sanitize_string_length( $redirect_uri, 2000 );
 	}
 
-	public static function validate_scope( $scope ) {
-		return self::validate_string_length( $scope, 100 );
+	public static function sanitize_scope( $scope ) {
+		return self::sanitize_string_length( $scope, 100 );
 	}
 
-	public static function validate_id_token( $id_token ) {
-		return self::validate_string_length( $id_token, 2000 );
+	public static function sanitize_id_token( $id_token ) {
+		return self::sanitize_string_length( $id_token, 2000 );
 	}
 
-	public static function validate_user_id( $user_id ) {
-		return intval( $user_id );
+	public static function sanitize_user_login( $user_login ) {
+		return self::sanitize_string_length( $user_login, 60 );
 	}
 
-	public static function validate_expires( $expires ) {
+	public static function sanitize_expires( $expires ) {
 		return intval( $expires );
 	}
 
@@ -106,13 +106,13 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 		if ( $term ) {
 			$authorization_code = array();
 			foreach ( array(
-				'client_id',
-				'user_id',
-				'expires',
-				'redirect_uri',
-				'scope',
-			) as $key ) {
-				$authorization_code[$key] = get_term_meta( $term->term_id, $key, true );
+				'client_id' => 'client_id',
+				'user_id' => 'user_login',
+				'expires' => 'expires',
+				'redirect_uri' => 'redirect_uri',
+				'scope' => 'scope',
+			) as $key => $meta_key ) {
+				$authorization_code[$key] = get_term_meta( $term->term_id, $meta_key, true );
 			}
 
 			return $authorization_code;
@@ -134,7 +134,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 	 *
 	 * @param string $code         - authorization code to be stored.
 	 * @param mixed $client_id     - client identifier to be stored.
-	 * @param mixed $user_id       - user identifier to be stored.
+	 * @param mixed $user_login       - user identifier to be stored.
 	 * @param string $redirect_uri - redirect URI(s) to be stored in a space-separated string.
 	 * @param int    $expires      - expiration to be stored as a Unix timestamp.
 	 * @param string $scope        - OPTIONAL scopes to be stored in space-separated string.
@@ -142,7 +142,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 	 *
 	 * @ingroup oauth2_section_4
 	 */
-	public function setAuthorizationCode( $code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null ) {
+	public function setAuthorizationCode( $code, $client_id, $user_login, $redirect_uri, $expires, $scope = null, $id_token = null ) {
 		if ( $code ) {
 			$this->expireAuthorizationCode( $code );
 
@@ -154,7 +154,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 
 			foreach ( array(
 				'client_id' => $client_id,
-				'user_id' => $user_id,
+				'user_login' => $user_login,
 				'redirect_uri' => $redirect_uri,
 				'expires' => $expires,
 				'scope' => $scope,
@@ -268,7 +268,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 	 * Groups of claims are returned based on the requested scopes. No group
 	 * is required, and no claim is required.
 	 *
-	 * @param mixed  $user_id - The id of the user for which claims should be returned.
+	 * @param mixed  $user_login - The id of the user for which claims should be returned.
 	 * @param string $scope   - The requested scope.
 	 * Scopes with matching claims: profile, email, address, phone.
 	 *
@@ -276,7 +276,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 	 *
 	 * @see http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
 	 */
-	public function getUserClaims( $user_id, $scope ) {
+	public function getUserClaims( $user_login, $scope ) {
 		$claims = array(
 			// We expose the scope here so that it's in the token (unclear from the specs but the userinfo endpoint reads the scope from the token).
 			'scope' => $scope,
@@ -287,7 +287,7 @@ class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\C
 
 		foreach ( explode( ' ', $scope ) as $s ) {
 			if ( $s === 'profile') {
-				$user = \get_user_by( 'id', $user_id );
+				$user = \get_user_by( 'login', $user_login );
 				if ( $user ) {
 					foreach ( array(
 						'username' => 'user_login',
