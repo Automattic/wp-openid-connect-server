@@ -27,7 +27,7 @@ if ( ! defined( 'OIDC_DISPLAY_AUTHORIZE' ) || ! OIDC_DISPLAY_AUTHORIZE ) {
 		wp_get_current_user()->user_nicename
 		)
 		); ?></p>
-		<?php if ( ! current_user_can( apply_filters( 'oidc_minimal_capability', 'edit_posts' ) ) ) : ?>
+		<?php if ( ! current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) ) ) : ?>
 		<p><?php esc_html_e( "Unfortunately your user doesn't have sufficient permissions to use OpenID Connect on this server.", 'wp-openid-connect-server' ); ?></p>
 		<?php else : ?>
 		<form method="post" action="<?php echo esc_url( rest_url( Rest::NAMESPACE . '/authorize' ) ); ?>">
