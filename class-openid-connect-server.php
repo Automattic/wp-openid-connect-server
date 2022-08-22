@@ -93,9 +93,12 @@ class OpenIDConnectServer {
 	}
 
 	public function openid_authenticate() {
-		if ( 0 !== strpos( $_SERVER['REQUEST_URI'], '/openid-connect/authenticate' ) ) {
+		global $wp;
+
+		if ( $wp->request !== 'openid-connect/authenticate' ) {
 			return;
 		}
+
 		$request = OAuth2\Request::createFromGlobals();
 		if ( empty( $request->query( 'client_id' ) ) || ! OAuth2_Storage::getClientName( $request->query( 'client_id' ) ) ) {
 			return;
