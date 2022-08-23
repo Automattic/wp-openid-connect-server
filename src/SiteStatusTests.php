@@ -130,10 +130,10 @@ class SiteStatusTests {
 				}
 				if ( $error ) {
 					$label = sprintf(
-					// translators: %s is a random string representing the client id.
-						__( 'The client %s seems to be malformed.', 'wp-openid-connect-server' ),
-						$client_id
-					) . ' ' . $error;
+                        // translators: %s is a random string representing the client id.
+                            __('The client %s seems to be malformed.', 'wp-openid-connect-server'),
+                            $client_id
+                        ) . ' ' . $error;
 					$status = 'critical';
 					$badge = 'red';
 					$all_clients_ok = false;
