@@ -2,7 +2,7 @@
 namespace OpenIDConnectServer;
 use OAuth2;
 
-class OAuth2_Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\ClientCredentialsInterface, OAuth2\OpenID\Storage\AuthorizationCodeInterface, OAuth2\OpenID\Storage\UserClaimsInterface {
+class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\ClientCredentialsInterface, OAuth2\OpenID\Storage\AuthorizationCodeInterface, OAuth2\OpenID\Storage\UserClaimsInterface {
 	const TAXONOMY = 'oicd-authorization-code';
 	private $authorization_code_data = array(
 		'code' => 'string',         // authorization code.

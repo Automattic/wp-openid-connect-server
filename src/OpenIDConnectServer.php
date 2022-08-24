@@ -111,7 +111,7 @@ class OpenIDConnectServer {
 		define( 'OIDC_DISPLAY_AUTHORIZE', true );
 
 		status_header( 200 );
-		include __DIR__ . '/template/authorize.php';
+		include __DIR__ . '/Template/Authorize.php';
 		exit;
 	}
 }
