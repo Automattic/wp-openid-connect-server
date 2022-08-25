@@ -116,7 +116,6 @@ class OpenIDConnectServer {
 
 			status_header( 200 );
 			include __DIR__ . '/Template/Authorize.php';
-			exit;
 		} else {
 			// rebuild request with all parameters and send to authorize endpoint
 			$url = rest_url( Rest::NAMESPACE . '/authorize' );
@@ -129,7 +128,7 @@ class OpenIDConnectServer {
 					$url
 				)
 			);
-			exit;
 		}
+		exit;
 	}
 }
