@@ -3,6 +3,9 @@ namespace OpenIDConnectServer;
 use OAuth2;
 
 class OpenIDConnectServer {
+
+	private $rest;
+
 	public function __construct() {
 		add_filter( 'site_status_tests', array( __NAMESPACE__ . '\SiteStatusTests', 'register_site_status_tests' ) );
 
@@ -34,7 +37,7 @@ class OpenIDConnectServer {
 		);
 
 		// Add REST endpoints.
-		new Rest( $server );
+		$this->rest = new Rest( $server );
 
 		add_action( 'template_redirect', array( $this, 'jwks' ) );
 		add_action( 'template_redirect', array( $this, 'openid_configuration' ) );
@@ -108,10 +111,24 @@ class OpenIDConnectServer {
 			auth_redirect();
 		}
 
-		define( 'OIDC_DISPLAY_AUTHORIZE', true );
+		if ( $this->rest->is_consent_needed() ) {
+			define( 'OIDC_DISPLAY_AUTHORIZE', true );
 
-		status_header( 200 );
-		include __DIR__ . '/Template/Authorize.php';
+			status_header( 200 );
+			include __DIR__ . '/Template/Authorize.php';
+		} else {
+			// rebuild request with all parameters and send to authorize endpoint
+			$url = rest_url( Rest::NAMESPACE . '/authorize' );
+			wp_redirect(
+				add_query_arg(
+					array_merge(
+						array( '_wpnonce'  => wp_create_nonce('wp_rest') ),
+						$request->getAllQueryParameters()
+					),
+					$url
+				)
+			);
+		}
 		exit;
 	}
 }

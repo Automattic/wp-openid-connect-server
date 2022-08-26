@@ -5,8 +5,12 @@ use OAuth2;
 const OIDC_DEFAULT_MINIMAL_CAPABILITY = 'edit_posts';
 
 class Rest {
+
 	private $server;
+
 	const NAMESPACE = 'openid-connect';
+	const STICKY_CONSENT_DURATION = 7 * DAY_IN_SECONDS;
+
 	public function __construct( $server ) {
 		$this->server = $server;
 		add_action( 'rest_api_init', array( $this, 'add_rest_routes' ) );
@@ -58,15 +62,14 @@ class Rest {
 			exit;
 		}
 
-		if ( ! isset( $_POST['authorize'] ) || $_POST['authorize'] !== 'Authorize' ) {
-			$response->send();
-			exit;
-		}
-
 		$user = wp_get_current_user();
-		if ( ! $user ) {
-			$response->send();
-			exit;
+		if ( $this->is_consent_needed() ) {
+			if ( ! isset( $_POST['authorize'] ) || $_POST['authorize'] !== 'Authorize' ) {
+				$response->send();
+				exit;
+			}
+
+			$this->update_consent_timestamp();
 		}
 
 		$this->server->handleAuthorizeRequest( $request, $response, true, $user->user_login );
@@ -83,5 +86,18 @@ class Rest {
 	public function userinfo() {
 		$this->server->handleUserInfoRequest(OAuth2\Request::createFromGlobals())->send();
 		exit;
+	}
+
+	public function is_consent_needed() : bool {
+		$current_user_id   = get_current_user_id();
+		$consent_timestamp = absint( get_user_meta( $current_user_id, 'oidc_consent_timestamp', true ) );
+
+		$past_consent_expiry = time() > ( $consent_timestamp + (self::STICKY_CONSENT_DURATION) );
+
+		return empty( $consent_timestamp ) || $past_consent_expiry;
+	}
+
+	public function update_consent_timestamp() {
+		update_user_meta( get_current_user_id(), 'oidc_consent_timestamp', time() );
 	}
 }
