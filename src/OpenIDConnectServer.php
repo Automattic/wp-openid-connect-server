@@ -2,7 +2,11 @@
 
 namespace OpenIDConnectServer;
 
-use OAuth2;
+use OAuth2\Request;
+use OAuth2\Server;
+use OAuth2\Storage\Memory;
+use function openssl_pkey_get_details;
+use function openssl_pkey_get_public;
 
 class OpenIDConnectServer {
 
@@ -25,10 +29,9 @@ class OpenIDConnectServer {
 			'issuer'                => home_url( '/' ),
 		);
 
-		$server = new OAuth2\Server( new OAuth2_Storage(), $config );
-
+		$server = new Server( new OAuth2Storage(), $config );
 		$server->addStorage(
-			new OAuth2\Storage\Memory(
+			new Memory(
 				array(
 					'keys' => compact( 'private_key', 'public_key' ),
 				)
@@ -55,7 +58,7 @@ class OpenIDConnectServer {
 		header( 'Content-type: application/json' );
 		header( 'Access-Control-Allow-Origin: *' );
 
-		$key_info = \openssl_pkey_get_details( \openssl_pkey_get_public( OIDC_PUBLIC_KEY ) );
+		$key_info = openssl_pkey_get_details( openssl_pkey_get_public( OIDC_PUBLIC_KEY ) );
 
 		echo wp_json_encode(
 			array(
@@ -105,8 +108,8 @@ class OpenIDConnectServer {
 			return;
 		}
 
-		$request = OAuth2\Request::createFromGlobals();
-		if ( empty( $request->query( 'client_id' ) ) || ! OAuth2_Storage::getClientName( $request->query( 'client_id' ) ) ) {
+		$request = Request::createFromGlobals();
+		if ( empty( $request->query( 'client_id' ) ) || ! OAuth2Storage::getClientName( $request->query( 'client_id' ) ) ) {
 			return;
 
 		}
