@@ -2,7 +2,8 @@
 
 namespace OpenIDConnectServer;
 
-use OAuth2;
+use OAuth2\Request;
+use OAuth2\Response;
 
 const OIDC_DEFAULT_MINIMAL_CAPABILITY = 'edit_posts';
 
@@ -49,8 +50,8 @@ class Rest {
 	}
 
 	public function authorize() {
-		$request  = OAuth2\Request::createFromGlobals();
-		$response = new OAuth2\Response();
+		$request  = Request::createFromGlobals();
+		$response = new Response();
 
 		if ( ! $this->server->validateAuthorizeRequest( $request, $response ) ) {
 			$response->send();
@@ -81,12 +82,12 @@ class Rest {
 	}
 
 	public function token() {
-		$this->server->handleTokenRequest( OAuth2\Request::createFromGlobals() )->send();
+		$this->server->handleTokenRequest( Request::createFromGlobals() )->send();
 		exit;
 	}
 
 	public function userinfo() {
-		$this->server->handleUserInfoRequest( OAuth2\Request::createFromGlobals() )->send();
+		$this->server->handleUserInfoRequest( Request::createFromGlobals() )->send();
 		exit;
 	}
 
