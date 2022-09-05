@@ -1,14 +1,16 @@
 <?php
+
 namespace OpenIDConnectServer;
+
 use OAuth2;
 
 const OIDC_DEFAULT_MINIMAL_CAPABILITY = 'edit_posts';
 
 class Rest {
-
 	private $server;
 
 	const NAMESPACE = 'openid-connect';
+
 	const STICKY_CONSENT_DURATION = 7 * DAY_IN_SECONDS;
 
 	public function __construct( $server ) {
@@ -21,7 +23,7 @@ class Rest {
 			self::NAMESPACE,
 			'token',
 			array(
-				'methods'             => 'POST', // MUST support POST only
+				'methods'             => 'POST', // MUST support POST only.
 				'callback'            => array( $this, 'token' ),
 				'permission_callback' => '__return_true',
 			)
@@ -30,7 +32,7 @@ class Rest {
 			self::NAMESPACE,
 			'authorize',
 			array(
-				'methods'             => 'GET,POST', // MUST support both GET and POST
+				'methods'             => 'GET,POST', // MUST support both GET and POST.
 				'callback'            => array( $this, 'authorize' ),
 				'permission_callback' => '__return_true',
 			)
@@ -39,7 +41,7 @@ class Rest {
 			self::NAMESPACE,
 			'userinfo',
 			array(
-				'methods'             => 'GET,POST',  // MUST support both GET and POST
+				'methods'             => 'GET,POST',  // MUST support both GET and POST.
 				'callback'            => array( $this, 'userinfo' ),
 				'permission_callback' => '__return_true',
 			)
@@ -47,7 +49,7 @@ class Rest {
 	}
 
 	public function authorize() {
-		$request = OAuth2\Request::createFromGlobals();
+		$request  = OAuth2\Request::createFromGlobals();
 		$response = new OAuth2\Response();
 
 		if ( ! $this->server->validateAuthorizeRequest( $request, $response ) ) {
@@ -64,7 +66,7 @@ class Rest {
 
 		$user = wp_get_current_user();
 		if ( $this->is_consent_needed() ) {
-			if ( ! isset( $_POST['authorize'] ) || $_POST['authorize'] !== 'Authorize' ) {
+			if ( ! isset( $_POST['authorize'] ) || 'Authorize' !== $_POST['authorize'] ) {
 				$response->send();
 				exit;
 			}
@@ -79,20 +81,20 @@ class Rest {
 	}
 
 	public function token() {
-		$this->server->handleTokenRequest(OAuth2\Request::createFromGlobals())->send();
+		$this->server->handleTokenRequest( OAuth2\Request::createFromGlobals() )->send();
 		exit;
 	}
 
 	public function userinfo() {
-		$this->server->handleUserInfoRequest(OAuth2\Request::createFromGlobals())->send();
+		$this->server->handleUserInfoRequest( OAuth2\Request::createFromGlobals() )->send();
 		exit;
 	}
 
-	public function is_consent_needed() : bool {
+	public function is_consent_needed(): bool {
 		$current_user_id   = get_current_user_id();
 		$consent_timestamp = absint( get_user_meta( $current_user_id, 'oidc_consent_timestamp', true ) );
 
-		$past_consent_expiry = time() > ( $consent_timestamp + (self::STICKY_CONSENT_DURATION) );
+		$past_consent_expiry = time() > ( $consent_timestamp + ( self::STICKY_CONSENT_DURATION ) );
 
 		return empty( $consent_timestamp ) || $past_consent_expiry;
 	}
