@@ -46,9 +46,8 @@ class OpenIDConnectServer {
 		add_action( 'template_redirect', array( $this, 'openid_authenticate' ) );
 	}
 
-
 	public function jwks() {
-		if ( $_SERVER['REQUEST_URI'] !== '/.well-known/jwks.json' ) {
+		if ( empty( $_SERVER['REQUEST_URI'] ) || '/.well-known/jwks.json' !== $_SERVER['REQUEST_URI'] ) {
 			return;
 		}
 		if ( ! defined( 'OIDC_PUBLIC_KEY' ) || empty( OIDC_PUBLIC_KEY ) ) {
@@ -60,7 +59,7 @@ class OpenIDConnectServer {
 
 		$key_info = \openssl_pkey_get_details( \openssl_pkey_get_public( OIDC_PUBLIC_KEY ) );
 
-		echo json_encode(
+		echo wp_json_encode(
 			array(
 				'keys' =>
 					array(
@@ -68,39 +67,43 @@ class OpenIDConnectServer {
 							'kty' => 'RSA',
 							'use' => 'sig',
 							'alg' => 'RS256',
+							// phpcs:ignore
 							'n'   => rtrim( strtr( base64_encode( $key_info['rsa']['n'] ), '+/', '-_' ), '=' ),
+							// phpcs:ignore
 							'e'   => rtrim( strtr( base64_encode( $key_info['rsa']['e'] ), '+/', '-_' ), '=' ),
-						)
-					)
+						),
+					),
 			)
 		);
 		exit;
 	}
 
 	public function openid_configuration() {
-		if ( $_SERVER['REQUEST_URI'] !== '/.well-known/openid-configuration' ) {
+		if ( empty( $_SERVER['REQUEST_URI'] ) || '/.well-known/openid-configuration' !== $_SERVER['REQUEST_URI'] ) {
 			return;
 		}
 		status_header( 200 );
 		header( 'Content-type: application/json' );
 		header( 'Access-Control-Allow-Origin: *' );
-		echo json_encode( array(
-			'issuer'                                => home_url( '/' ),
-			'authorization_endpoint'                => rest_url( 'openid-connect/authorize' ),
-			'token_endpoint'                        => rest_url( 'openid-connect/token' ),
-			'userinfo_endpoint'                     => rest_url( 'openid-connect/userinfo' ),
-			'jwks_uri'                              => home_url( '/.well-known/jwks.json' ),
-			'scopes_supported'                      => array( 'openid', 'profile' ),
-			'response_types_supported'              => array( 'code' ),
-			'id_token_signing_alg_values_supported' => array( 'RS256' ),
-		) );
+		echo wp_json_encode(
+			array(
+				'issuer'                                => home_url( '/' ),
+				'authorization_endpoint'                => rest_url( 'openid-connect/authorize' ),
+				'token_endpoint'                        => rest_url( 'openid-connect/token' ),
+				'userinfo_endpoint'                     => rest_url( 'openid-connect/userinfo' ),
+				'jwks_uri'                              => home_url( '/.well-known/jwks.json' ),
+				'scopes_supported'                      => array( 'openid', 'profile' ),
+				'response_types_supported'              => array( 'code' ),
+				'id_token_signing_alg_values_supported' => array( 'RS256' ),
+			)
+		);
 		exit;
 	}
 
 	public function openid_authenticate() {
 		global $wp;
 
-		if ( $wp->request !== 'openid-connect/authenticate' ) {
+		if ( 'openid-connect/authenticate' !== $wp->request ) {
 			return;
 		}
 
@@ -119,9 +122,9 @@ class OpenIDConnectServer {
 			status_header( 200 );
 			include __DIR__ . '/Template/Authorize.php';
 		} else {
-			// rebuild request with all parameters and send to authorize endpoint
+			// rebuild request with all parameters and send to authorize endpoint.
 			$url = rest_url( Rest::NAMESPACE . '/authorize' );
-			wp_redirect(
+			wp_safe_redirect(
 				add_query_arg(
 					array_merge(
 						array( '_wpnonce' => wp_create_nonce( 'wp_rest' ) ),
