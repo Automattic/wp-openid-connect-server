@@ -5,7 +5,10 @@
         "ext-json": "*"
     },
     "require-dev": {
-        "johnpbloch/wordpress": "^6.0"
+        "johnpbloch/wordpress": "^6.0",
+        "squizlabs/php_codesniffer": "^3.7",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+        "wp-coding-standards/wpcs": "^2.3"
     },
     "autoload": {
         "psr-4": {
@@ -14,9 +17,13 @@
         "exclude-from-classmap": ["vendor/bshaffer/oauth2-server-php/src/OAuth2/OpenID/Controller/AuthorizeController.php"],
         "files": ["src/OAuth2/OpenID/Controller/AuthorizeController.php"]
     },
+    "scripts": {
+        "phpcs": "phpcs --standard=phpcs.xml"
+    },
     "config": {
         "allow-plugins": {
-            "johnpbloch/wordpress-core-installer": false
+            "johnpbloch/wordpress-core-installer": false,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }
