@@ -7,10 +7,14 @@
  * Plugin URI: https://github.com/Automattic/wp-openid-connect-server
  * Version: 1.0
  */
+
 namespace OpenIDConnectServer;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-add_action( 'wp_loaded', function() {
-	new OpenIDConnectServer();
-} );
+add_action(
+	'wp_loaded',
+	function () {
+		new OpenIDConnectServer();
+	}
+);
