@@ -1,5 +1,7 @@
 <?php
+
 namespace OpenIDConnectServer;
+
 use OAuth2;
 
 class OpenIDConnectServer {
@@ -21,8 +23,8 @@ class OpenIDConnectServer {
 
 		$config = array(
 			'use_jwt_access_tokens' => true,
-			'use_openid_connect' => true,
-			'issuer' => home_url( '/' ),
+			'use_openid_connect'    => true,
+			'issuer'                => home_url( '/' ),
 		);
 
 		$server = new OAuth2\Server( new OAuth2_Storage(), $config );
@@ -61,15 +63,15 @@ class OpenIDConnectServer {
 		echo json_encode(
 			array(
 				'keys' =>
-				array(
-				array(
-					'kty' => 'RSA',
-					'use' => 'sig',
-					'alg' => 'RS256',
-					'n' => rtrim( strtr( base64_encode( $key_info['rsa']['n'] ), '+/', '-_' ), '=' ),
-					'e' => rtrim( strtr( base64_encode( $key_info['rsa']['e'] ), '+/', '-_' ), '=' ),
-				)
-				)
+					array(
+						array(
+							'kty' => 'RSA',
+							'use' => 'sig',
+							'alg' => 'RS256',
+							'n'   => rtrim( strtr( base64_encode( $key_info['rsa']['n'] ), '+/', '-_' ), '=' ),
+							'e'   => rtrim( strtr( base64_encode( $key_info['rsa']['e'] ), '+/', '-_' ), '=' ),
+						)
+					)
 			)
 		);
 		exit;
@@ -83,13 +85,13 @@ class OpenIDConnectServer {
 		header( 'Content-type: application/json' );
 		header( 'Access-Control-Allow-Origin: *' );
 		echo json_encode( array(
-			'issuer' => home_url( '/' ),
-			'authorization_endpoint' => rest_url( 'openid-connect/authorize' ),
-			'token_endpoint' => rest_url( 'openid-connect/token' ),
-			'userinfo_endpoint' => rest_url( 'openid-connect/userinfo' ),
-			'jwks_uri' => home_url( '/.well-known/jwks.json' ),
-			'scopes_supported' => array( 'openid', 'profile' ),
-			'response_types_supported' => array( 'code' ),
+			'issuer'                                => home_url( '/' ),
+			'authorization_endpoint'                => rest_url( 'openid-connect/authorize' ),
+			'token_endpoint'                        => rest_url( 'openid-connect/token' ),
+			'userinfo_endpoint'                     => rest_url( 'openid-connect/userinfo' ),
+			'jwks_uri'                              => home_url( '/.well-known/jwks.json' ),
+			'scopes_supported'                      => array( 'openid', 'profile' ),
+			'response_types_supported'              => array( 'code' ),
 			'id_token_signing_alg_values_supported' => array( 'RS256' ),
 		) );
 		exit;
@@ -122,7 +124,7 @@ class OpenIDConnectServer {
 			wp_redirect(
 				add_query_arg(
 					array_merge(
-						array( '_wpnonce'  => wp_create_nonce('wp_rest') ),
+						array( '_wpnonce' => wp_create_nonce( 'wp_rest' ) ),
 						$request->getAllQueryParameters()
 					),
 					$url
