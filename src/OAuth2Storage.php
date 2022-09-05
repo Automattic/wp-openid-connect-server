@@ -11,7 +11,7 @@ class OAuth2Storage implements ClientInterface,
 	ClientCredentialsInterface,
 	AuthorizationCodeInterface,
 	UserClaimsInterface {
-	const TAXONOMY = 'oicd-authorization-code';
+	const TAXONOMY = 'oidc-authorization-code';
 
 	private $authorization_code_data = array(
 		'code'         => 'string', // authorization code.
