@@ -29,7 +29,7 @@ class OpenIDConnectServer {
 			'issuer'                => home_url( '/' ),
 		);
 
-		$server = new Server( new OAuth2Storage(), $config );
+		$server = new Server( new TaxonomyStorage(), $config );
 		$server->addStorage(
 			new Memory(
 				array(
@@ -109,7 +109,7 @@ class OpenIDConnectServer {
 		}
 
 		$request = Request::createFromGlobals();
-		if ( empty( $request->query( 'client_id' ) ) || ! OAuth2Storage::getClientName( $request->query( 'client_id' ) ) ) {
+		if ( empty( $request->query( 'client_id' ) ) || ! TaxonomyStorage::getClientName( $request->query( 'client_id' ) ) ) {
 			return;
 
 		}

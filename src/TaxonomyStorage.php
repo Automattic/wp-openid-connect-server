@@ -7,7 +7,7 @@ use OAuth2\OpenID\Storage\UserClaimsInterface;
 use OAuth2\Storage\ClientCredentialsInterface;
 use OAuth2\Storage\ClientInterface;
 
-class OAuth2Storage implements ClientInterface,
+class TaxonomyStorage implements ClientInterface,
 	ClientCredentialsInterface,
 	AuthorizationCodeInterface,
 	UserClaimsInterface {

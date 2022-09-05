@@ -46,7 +46,7 @@ if ( ! defined( 'OIDC_DISPLAY_AUTHORIZE' ) || ! OIDC_DISPLAY_AUTHORIZE ) {
 					sprintf(
 					// translators: %1$s is the site name, %2$s is the username.
 						__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
-						OAuth2Storage::getClientName( $request->query( 'client_id' ) ),
+						TaxonomyStorage::getClientName( $request->query( 'client_id' ) ),
 						get_bloginfo( 'name' )
 					),
 					array(
