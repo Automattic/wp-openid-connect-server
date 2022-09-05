@@ -15,6 +15,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 add_action(
 	'wp_loaded',
 	function () {
+		new SiteStatusTests();
 		new OpenIDConnectServer();
 	}
 );
