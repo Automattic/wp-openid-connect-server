@@ -3,26 +3,30 @@
 namespace OpenIDConnectServer;
 
 class SiteStatusTests {
-	public static function register_site_status_tests( $tests ) {
+	public function __construct() {
+		add_filter( 'site_status_tests', array( $this, 'register_site_status_tests' ) );
+	}
+
+	public function register_site_status_tests( $tests ): array {
 		$tests['direct']['oidc-public-key'] = array(
 			'label' => __( 'The public key is defined and in the right format', 'wp-openid-connect-server' ),
-			'test'  => array( __NAMESPACE__ . '\\' . __CLASS__, 'site_status_test_public_key' ),
+			'test'  => array( $this, 'site_status_test_public_key' ),
 		);
 
 		$tests['direct']['oidc-private-key'] = array(
 			'label' => __( 'The private key is defined and in the right format', 'wp-openid-connect-server' ),
-			'test'  => array( __NAMESPACE__ . '\\' . __CLASS__, 'site_status_test_private_key' ),
+			'test'  => array( $this, 'site_status_test_private_key' ),
 		);
 
 		$tests['direct']['oidc-clients'] = array(
 			'label' => __( 'One or more clients have been defined correctly', 'wp-openid-connect-server' ),
-			'test'  => array( __NAMESPACE__ . '\\' . __CLASS__, 'site_status_test_clients' ),
+			'test'  => array( $this, 'site_status_test_clients' ),
 		);
 
 		return $tests;
 	}
 
-	public static function site_status_test_public_key() {
+	public function site_status_test_public_key(): array {
 		if ( ! defined( 'OIDC_PUBLIC_KEY' ) ) {
 			$label  = __( 'The public key constant OIDC_PUBLIC_KEY is not defined.', 'wp-openid-connect-server' );
 			$status = 'critical';
@@ -64,7 +68,7 @@ class SiteStatusTests {
 		);
 	}
 
-	public static function site_status_test_private_key() {
+	public function site_status_test_private_key(): array {
 		if ( ! defined( 'OIDC_PRIVATE_KEY' ) ) {
 			$label  = __( 'The private key constant OIDC_PRIVATE_KEY is not defined.', 'wp-openid-connect-server' );
 			$status = 'critical';
@@ -106,7 +110,7 @@ class SiteStatusTests {
 		);
 	}
 
-	public static function site_status_test_clients() {
+	public function site_status_test_clients(): array {
 		$clients = function_exists( '\oidc_clients' ) ? \oidc_clients() : array();
 		if ( empty( $clients ) ) {
 			$label  = __( 'No clients have been defined.', 'wp-openid-connect-server' );
