@@ -1,6 +1,8 @@
 {
     "require": {
-        "bshaffer/oauth2-server-php": "^1.12"
+        "bshaffer/oauth2-server-php": "^1.12",
+        "ext-openssl": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "johnpbloch/wordpress": "^6.0"
