@@ -1,17 +1,20 @@
 <?php
+
 namespace OpenIDConnectServer;
+
 use OAuth2;
 
 class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\ClientCredentialsInterface, OAuth2\OpenID\Storage\AuthorizationCodeInterface, OAuth2\OpenID\Storage\UserClaimsInterface {
 	const TAXONOMY = 'oicd-authorization-code';
+
 	private $authorization_code_data = array(
-		'code' => 'string',         // authorization code.
-		'client_id' => 'string',    // client identifier.
-		'user_login' => 'string',         // The WordPress user id.
+		'code'         => 'string', // authorization code.
+		'client_id'    => 'string', // client identifier.
+		'user_login'   => 'string', // The WordPress user id.
 		'redirect_uri' => 'string', // redirect URI.
-		'expires' => 'int',         // expires as unix timestamp.
-		'scope' => 'string',        // scope as space-separated string.
-		'id_token' => 'string',     // The OpenID Connect id_token.
+		'expires'      => 'int',    // expires as unix timestamp.
+		'scope'        => 'string', // scope as space-separated string.
+		'id_token'     => 'string', // The OpenID Connect id_token.
 	);
 
 	private static $clients;
@@ -67,11 +70,11 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	}
 
 	public static function getClientName( $client_id ) {
-		if ( empty( self::$clients[$client_id]['name'] ) ) {
+		if ( empty( self::$clients[ $client_id ]['name'] ) ) {
 			return null;
 		}
 
-		return self::$clients[$client_id]['name'];
+		return self::$clients[ $client_id ]['name'];
 	}
 
 	/**
@@ -84,7 +87,7 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	 * @param $code
 	 * Authorization code to be check with.
 	 *
-	 * @return
+	 * @return array|null
 	 * An associative array as below, and NULL if the code is invalid
 	 * @code
 	 * return array(
@@ -105,14 +108,16 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 
 		if ( $term ) {
 			$authorization_code = array();
-			foreach ( array(
-				'client_id' => 'client_id',
-				'user_id' => 'user_login',
-				'expires' => 'expires',
-				'redirect_uri' => 'redirect_uri',
-				'scope' => 'scope',
-			) as $key => $meta_key ) {
-				$authorization_code[$key] = get_term_meta( $term->term_id, $meta_key, true );
+			foreach (
+				array(
+					'client_id'    => 'client_id',
+					'user_id'      => 'user_login',
+					'expires'      => 'expires',
+					'redirect_uri' => 'redirect_uri',
+					'scope'        => 'scope',
+				) as $key => $meta_key
+			) {
+				$authorization_code[ $key ] = get_term_meta( $term->term_id, $meta_key, true );
 			}
 
 			return $authorization_code;
@@ -132,13 +137,13 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	 *
 	 * Required for OAuth2::GRANT_TYPE_AUTH_CODE.
 	 *
-	 * @param string $code         - authorization code to be stored.
-	 * @param mixed $client_id     - client identifier to be stored.
-	 * @param mixed $user_login       - user identifier to be stored.
+	 * @param string $code - authorization code to be stored.
+	 * @param mixed  $client_id - client identifier to be stored.
+	 * @param mixed  $user_login - user identifier to be stored.
 	 * @param string $redirect_uri - redirect URI(s) to be stored in a space-separated string.
-	 * @param int    $expires      - expiration to be stored as a Unix timestamp.
-	 * @param string $scope        - OPTIONAL scopes to be stored in space-separated string.
-	 * @param string $id_token     - OPTIONAL the OpenID Connect id_token.
+	 * @param int    $expires - expiration to be stored as a Unix timestamp.
+	 * @param string $scope - OPTIONAL scopes to be stored in space-separated string.
+	 * @param string $id_token - OPTIONAL the OpenID Connect id_token.
 	 *
 	 * @ingroup oauth2_section_4
 	 */
@@ -152,21 +157,23 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 				exit;
 			}
 
-			foreach ( array(
-				'client_id' => $client_id,
-				'user_login' => $user_login,
-				'redirect_uri' => $redirect_uri,
-				'expires' => $expires,
-				'scope' => $scope,
-				'id_token' => $id_token,
-			) as $key => $value ) {
-				add_term_meta(  $term['term_id'], $key, $value );
+			foreach (
+				array(
+					'client_id'    => $client_id,
+					'user_login'   => $user_login,
+					'redirect_uri' => $redirect_uri,
+					'expires'      => $expires,
+					'scope'        => $scope,
+					'id_token'     => $id_token,
+				) as $key => $value
+			) {
+				add_term_meta( $term['term_id'], $key, $value );
 			}
 		}
 	}
 
 	/**
-	 * once an Authorization Code is used, it must be expired
+	 * Once an Authorization Code is used, it must be expired
 	 *
 	 * @see http://tools.ietf.org/html/rfc6749#section-4.1.2
 	 *
@@ -175,7 +182,6 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	 *    once, the authorization server MUST deny the request and SHOULD
 	 *    revoke (when possible) all tokens previously issued based on
 	 *    that authorization code
-	 *
 	 */
 	public function expireAuthorizationCode( $code ) {
 		$term = get_term_by( 'slug', $code, self::TAXONOMY );
@@ -214,8 +220,8 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 		if ( isset( self::$clients[ $client_id ] ) ) {
 			return array(
 				'redirect_uri' => self::$clients[ $client_id ]['redirect_uri'],
-				'client_id' => $client_id,
-				'scope' => self::$clients[ $client_id ]['scope'],
+				'client_id'    => $client_id,
+				'scope'        => self::$clients[ $client_id ]['scope'],
 			);
 		}
 
@@ -225,7 +231,7 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	/**
 	 * Get the scope associated with this client
 	 *
-	 * @return
+	 * @return string
 	 * STRING the space-delineated scope list for the specified client_id
 	 */
 	public function getClientScope( $client_id ) {
@@ -247,7 +253,7 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	 * @param $grant_type
 	 * Grant type to be check with
 	 *
-	 * @return
+	 * @return bool
 	 * TRUE if the grant type is supported by this client identifier, and
 	 * FALSE if it isn't.
 	 *
@@ -255,7 +261,7 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	 */
 	public function checkRestrictedGrantType( $client_id, $grant_type ) {
 		if ( isset( self::$clients[ $client_id ]['grant_types'] ) ) {
-			return in_array( $grant_type, self::$clients[ $client_id ]['grant_types'] );
+			return in_array( $grant_type, self::$clients[ $client_id ]['grant_types'], true );
 		}
 
 		return false;
@@ -269,7 +275,7 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	 * is required, and no claim is required.
 	 *
 	 * @param mixed  $user_login - The id of the user for which claims should be returned.
-	 * @param string $scope   - The requested scope.
+	 * @param string $scope - The requested scope.
 	 * Scopes with matching claims: profile, email, address, phone.
 	 *
 	 * @return array - An array in the claim => value format.
@@ -282,19 +288,21 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 			'scope' => $scope,
 		);
 		if ( ! empty( $_REQUEST['nonce'] ) ) {
-			$claims['nonce'] = $_REQUEST['nonce'];
+			$claims['nonce'] = sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) );
 		}
 
 		foreach ( explode( ' ', $scope ) as $s ) {
-			if ( $s === 'profile') {
+			if ( 'profile' === $s ) {
 				$user = \get_user_by( 'login', $user_login );
 				if ( $user ) {
-					foreach ( array(
-						'username' => 'user_login',
-						'given_name' => 'first_name',
-						'family_name' => 'last_name',
-						'nickname' => 'user_nicename',
-					) as $key => $value ) {
+					foreach (
+						array(
+							'username'    => 'user_login',
+							'given_name'  => 'first_name',
+							'family_name' => 'last_name',
+							'nickname'    => 'user_nicename',
+						) as $key => $value
+					) {
 						if ( $user->$value ) {
 							$claims[ $key ] = $user->$value;
 						}
@@ -316,7 +324,7 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	 * @param $client_secret
 	 * (optional) If a secret is required, check that they've given the right one.
 	 *
-	 * @return
+	 * @return bool
 	 * TRUE if the client credentials are valid, and MUST return FALSE if it isn't.
 	 * @endcode
 	 *
@@ -329,6 +337,7 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 			if ( ! isset( self::$clients[ $client_id ]['secret'] ) ) {
 				return true;
 			}
+
 			return $client_secret === self::$clients[ $client_id ]['secret'];
 		}
 
@@ -342,7 +351,7 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	 * @param $client_id
 	 * Client identifier to be check with.
 	 *
-	 * @return
+	 * @return bool
 	 * TRUE if the client is public, and FALSE if it isn't.
 	 * @endcode
 	 *
@@ -351,7 +360,7 @@ class OAuth2Storage implements OAuth2\Storage\ClientInterface, OAuth2\Storage\Cl
 	 *
 	 * @ingroup oauth2_section_2
 	 */
-	public function isPublicClient($client_id) {
+	public function isPublicClient( $client_id ) {
 		return isset( self::$clients[ $client_id ] ) && ! isset( self::$clients[ $client_id ]['secret'] );
 
 	}
