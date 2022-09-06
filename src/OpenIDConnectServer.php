@@ -6,6 +6,7 @@ use OAuth2\Request;
 use OAuth2\Storage\Memory;
 use OpenIDConnectServer\Overrides\Server;
 use OpenIDConnectServer\Storage\ClientCredentialsStorage;
+use OpenIDConnectServer\Storage\UserClaimsStorage;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_public;
 
@@ -42,6 +43,7 @@ class OpenIDConnectServer {
 
 		$clients = function_exists( '\oidc_clients' ) ? \oidc_clients() : array();
 		$server->addStorage( new ClientCredentialsStorage( $clients ), 'client_credentials' );
+		$server->addStorage( new UserClaimsStorage(), 'user_claims' );
 
 		// Add REST endpoints.
 		$this->rest = new Rest( $server );

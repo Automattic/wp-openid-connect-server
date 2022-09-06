@@ -3,11 +3,8 @@
 namespace OpenIDConnectServer;
 
 use OAuth2\OpenID\Storage\AuthorizationCodeInterface;
-use OAuth2\OpenID\Storage\UserClaimsInterface;
 
-class TaxonomyStorage implements
-	AuthorizationCodeInterface,
-	UserClaimsInterface {
+class TaxonomyStorage implements AuthorizationCodeInterface {
 	const TAXONOMY = 'oidc-authorization-code';
 
 	private $authorization_code_data = array(
@@ -134,38 +131,5 @@ class TaxonomyStorage implements
 		if ( $term ) {
 			wp_delete_term( $term->term_id, self::TAXONOMY );
 		}
-	}
-
-	public function getUserClaims( $user_login, $scope ) {
-		$claims = array(
-			// We expose the scope here so that it's in the token (unclear from the specs but the userinfo endpoint reads the scope from the token).
-			'scope' => $scope,
-		);
-		if ( ! empty( $_REQUEST['nonce'] ) ) {
-			$claims['nonce'] = sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) );
-		}
-
-		foreach ( explode( ' ', $scope ) as $s ) {
-			if ( 'profile' === $s ) {
-				$user = \get_user_by( 'login', $user_login );
-				if ( $user ) {
-					foreach (
-						array(
-							'username'    => 'user_login',
-							'given_name'  => 'first_name',
-							'family_name' => 'last_name',
-							'nickname'    => 'user_nicename',
-						) as $key => $value
-					) {
-						if ( $user->$value ) {
-							$claims[ $key ] = $user->$value;
-						}
-					}
-					$claims['picture'] = \get_avatar_url( $user->user_email );
-				}
-			}
-		}
-
-		return $claims;
 	}
 }
