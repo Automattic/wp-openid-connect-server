@@ -96,7 +96,9 @@ class OpenIDConnectServer {
 		}
 
 		$request = Request::createFromGlobals();
-		if ( empty( $request->query( 'client_id' ) ) || ! AuthorizationCodeStorage::getClientName( $request->query( 'client_id' ) ) ) {
+		$client_name = AuthorizationCodeStorage::getClientName( $request->query( 'client_id' ) );
+
+		if ( ! $client_name ) {
 			return;
 
 		}
