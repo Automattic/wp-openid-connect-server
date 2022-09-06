@@ -4,11 +4,8 @@ namespace OpenIDConnectServer;
 
 use OAuth2\OpenID\Storage\AuthorizationCodeInterface;
 use OAuth2\OpenID\Storage\UserClaimsInterface;
-use OAuth2\Storage\ClientCredentialsInterface;
-use OAuth2\Storage\ClientInterface;
 
-class TaxonomyStorage implements ClientInterface,
-	ClientCredentialsInterface,
+class TaxonomyStorage implements
 	AuthorizationCodeInterface,
 	UserClaimsInterface {
 	const TAXONOMY = 'oidc-authorization-code';
@@ -139,34 +136,6 @@ class TaxonomyStorage implements ClientInterface,
 		}
 	}
 
-	public function getClientDetails( $client_id ) {
-		if ( isset( self::$clients[ $client_id ] ) ) {
-			return array(
-				'redirect_uri' => self::$clients[ $client_id ]['redirect_uri'],
-				'client_id'    => $client_id,
-				'scope'        => self::$clients[ $client_id ]['scope'],
-			);
-		}
-
-		return false;
-	}
-
-	public function getClientScope( $client_id ) {
-		if ( isset( self::$clients[ $client_id ]['scope'] ) ) {
-			return self::$clients[ $client_id ]['scope'];
-		}
-
-		return '';
-	}
-
-	public function checkRestrictedGrantType( $client_id, $grant_type ) {
-		if ( isset( self::$clients[ $client_id ]['grant_types'] ) ) {
-			return in_array( $grant_type, self::$clients[ $client_id ]['grant_types'], true );
-		}
-
-		return false;
-	}
-
 	public function getUserClaims( $user_login, $scope ) {
 		$claims = array(
 			// We expose the scope here so that it's in the token (unclear from the specs but the userinfo endpoint reads the scope from the token).
@@ -198,22 +167,5 @@ class TaxonomyStorage implements ClientInterface,
 		}
 
 		return $claims;
-	}
-
-	public function checkClientCredentials( $client_id, $client_secret = null ) {
-		if ( isset( self::$clients[ $client_id ] ) ) {
-			if ( ! isset( self::$clients[ $client_id ]['secret'] ) ) {
-				return true;
-			}
-
-			return $client_secret === self::$clients[ $client_id ]['secret'];
-		}
-
-		return false;
-	}
-
-	public function isPublicClient( $client_id ) {
-		return isset( self::$clients[ $client_id ] ) && ! isset( self::$clients[ $client_id ]['secret'] );
-
 	}
 }
