@@ -17,11 +17,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		'id_token'     => 'string', // The OpenID Connect id_token.
 	);
 
-	private static $clients;
-
 	public function __construct() {
-		self::$clients = function_exists( '\oidc_clients' ) ? \oidc_clients() : array();
-
 		// Store the authorization codes in a taxonomy.
 		register_taxonomy( self::TAXONOMY, null );
 		foreach ( self::$authorization_code_data as $key => $type ) {
@@ -67,14 +63,6 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 	public static function sanitize_expires( $expires ) {
 		return intval( $expires );
-	}
-
-	public static function getClientName( $client_id ) {
-		if ( empty( self::$clients[ $client_id ]['name'] ) ) {
-			return null;
-		}
-
-		return self::$clients[ $client_id ]['name'];
 	}
 
 	public function getAuthorizationCode( $code ) {

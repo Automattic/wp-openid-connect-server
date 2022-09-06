@@ -14,9 +14,11 @@ use function openssl_pkey_get_public;
 class OpenIDConnectServer {
 	private $rest;
 	private string $public_key;
+	private array $clients;
 
 	public function __construct( string $public_key, string $private_key, array $clients ) {
 		$this->public_key = $public_key;
+		$this->clients = $clients;
 
 		$config = array(
 			'use_jwt_access_tokens' => true,
@@ -96,7 +98,7 @@ class OpenIDConnectServer {
 		}
 
 		$request = Request::createFromGlobals();
-		$client_name = AuthorizationCodeStorage::getClientName( $request->query( 'client_id' ) );
+		$client_name = $this->get_client_name( $request );
 
 		if ( ! $client_name ) {
 			return;
@@ -125,5 +127,22 @@ class OpenIDConnectServer {
 			);
 		}
 		exit;
+	}
+
+	// TODO: Remove this function in favour of ClientCredentialsStorage?
+	private function get_client_name( Request $request ): string {
+		$client_id = $request->query( 'client_id' );
+
+		if ( ! array_key_exists( $client_id, $this->clients ) ) {
+			return '';
+		}
+
+		$client = $this->clients[ $client_id ];
+
+		if ( empty( $client['name'] ) ) {
+			return '';
+		}
+
+		return $client['name'];
 	}
 }
