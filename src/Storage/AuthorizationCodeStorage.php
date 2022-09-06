@@ -1,10 +1,10 @@
 <?php
 
-namespace OpenIDConnectServer;
+namespace OpenIDConnectServer\Storage;
 
 use OAuth2\OpenID\Storage\AuthorizationCodeInterface;
 
-class TaxonomyStorage implements AuthorizationCodeInterface {
+class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 	const TAXONOMY = 'oidc-authorization-code';
 
 	private $authorization_code_data = array(

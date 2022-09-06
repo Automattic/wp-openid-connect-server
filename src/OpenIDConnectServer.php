@@ -4,6 +4,7 @@ namespace OpenIDConnectServer;
 
 use OAuth2\Request;
 use OpenIDConnectServer\Overrides\Server;
+use OpenIDConnectServer\Storage\AuthorizationCodeStorage;
 use OpenIDConnectServer\Storage\ClientCredentialsStorage;
 use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
@@ -23,7 +24,7 @@ class OpenIDConnectServer {
 			'issuer'                => home_url( '/' ),
 		);
 
-		$server = new Server( new TaxonomyStorage(), $config );
+		$server = new Server( new AuthorizationCodeStorage(), $config );
 		$server->addStorage( new PublicKeyStorage( $public_key, $private_key ), 'public_key' );
 		$server->addStorage( new ClientCredentialsStorage( $clients ), 'client_credentials' );
 		$server->addStorage( new UserClaimsStorage(), 'user_claims' );
@@ -95,7 +96,7 @@ class OpenIDConnectServer {
 		}
 
 		$request = Request::createFromGlobals();
-		if ( empty( $request->query( 'client_id' ) ) || ! TaxonomyStorage::getClientName( $request->query( 'client_id' ) ) ) {
+		if ( empty( $request->query( 'client_id' ) ) || ! AuthorizationCodeStorage::getClientName( $request->query( 'client_id' ) ) ) {
 			return;
 
 		}
