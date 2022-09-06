@@ -11,11 +11,6 @@ use OAuth2\ResponseInterface;
 
 class AuthorizeController extends BaseAuthorizeController implements AuthorizeControllerInterface {
 	/**
-	 * @var mixed
-	 */
-	private $nonce;
-
-	/**
 	 * @TODO: add dependency injection for the parameters in this method
 	 *
 	 * @param RequestInterface  $request
@@ -33,12 +28,12 @@ class AuthorizeController extends BaseAuthorizeController implements AuthorizeCo
 		if ( $this->needsIdToken( $this->getScope() ) && $this->getResponseType() == self::RESPONSE_TYPE_AUTHORIZATION_CODE ) {
 			// START MODIFICATION.
 			$userClaims         = $this->clientStorage->getUserClaims( $user_id, $params['scope'] );
-			$params['id_token'] = $this->responseTypes['id_token']->createIdToken( $this->getClientId(), $user_id, $this->nonce, $userClaims );
+			$params['id_token'] = $this->responseTypes['id_token']->createIdToken( $this->getClientId(), $user_id, $this->getNonce(), $userClaims );
 			// END MODIFICATION.
 		}
 
 		// add the nonce to return with the redirect URI
-		$params['nonce'] = $this->nonce;
+		$params['nonce'] = $this->getNonce();
 
 		return $params;
 	}
