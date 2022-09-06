@@ -32,17 +32,4 @@ class Rest {
 		$this->server->handleUserInfoRequest( Request::createFromGlobals() )->send();
 		exit;
 	}
-
-	public function is_consent_needed(): bool {
-		$current_user_id   = get_current_user_id();
-		$consent_timestamp = absint( get_user_meta( $current_user_id, 'oidc_consent_timestamp', true ) );
-
-		$past_consent_expiry = time() > ( $consent_timestamp + ( STICKY_CONSENT_DURATION ) );
-
-		return empty( $consent_timestamp ) || $past_consent_expiry;
-	}
-
-	public function update_consent_timestamp() {
-		update_user_meta( get_current_user_id(), 'oidc_consent_timestamp', time() );
-	}
 }

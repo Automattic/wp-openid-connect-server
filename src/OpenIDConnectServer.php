@@ -9,6 +9,7 @@ use OpenIDConnectServer\Http\Router;
 use OpenIDConnectServer\Overrides\Server;
 use OpenIDConnectServer\Storage\AuthorizationCodeStorage;
 use OpenIDConnectServer\Storage\ClientCredentialsStorage;
+use OpenIDConnectServer\Storage\ConsentStorage;
 use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
 use function openssl_pkey_get_details;
@@ -19,10 +20,12 @@ class OpenIDConnectServer {
 	private $router;
 	private string $public_key;
 	private array $clients;
+	private ConsentStorage $consent_storage;
 
 	public function __construct( string $public_key, string $private_key, array $clients ) {
-		$this->public_key = $public_key;
-		$this->clients    = $clients;
+		$this->public_key      = $public_key;
+		$this->clients         = $clients;
+		$this->consent_storage = new ConsentStorage();
 
 		$config = array(
 			'use_jwt_access_tokens' => true,
@@ -40,7 +43,10 @@ class OpenIDConnectServer {
 
 		$this->router = new Router();
 		$this->router->addRestRoute( 'token', new TokenHandler( $server ), array( 'POST' ) );
-		$this->router->addRestRoute( 'authorize', new AuthorizeHandler( $server ), array( 'GET', 'POST' ) );
+		$this->router->addRestRoute(
+			'authorize',
+			new AuthorizeHandler( $server, $this->consent_storage ), array( 'GET', 'POST' )
+		);
 
 		add_action( 'template_redirect', array( $this, 'jwks' ) );
 		add_action( 'template_redirect', array( $this, 'openid_configuration' ) );
@@ -116,7 +122,7 @@ class OpenIDConnectServer {
 			auth_redirect();
 		}
 
-		if ( $this->rest->is_consent_needed() ) {
+		if ( $this->consent_storage->needs_consent( get_current_user_id() ) ) {
 			define( 'OIDC_DISPLAY_AUTHORIZE', true );
 
 			status_header( 200 );
