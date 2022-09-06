@@ -22,15 +22,6 @@ class Rest {
 	public function add_rest_routes() {
 		register_rest_route(
 			self::NAMESPACE,
-			'token',
-			array(
-				'methods'             => 'POST', // MUST support POST only.
-				'callback'            => array( $this, 'token' ),
-				'permission_callback' => '__return_true',
-			)
-		);
-		register_rest_route(
-			self::NAMESPACE,
 			'authorize',
 			array(
 				'methods'             => 'GET,POST', // MUST support both GET and POST.
@@ -78,11 +69,6 @@ class Rest {
 		$this->server->handleAuthorizeRequest( $request, $response, true, $user->user_login );
 
 		$response->send();
-		exit;
-	}
-
-	public function token() {
-		$this->server->handleTokenRequest( Request::createFromGlobals() )->send();
 		exit;
 	}
 

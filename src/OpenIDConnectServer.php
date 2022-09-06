@@ -3,6 +3,8 @@
 namespace OpenIDConnectServer;
 
 use OAuth2\Request;
+use OpenIDConnectServer\Http\Handlers\TokenHandler;
+use OpenIDConnectServer\Http\Router;
 use OpenIDConnectServer\Overrides\Server;
 use OpenIDConnectServer\Storage\AuthorizationCodeStorage;
 use OpenIDConnectServer\Storage\ClientCredentialsStorage;
@@ -13,6 +15,7 @@ use function openssl_pkey_get_public;
 
 class OpenIDConnectServer {
 	private $rest;
+	private $router;
 	private string $public_key;
 	private array $clients;
 
@@ -33,6 +36,9 @@ class OpenIDConnectServer {
 
 		// Add REST endpoints.
 		$this->rest = new Rest( $server );
+
+		$this->router = new Router( $server );
+		$this->router->addRestRoute( 'token', TokenHandler::class, array( 'POST' ) );
 
 		add_action( 'template_redirect', array( $this, 'jwks' ) );
 		add_action( 'template_redirect', array( $this, 'openid_configuration' ) );
