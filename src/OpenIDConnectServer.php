@@ -14,24 +14,13 @@ class OpenIDConnectServer {
 
 	private $rest;
 
-	public function __construct() {
+	public function __construct( string $public_key, string $private_key, array $clients ) {
 		$config = array(
 			'use_jwt_access_tokens' => true,
 			'use_openid_connect'    => true,
 			'issuer'                => home_url( '/' ),
 		);
 
-		// Please follow the instructions in the readme for defining these.
-		$public_key = defined( 'OIDC_PUBLIC_KEY' ) ? OIDC_PUBLIC_KEY : false;
-		if ( ! $public_key ) {
-			return false;
-		}
-		$private_key = defined( 'OIDC_PRIVATE_KEY' ) ? OIDC_PRIVATE_KEY : false;
-		if ( ! $private_key ) {
-			return false;
-		}
-
-		$clients = function_exists( '\oidc_clients' ) ? \oidc_clients() : array();
 		$server = new Server( new TaxonomyStorage(), $config );
 		$server->addStorage( new PublicKeyStorage( $public_key, $private_key ), 'public_key' );
 		$server->addStorage( new ClientCredentialsStorage( $clients ), 'client_credentials' );
