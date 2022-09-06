@@ -13,9 +13,7 @@
     "autoload": {
         "psr-4": {
             "OpenIDConnectServer\\": "src/"
-        },
-        "exclude-from-classmap": ["vendor/bshaffer/oauth2-server-php/src/OAuth2/OpenID/Controller/AuthorizeController.php"],
-        "files": ["src/OAuth2/OpenID/Controller/AuthorizeController.php"]
+        }
     },
     "scripts": {
         "phpcs": "phpcs --standard=phpcs.xml"

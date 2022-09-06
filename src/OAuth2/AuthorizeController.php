@@ -1,13 +1,11 @@
 <?php
-/**
- * This is a modified copy of vendor/bshaffer/oauth2-server-php/src/OAuth2/OpenID/Controller/AuthorizeController.php
- */
 
 // phpcs:ignoreFile
 
-namespace OAuth2\OpenID\Controller;
+namespace OpenIDConnectServer\OAuth2;
 
 use OAuth2\Controller\AuthorizeController as BaseAuthorizeController;
+use OAuth2\OpenID\Controller\AuthorizeControllerInterface;
 use OAuth2\RequestInterface;
 use OAuth2\ResponseInterface;
 
