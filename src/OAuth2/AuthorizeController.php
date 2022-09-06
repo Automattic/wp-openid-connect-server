@@ -5,12 +5,11 @@
 
 namespace OpenIDConnectServer\OAuth2;
 
-use OAuth2\OpenID\Controller\AuthorizeController as BaseAuthorizeController;
-use OAuth2\OpenID\Controller\AuthorizeControllerInterface;
+use OAuth2\OpenID\Controller\AuthorizeController as BaseOpenIDAuthorizeController;
 use OAuth2\RequestInterface;
 use OAuth2\ResponseInterface;
 
-class AuthorizeController extends BaseAuthorizeController implements AuthorizeControllerInterface {
+class AuthorizeController extends BaseOpenIDAuthorizeController {
 	/**
 	 * @TODO: add dependency injection for the parameters in this method
 	 *
