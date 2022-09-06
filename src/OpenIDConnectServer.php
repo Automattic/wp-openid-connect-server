@@ -11,10 +11,12 @@ use function openssl_pkey_get_details;
 use function openssl_pkey_get_public;
 
 class OpenIDConnectServer {
-
 	private $rest;
+	private string $public_key;
 
 	public function __construct( string $public_key, string $private_key, array $clients ) {
+		$this->public_key = $public_key;
+
 		$config = array(
 			'use_jwt_access_tokens' => true,
 			'use_openid_connect'    => true,
@@ -45,7 +47,7 @@ class OpenIDConnectServer {
 		header( 'Content-type: application/json' );
 		header( 'Access-Control-Allow-Origin: *' );
 
-		$key_info = openssl_pkey_get_details( openssl_pkey_get_public( OIDC_PUBLIC_KEY ) );
+		$key_info = openssl_pkey_get_details( openssl_pkey_get_public( $this->public_key ) );
 
 		echo wp_json_encode(
 			array(
