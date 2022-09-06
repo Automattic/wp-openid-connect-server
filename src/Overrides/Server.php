@@ -2,10 +2,11 @@
 
 // phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
-namespace OpenIDConnectServer\OAuth2;
+namespace OpenIDConnectServer\Overrides;
 
 use OAuth2\Server as BaseServer;
 use OAuth2\OpenID\Controller\AuthorizeController as BaseAuthorizeController;
+use OpenIDConnectServer\Overrides\OpenID\Controller\AuthorizeController;
 
 class Server extends BaseServer {
 	protected function createDefaultAuthorizeController() {

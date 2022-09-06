@@ -4,7 +4,7 @@ namespace OpenIDConnectServer;
 
 use OAuth2\Request;
 use OAuth2\Storage\Memory;
-use OpenIDConnectServer\OAuth2\Server;
+use OpenIDConnectServer\Overrides\Server;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_public;
 

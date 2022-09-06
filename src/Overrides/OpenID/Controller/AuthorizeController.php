@@ -3,7 +3,7 @@
 // phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
 // phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
-namespace OpenIDConnectServer\OAuth2;
+namespace OpenIDConnectServer\Overrides\OpenID\Controller;
 
 use OAuth2\OpenID\Controller\AuthorizeController as BaseOpenIDAuthorizeController;
 
