@@ -9,9 +9,9 @@ use OAuth2\Request;
 use OAuth2\Response;
 use OpenIDConnectServer\Overrides\Server as OAuth2Server;
 
-const PREFIX = 'openid-connect';
-
 class Router {
+	const PREFIX = 'openid-connect';
+
 	private array $routes = array();
 
 	public function addRoute( string $route, RequestHandler $handler ) {
@@ -29,7 +29,7 @@ class Router {
 			'rest_api_init',
 			function () use ( $route, $methods ) {
 				register_rest_route(
-					PREFIX,
+					self::PREFIX,
 					$route,
 					array(
 						'methods'             => $methods,
@@ -64,7 +64,7 @@ class Router {
 		$route_with_prefix = $wp_request->get_route();
 
 		// Remove prefix.
-		$route = str_replace( PREFIX, '', $route_with_prefix );
+		$route = str_replace( self::PREFIX, '', $route_with_prefix );
 
 		// Remove leading slashes.
 		return ltrim( $route, '/' );

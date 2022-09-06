@@ -5,6 +5,7 @@ namespace OpenIDConnectServer;
 use OAuth2\Request;
 use OpenIDConnectServer\Http\Handlers\AuthorizeHandler;
 use OpenIDConnectServer\Http\Handlers\TokenHandler;
+use OpenIDConnectServer\Http\Handlers\UserInfoHandler;
 use OpenIDConnectServer\Http\Router;
 use OpenIDConnectServer\Overrides\Server;
 use OpenIDConnectServer\Storage\AuthorizationCodeStorage;
@@ -16,7 +17,6 @@ use function openssl_pkey_get_details;
 use function openssl_pkey_get_public;
 
 class OpenIDConnectServer {
-	private $rest;
 	private $router;
 	private string $public_key;
 	private array $clients;
@@ -38,15 +38,13 @@ class OpenIDConnectServer {
 		$server->addStorage( new ClientCredentialsStorage( $clients ), 'client_credentials' );
 		$server->addStorage( new UserClaimsStorage(), 'user_claims' );
 
-		// Add REST endpoints.
-		$this->rest = new Rest( $server );
-
 		$this->router = new Router();
 		$this->router->addRestRoute( 'token', new TokenHandler( $server ), array( 'POST' ) );
 		$this->router->addRestRoute(
 			'authorize',
 			new AuthorizeHandler( $server, $this->consent_storage ), array( 'GET', 'POST' )
 		);
+		$this->router->addRestRoute( 'userinfo', new UserInfoHandler( $server ), array( 'GET', 'POST' ) );
 
 		add_action( 'template_redirect', array( $this, 'jwks' ) );
 		add_action( 'template_redirect', array( $this, 'openid_configuration' ) );
@@ -129,7 +127,7 @@ class OpenIDConnectServer {
 			include __DIR__ . '/Template/Authorize.php';
 		} else {
 			// rebuild request with all parameters and send to authorize endpoint.
-			$url = rest_url( Rest::NAMESPACE . '/authorize' );
+			$url = rest_url( Router::PREFIX . '/authorize' );
 			wp_safe_redirect(
 				add_query_arg(
 					array_merge(
