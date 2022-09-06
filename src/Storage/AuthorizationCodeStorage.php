@@ -7,7 +7,7 @@ use OAuth2\OpenID\Storage\AuthorizationCodeInterface;
 class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 	const TAXONOMY = 'oidc-authorization-code';
 
-	private $authorization_code_data = array(
+	private static array $authorization_code_data = array(
 		'code'         => 'string', // authorization code.
 		'client_id'    => 'string', // client identifier.
 		'user_login'   => 'string', // The WordPress user id.
@@ -24,7 +24,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		// Store the authorization codes in a taxonomy.
 		register_taxonomy( self::TAXONOMY, null );
-		foreach ( $this->authorization_code_data as $key => $type ) {
+		foreach ( self::$authorization_code_data as $key => $type ) {
 			register_term_meta(
 				self::TAXONOMY,
 				$key,
