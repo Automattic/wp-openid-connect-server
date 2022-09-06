@@ -40,9 +40,6 @@ class OpenIDConnectServer {
 		if ( empty( $_SERVER['REQUEST_URI'] ) || '/.well-known/jwks.json' !== $_SERVER['REQUEST_URI'] ) {
 			return;
 		}
-		if ( ! defined( 'OIDC_PUBLIC_KEY' ) || empty( OIDC_PUBLIC_KEY ) ) {
-			return;
-		}
 		status_header( 200 );
 		header( 'Content-type: application/json' );
 		header( 'Access-Control-Allow-Origin: *' );
