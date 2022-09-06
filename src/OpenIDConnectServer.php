@@ -3,6 +3,7 @@
 namespace OpenIDConnectServer;
 
 use OAuth2\Request;
+use OpenIDConnectServer\Http\Handlers\AuthorizeHandler;
 use OpenIDConnectServer\Http\Handlers\TokenHandler;
 use OpenIDConnectServer\Http\Router;
 use OpenIDConnectServer\Overrides\Server;
@@ -39,6 +40,7 @@ class OpenIDConnectServer {
 
 		$this->router = new Router( $server );
 		$this->router->addRestRoute( 'token', TokenHandler::class, array( 'POST' ) );
+		$this->router->addRestRoute( 'authorize', AuthorizeHandler::class, array( 'GET', 'POST' ) );
 
 		add_action( 'template_redirect', array( $this, 'jwks' ) );
 		add_action( 'template_redirect', array( $this, 'openid_configuration' ) );
