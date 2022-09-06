@@ -6,19 +6,8 @@
 namespace OpenIDConnectServer\OAuth2;
 
 use OAuth2\OpenID\Controller\AuthorizeController as BaseOpenIDAuthorizeController;
-use OAuth2\RequestInterface;
-use OAuth2\ResponseInterface;
 
 class AuthorizeController extends BaseOpenIDAuthorizeController {
-	/**
-	 * @TODO: add dependency injection for the parameters in this method
-	 *
-	 * @param RequestInterface  $request
-	 * @param ResponseInterface $response
-	 * @param mixed             $user_id
-	 *
-	 * @return array
-	 */
 	protected function buildAuthorizeParameters( $request, $response, $user_id ) {
 		$params = parent::buildAuthorizeParameters( $request, $response, $user_id );
 		if ( ! $params ) {
