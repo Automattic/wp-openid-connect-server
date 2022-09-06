@@ -4,7 +4,7 @@
 
 namespace OpenIDConnectServer\OAuth2;
 
-use OAuth2\Controller\AuthorizeController as BaseAuthorizeController;
+use OAuth2\OpenID\Controller\AuthorizeController as BaseAuthorizeController;
 use OAuth2\OpenID\Controller\AuthorizeControllerInterface;
 use OAuth2\RequestInterface;
 use OAuth2\ResponseInterface;
