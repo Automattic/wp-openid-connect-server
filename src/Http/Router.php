@@ -13,22 +13,17 @@ const PREFIX = 'openid-connect';
 
 class Router {
 	private array $routes = array();
-	private OAuth2Server $server;
 
-	public function __construct( Oauth2Server $server ) {
-		$this->server = $server;
-	}
-
-	public function addRoute( string $route, string $handlerClass ) {
+	public function addRoute( string $route, RequestHandler $handler ) {
 		if ( array_key_exists( $route, $this->routes ) ) {
 			return;
 		}
 
-		$this->routes[ $route ] = $handlerClass;
+		$this->routes[ $route ] = $handler;
 	}
 
-	public function addRestRoute( string $route, string $handlerClass, array $methods = array( 'GET' ) ) {
-		$this->addRoute( $route, $handlerClass );
+	public function addRestRoute( string $route, RequestHandler $handler, array $methods = array( 'GET' ) ) {
+		$this->addRoute( $route, $handler );
 
 		add_action(
 			'rest_api_init',
@@ -58,7 +53,7 @@ class Router {
 		}
 
 		/** @var RequestHandler $handler */
-		$handler = new $this->routes[ $route ]( $this->server );
+		$handler = $this->routes[ $route ];
 
 		$response = $handler->handle( $request, $response );
 		$response->send();

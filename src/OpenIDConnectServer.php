@@ -22,7 +22,7 @@ class OpenIDConnectServer {
 
 	public function __construct( string $public_key, string $private_key, array $clients ) {
 		$this->public_key = $public_key;
-		$this->clients = $clients;
+		$this->clients    = $clients;
 
 		$config = array(
 			'use_jwt_access_tokens' => true,
@@ -38,9 +38,9 @@ class OpenIDConnectServer {
 		// Add REST endpoints.
 		$this->rest = new Rest( $server );
 
-		$this->router = new Router( $server );
-		$this->router->addRestRoute( 'token', TokenHandler::class, array( 'POST' ) );
-		$this->router->addRestRoute( 'authorize', AuthorizeHandler::class, array( 'GET', 'POST' ) );
+		$this->router = new Router();
+		$this->router->addRestRoute( 'token', new TokenHandler( $server ), array( 'POST' ) );
+		$this->router->addRestRoute( 'authorize', new AuthorizeHandler( $server ), array( 'GET', 'POST' ) );
 
 		add_action( 'template_redirect', array( $this, 'jwks' ) );
 		add_action( 'template_redirect', array( $this, 'openid_configuration' ) );
@@ -105,7 +105,7 @@ class OpenIDConnectServer {
 			return;
 		}
 
-		$request = Request::createFromGlobals();
+		$request     = Request::createFromGlobals();
 		$client_name = $this->get_client_name( $request );
 
 		if ( ! $client_name ) {
