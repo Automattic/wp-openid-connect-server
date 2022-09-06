@@ -3,9 +3,9 @@
 namespace OpenIDConnectServer;
 
 use OAuth2\Request;
-use OAuth2\Storage\Memory;
 use OpenIDConnectServer\Overrides\Server;
 use OpenIDConnectServer\Storage\ClientCredentialsStorage;
+use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_public;
@@ -15,6 +15,12 @@ class OpenIDConnectServer {
 	private $rest;
 
 	public function __construct() {
+		$config = array(
+			'use_jwt_access_tokens' => true,
+			'use_openid_connect'    => true,
+			'issuer'                => home_url( '/' ),
+		);
+
 		// Please follow the instructions in the readme for defining these.
 		$public_key = defined( 'OIDC_PUBLIC_KEY' ) ? OIDC_PUBLIC_KEY : false;
 		if ( ! $public_key ) {
@@ -25,23 +31,9 @@ class OpenIDConnectServer {
 			return false;
 		}
 
-		$config = array(
-			'use_jwt_access_tokens' => true,
-			'use_openid_connect'    => true,
-			'issuer'                => home_url( '/' ),
-		);
-
-		$server = new Server( new TaxonomyStorage(), $config );
-		$server->addStorage(
-			new Memory(
-				array(
-					'keys' => compact( 'private_key', 'public_key' ),
-				)
-			),
-			'public_key'
-		);
-
 		$clients = function_exists( '\oidc_clients' ) ? \oidc_clients() : array();
+		$server = new Server( new TaxonomyStorage(), $config );
+		$server->addStorage( new PublicKeyStorage( $public_key, $private_key ), 'public_key' );
 		$server->addStorage( new ClientCredentialsStorage( $clients ), 'client_credentials' );
 		$server->addStorage( new UserClaimsStorage(), 'user_claims' );
 
