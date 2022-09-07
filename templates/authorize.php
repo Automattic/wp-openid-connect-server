@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUndefinedFieldInspection */ ?>
+<?php /** @var stdClass $data */ ?>
 <html <?php language_attributes(); ?> class="no-js no-svg">
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
@@ -9,6 +9,7 @@
 			padding: 4em;
 		}
 	</style>
+	<title>OpenID Connect</title>
 </head>
 
 <body class="<?php echo esc_attr( $data->body_class_attr ); ?>">
@@ -27,33 +28,24 @@
 <?php if ( ! $data->has_permission ) : ?>
 	<p><?php esc_html_e( "Unfortunately your user doesn't have sufficient permissions to use OpenID Connect on this server.", 'wp-openid-connect-server' ); ?></p>
 <?php else : ?>
-	<form method="post" action="<?php echo esc_url( $data->form_url ); ?>">
-		<?php wp_nonce_field( 'wp_rest' ); /* The nonce will give the REST call the userdata. */ ?>
-		<?php foreach ( $data->form_fields as $key => $value ) : ?>
-			<input type="hidden" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>"/>
-		<?php endforeach; ?>
-		<p>
-			<label>
-				<?php
-				echo wp_kses(
-					sprintf(
-					// translators: %1$s is the site name, %2$s is the username.
-						__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
-						$data->client_name,
-						$data->account_name
-					),
-					array(
-						'em' => array(),
-					)
-				);
-				?>
-			</label>
-		</p>
-		<input type="submit" name="authorize" value="<?php esc_attr_e( 'Authorize', 'wp-openid-connect-server' ); ?>"/>
-		<a href="<?php echo esc_url( $data->cancel_url ); ?>" target="_top">
-			<?php esc_html_e( 'Cancel', 'wp-openid-connect-server' ); ?>
-		</a>
-	</form>
+	<p>
+		<label>
+			<?php
+			echo wp_kses(
+				sprintf(
+				// translators: %1$s is the site name, %2$s is the username.
+					__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
+					$data->client_name,
+					$data->account_name
+				),
+				array(
+					'em' => array(),
+				)
+			);
+			?>
+		</label>
+	</p>
+	<?php $data->templates->partial( 'authorize-form' ); ?>
 <?php endif; ?>
 <?php wp_footer(); ?>
 </body>
