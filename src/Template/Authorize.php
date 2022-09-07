@@ -3,6 +3,7 @@
 namespace OpenIDConnectServer;
 
 use OpenIDConnectServer\Http\Router;
+use const OpenIDConnectServer\Http\Handlers\OIDC_DEFAULT_MINIMAL_CAPABILITY;
 
 if ( ! defined( 'OIDC_DISPLAY_AUTHORIZE' ) || ! OIDC_DISPLAY_AUTHORIZE ) {
 	return;
