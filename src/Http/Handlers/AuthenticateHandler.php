@@ -29,23 +29,29 @@ class AuthenticateHandler extends RequestHandler {
 			auth_redirect();
 		}
 
-		if ( $this->consent_storage->needs_consent( get_current_user_id() ) ) {
-			include __DIR__ . '/../../Template/Authorize.php';
-		} else {
-			// rebuild request with all parameters and send to authorize endpoint.
-			wp_safe_redirect(
-				add_query_arg(
-					array_merge(
-						array( '_wpnonce' => wp_create_nonce( 'wp_rest' ) ),
-						$request->getAllQueryParameters()
-					),
-					Router::make_rest_url( 'authorize' )
-				)
-			);
+		if ( ! $this->consent_storage->needs_consent( get_current_user_id() ) ) {
+			$this->redirect( $request );
+			// TODO: return response instead of exiting.
+			exit;
 		}
+
+		include __DIR__ . '/../../Template/Authorize.php';
 
 		// TODO: return response instead of exiting.
 		exit;
+	}
+
+	private function redirect( Request $request ) {
+		// Rebuild request with all parameters and send to authorize endpoint.
+		wp_safe_redirect(
+			add_query_arg(
+				array_merge(
+					array( '_wpnonce' => wp_create_nonce( 'wp_rest' ) ),
+					$request->getAllQueryParameters()
+				),
+				Router::make_rest_url( 'authorize' )
+			)
+		);
 	}
 
 	/**
