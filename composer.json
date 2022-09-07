@@ -2,7 +2,8 @@
     "require": {
         "bshaffer/oauth2-server-php": "^1.12",
         "ext-openssl": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "gamajo/template-loader": "^1.3"
     },
     "require-dev": {
         "johnpbloch/wordpress": "^6.0",
