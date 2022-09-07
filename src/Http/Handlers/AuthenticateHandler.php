@@ -19,7 +19,7 @@ class AuthenticateHandler extends RequestHandler {
 
 	public function handle( Request $request, Response $response ): Response {
 		$client_name = $this->get_client_name( $request );
-		if ( ! $client_name ) {
+		if ( empty( $client_name ) ) {
 			$response->setStatusCode( 404 );
 
 			return $response;
@@ -30,7 +30,6 @@ class AuthenticateHandler extends RequestHandler {
 		}
 
 		if ( $this->consent_storage->needs_consent( get_current_user_id() ) ) {
-			define( 'OIDC_DISPLAY_AUTHORIZE', true );
 			include __DIR__ . '/../../Template/Authorize.php';
 		} else {
 			// rebuild request with all parameters and send to authorize endpoint.
