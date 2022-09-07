@@ -28,7 +28,7 @@ class OpenIDConnectServer {
 		$this->clients         = $clients;
 		$this->router          = new Router();
 		$this->consent_storage = new ConsentStorage();
-		$this->templating      = new Templating( __DIR__ . '/Template');
+		$this->templating      = new Templating( __DIR__ . '/../templates');
 
 		$config = array(
 			'use_jwt_access_tokens' => true,
