@@ -4,6 +4,7 @@ namespace OpenIDConnectServer;
 
 use OAuth2\Request;
 use OpenIDConnectServer\Http\Handlers\AuthorizeHandler;
+use OpenIDConnectServer\Http\Handlers\WebKeySetsHandler;
 use OpenIDConnectServer\Http\Handlers\TokenHandler;
 use OpenIDConnectServer\Http\Handlers\UserInfoHandler;
 use OpenIDConnectServer\Http\Router;
@@ -39,6 +40,8 @@ class OpenIDConnectServer {
 		$server->addStorage( new UserClaimsStorage(), 'user_claims' );
 
 		$this->router = new Router();
+
+		// Declare rest routes.
 		$this->router->add_rest_route( 'token', new TokenHandler( $server ), array( 'POST' ) );
 		$this->router->add_rest_route(
 			'authorize',
@@ -47,38 +50,11 @@ class OpenIDConnectServer {
 		);
 		$this->router->add_rest_route( 'userinfo', new UserInfoHandler( $server ), array( 'GET', 'POST' ) );
 
-		add_action( 'template_redirect', array( $this, 'jwks' ) );
+		// Declare non-rest routes.
+		$this->router->add_route( '.well-known/jwks.json', new WebKeySetsHandler( $this->public_key) );
+
 		add_action( 'template_redirect', array( $this, 'openid_configuration' ) );
 		add_action( 'template_redirect', array( $this, 'openid_authenticate' ) );
-	}
-
-	public function jwks() {
-		if ( empty( $_SERVER['REQUEST_URI'] ) || '/.well-known/jwks.json' !== $_SERVER['REQUEST_URI'] ) {
-			return;
-		}
-		status_header( 200 );
-		header( 'Content-type: application/json' );
-		header( 'Access-Control-Allow-Origin: *' );
-
-		$key_info = openssl_pkey_get_details( openssl_pkey_get_public( $this->public_key ) );
-
-		echo wp_json_encode(
-			array(
-				'keys' =>
-					array(
-						array(
-							'kty' => 'RSA',
-							'use' => 'sig',
-							'alg' => 'RS256',
-							// phpcs:ignore
-							'n'   => rtrim( strtr( base64_encode( $key_info['rsa']['n'] ), '+/', '-_' ), '=' ),
-							// phpcs:ignore
-							'e'   => rtrim( strtr( base64_encode( $key_info['rsa']['e'] ), '+/', '-_' ), '=' ),
-						),
-					),
-			)
-		);
-		exit;
 	}
 
 	public function openid_configuration() {
