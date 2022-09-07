@@ -35,6 +35,13 @@ class AuthenticateHandler extends RequestHandler {
 			exit;
 		}
 
+		$body_class_attr = implode( ' ', array_diff( get_body_class( 'openid-connect-authentication' ), array( 'error404' ) ) );
+		$has_permission  = current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) );
+		$account_name    = get_bloginfo( 'name' );
+		$cancel_url      = Router::make_url();
+		$form_url        = Router::make_rest_url( 'authorize' );
+		$form_fields     = $request->getAllQueryParameters();
+
 		include __DIR__ . '/../../Template/Authorize.php';
 
 		// TODO: return response instead of exiting.

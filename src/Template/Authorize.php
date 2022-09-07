@@ -1,10 +1,3 @@
-<?php
-
-namespace OpenIDConnectServer;
-
-use OpenIDConnectServer\Http\Router;
-use const OpenIDConnectServer\Http\Handlers\OIDC_DEFAULT_MINIMAL_CAPABILITY;
-?>
 <html <?php language_attributes(); ?> class="no-js no-svg">
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
@@ -17,7 +10,7 @@ use const OpenIDConnectServer\Http\Handlers\OIDC_DEFAULT_MINIMAL_CAPABILITY;
 	</style>
 </head>
 
-<body class="<?php echo esc_attr( implode( ' ', array_diff( get_body_class( 'openid-connect-authentication' ), array( 'error404' ) ) ) ); ?>">
+<body class="<?php echo esc_attr( $body_class_attr ); ?>">
 <h1><?php esc_html_e( 'OpenID Connect', 'wp-openid-connect-server' ); ?></h1>
 <p>
 	<?php
@@ -30,12 +23,12 @@ use const OpenIDConnectServer\Http\Handlers\OIDC_DEFAULT_MINIMAL_CAPABILITY;
 	);
 	?>
 </p>
-<?php if ( ! current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) ) ) : ?>
+<?php if ( ! $has_permission ) : ?>
 	<p><?php esc_html_e( "Unfortunately your user doesn't have sufficient permissions to use OpenID Connect on this server.", 'wp-openid-connect-server' ); ?></p>
 <?php else : ?>
-	<form method="post" action="<?php echo esc_url( Router::make_rest_url( 'authorize' ) ); ?>">
+	<form method="post" action="<?php echo esc_url( $form_url ); ?>">
 		<?php wp_nonce_field( 'wp_rest' ); /* The nonce will give the REST call the userdata. */ ?>
-		<?php foreach ( $request->getAllQueryParameters() as $key => $value ) : ?>
+		<?php foreach ( $form_fields as $key => $value ) : ?>
 			<input type="hidden" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>"/>
 		<?php endforeach; ?>
 		<p>
@@ -46,7 +39,7 @@ use const OpenIDConnectServer\Http\Handlers\OIDC_DEFAULT_MINIMAL_CAPABILITY;
 					// translators: %1$s is the site name, %2$s is the username.
 						__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
 						$client_name,
-						get_bloginfo( 'name' )
+						$account_name
 					),
 					array(
 						'em' => array(),
@@ -56,7 +49,7 @@ use const OpenIDConnectServer\Http\Handlers\OIDC_DEFAULT_MINIMAL_CAPABILITY;
 			</label>
 		</p>
 		<input type="submit" name="authorize" value="<?php esc_attr_e( 'Authorize', 'wp-openid-connect-server' ); ?>"/>
-		<a href="<?php echo esc_url( home_url() ); ?>" target="_top">
+		<a href="<?php echo esc_url( $cancel_url ); ?>" target="_top">
 			<?php esc_html_e( 'Cancel', 'wp-openid-connect-server' ); ?>
 		</a>
 	</form>
