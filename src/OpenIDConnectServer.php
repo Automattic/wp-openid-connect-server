@@ -2,7 +2,7 @@
 
 namespace OpenIDConnectServer;
 
-use OAuth2\Request;
+use OpenIDConnectServer\Http\Handlers\AuthenticateHandler;
 use OpenIDConnectServer\Http\Handlers\AuthorizeHandler;
 use OpenIDConnectServer\Http\Handlers\ConfigurationHandler;
 use OpenIDConnectServer\Http\Handlers\WebKeySetsHandler;
@@ -17,15 +17,16 @@ use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
 
 class OpenIDConnectServer {
-	private $router;
 	private string $public_key;
 	private array $clients;
+	private Router $router;
 	private ConsentStorage $consent_storage;
 
 	public function __construct( string $public_key, string $private_key, array $clients ) {
 		$this->public_key      = $public_key;
 		$this->clients         = $clients;
 		$this->consent_storage = new ConsentStorage();
+		$this->router          = new Router();
 
 		$config = array(
 			'use_jwt_access_tokens' => true,
@@ -37,8 +38,6 @@ class OpenIDConnectServer {
 		$server->addStorage( new PublicKeyStorage( $public_key, $private_key ), 'public_key' );
 		$server->addStorage( new ClientCredentialsStorage( $clients ), 'client_credentials' );
 		$server->addStorage( new UserClaimsStorage(), 'user_claims' );
-
-		$this->router = new Router();
 
 		// Declare rest routes.
 		$this->router->add_rest_route( 'token', new TokenHandler( $server ), array( 'POST' ) );
@@ -52,64 +51,6 @@ class OpenIDConnectServer {
 		// Declare non-rest routes.
 		$this->router->add_route( '.well-known/jwks.json', new WebKeySetsHandler( $this->public_key ) );
 		$this->router->add_route( '.well-known/openid-configuration', new ConfigurationHandler() );
-
-		add_action( 'template_redirect', array( $this, 'openid_authenticate' ) );
-	}
-
-	public function openid_authenticate() {
-		global $wp;
-
-		if ( 'openid-connect/authenticate' !== $wp->request ) {
-			return;
-		}
-
-		$request     = Request::createFromGlobals();
-		$client_name = $this->get_client_name( $request );
-
-		if ( ! $client_name ) {
-			return;
-
-		}
-		if ( ! is_user_logged_in() ) {
-			auth_redirect();
-		}
-
-		if ( $this->consent_storage->needs_consent( get_current_user_id() ) ) {
-			define( 'OIDC_DISPLAY_AUTHORIZE', true );
-
-			status_header( 200 );
-			include __DIR__ . '/Template/Authorize.php';
-		} else {
-			// rebuild request with all parameters and send to authorize endpoint.
-			wp_safe_redirect(
-				add_query_arg(
-					array_merge(
-						array( '_wpnonce' => wp_create_nonce( 'wp_rest' ) ),
-						$request->getAllQueryParameters()
-					),
-					Router::make_rest_url( 'authorize' )
-				)
-			);
-		}
-		exit;
-	}
-
-	/**
-	 * TODO: Remove this function in favour of ClientCredentialsStorage?
-	 */
-	private function get_client_name( Request $request ): string {
-		$client_id = $request->query( 'client_id' );
-
-		if ( ! array_key_exists( $client_id, $this->clients ) ) {
-			return '';
-		}
-
-		$client = $this->clients[ $client_id ];
-
-		if ( empty( $client['name'] ) ) {
-			return '';
-		}
-
-		return $client['name'];
+		$this->router->add_route( 'openid-connect/authenticate', new AuthenticateHandler( $this->consent_storage, $this->clients ) );
 	}
 }
