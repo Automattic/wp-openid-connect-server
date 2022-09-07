@@ -7,12 +7,15 @@ namespace OpenIDConnectServer\Http;
 
 use OAuth2\Request;
 use OAuth2\Response;
-use OpenIDConnectServer\Overrides\Server as OAuth2Server;
 
 class Router {
-	const PREFIX = 'openid-connect';
+	private const PREFIX = 'openid-connect';
 
 	private array $routes = array();
+
+	public static function makeRestUrl( $route ): string {
+		return rest_url( Router::PREFIX . "/$route" );
+	}
 
 	public function addRoute( string $route, RequestHandler $handler ) {
 		if ( array_key_exists( $route, $this->routes ) ) {

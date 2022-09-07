@@ -127,14 +127,13 @@ class OpenIDConnectServer {
 			include __DIR__ . '/Template/Authorize.php';
 		} else {
 			// rebuild request with all parameters and send to authorize endpoint.
-			$url = rest_url( Router::PREFIX . '/authorize' );
 			wp_safe_redirect(
 				add_query_arg(
 					array_merge(
 						array( '_wpnonce' => wp_create_nonce( 'wp_rest' ) ),
 						$request->getAllQueryParameters()
 					),
-					$url
+					Router::makeRestUrl( 'authorize' )
 				)
 			);
 		}
