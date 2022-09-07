@@ -39,12 +39,13 @@ class OpenIDConnectServer {
 		$server->addStorage( new UserClaimsStorage(), 'user_claims' );
 
 		$this->router = new Router();
-		$this->router->addRestRoute( 'token', new TokenHandler( $server ), array( 'POST' ) );
-		$this->router->addRestRoute(
+		$this->router->add_rest_route( 'token', new TokenHandler( $server ), array( 'POST' ) );
+		$this->router->add_rest_route(
 			'authorize',
-			new AuthorizeHandler( $server, $this->consent_storage ), array( 'GET', 'POST' )
+			new AuthorizeHandler( $server, $this->consent_storage ),
+			array( 'GET', 'POST' )
 		);
-		$this->router->addRestRoute( 'userinfo', new UserInfoHandler( $server ), array( 'GET', 'POST' ) );
+		$this->router->add_rest_route( 'userinfo', new UserInfoHandler( $server ), array( 'GET', 'POST' ) );
 
 		add_action( 'template_redirect', array( $this, 'jwks' ) );
 		add_action( 'template_redirect', array( $this, 'openid_configuration' ) );
@@ -133,14 +134,16 @@ class OpenIDConnectServer {
 						array( '_wpnonce' => wp_create_nonce( 'wp_rest' ) ),
 						$request->getAllQueryParameters()
 					),
-					Router::makeRestUrl( 'authorize' )
+					Router::make_rest_url( 'authorize' )
 				)
 			);
 		}
 		exit;
 	}
 
-	// TODO: Remove this function in favour of ClientCredentialsStorage?
+	/**
+	 * TODO: Remove this function in favour of ClientCredentialsStorage?
+	 */
 	private function get_client_name( Request $request ): string {
 		$client_id = $request->query( 'client_id' );
 

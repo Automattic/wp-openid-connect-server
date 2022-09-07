@@ -1,7 +1,5 @@
 <?php
 
-// phpcs:disable WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
-
 namespace OpenIDConnectServer\Http;
 
 use OAuth2\Request;
@@ -12,11 +10,11 @@ class Router {
 
 	private array $rest_routes = array();
 
-	public static function makeRestUrl( $route ): string {
+	public static function make_rest_url( $route ): string {
 		return rest_url( self::PREFIX . "/$route" );
 	}
 
-	public function addRestRoute( string $route, RequestHandler $handler, array $methods = array( 'GET' ) ) {
+	public function add_rest_route( string $route, RequestHandler $handler, array $methods = array( 'GET' ) ) {
 		$route_with_prefix = self::PREFIX . "/$route";
 		if ( array_key_exists( $route_with_prefix, $this->rest_routes ) ) {
 			return;
@@ -33,7 +31,7 @@ class Router {
 					array(
 						'methods'             => $methods,
 						'permission_callback' => '__return_true',
-						'callback'            => array( $this, 'handleRestRequest' ),
+						'callback'            => array( $this, 'handle_rest_request' ),
 					)
 				);
 			}
@@ -44,12 +42,8 @@ class Router {
 	 * This method is meant for internal use in this class only.
 	 * It must not be used elsewhere.
 	 * It's only public since it's used as a callback.
-	 *
-	 * @param $wp_request
-	 *
-	 * @return Response|void
 	 */
-	public function handleRestRequest( $wp_request ) {
+	public function handle_rest_request( $wp_request ) {
 		$request  = Request::createFromGlobals();
 		$response = new Response();
 
@@ -59,8 +53,8 @@ class Router {
 
 		if ( ! array_key_exists( $route, $this->rest_routes ) ) {
 			$response->setStatusCode( 404 );
-
-			return $response;
+			$response->send();
+			exit;
 		}
 
 		/** @var RequestHandler $handler */
