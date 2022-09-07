@@ -8,7 +8,8 @@
  * Version: 1.0
  */
 
-namespace OpenIDConnectServer;
+use OpenIDConnectServer\OpenIDConnectServer;
+use OpenIDConnectServer\SiteStatusTests;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
