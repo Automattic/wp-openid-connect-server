@@ -3,15 +3,16 @@
 namespace OpenIDConnectServer\Templating;
 
 class Templating {
-	private string $path_to_templates_dir;
 
-	public function __construct( string $path_to_templates_dir ) {
-		$this->path_to_templates_dir = $path_to_templates_dir;
+	public function __construct() {
+		$this->loader = new Loader();
 	}
 
 	public function render( string $template_name, array $parameters ): string {
 		ob_start();
-		require "$this->path_to_templates_dir/$template_name";
+		$this->loader
+			->set_template_data( $parameters, 'parameters' )
+			->get_template_part( $template_name );
 
 		return ob_get_clean();
 	}
