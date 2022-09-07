@@ -1,7 +1,6 @@
 <?php
 
 // phpcs:disable WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
-// phpcs:disable WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase
 
 namespace OpenIDConnectServer\Http;
 
@@ -11,22 +10,19 @@ use OAuth2\Response;
 class Router {
 	private const PREFIX = 'openid-connect';
 
-	private array $routes = array();
+	private array $rest_routes = array();
 
 	public static function makeRestUrl( $route ): string {
-		return rest_url( Router::PREFIX . "/$route" );
-	}
-
-	public function addRoute( string $route, RequestHandler $handler ) {
-		if ( array_key_exists( $route, $this->routes ) ) {
-			return;
-		}
-
-		$this->routes[ $route ] = $handler;
+		return rest_url( self::PREFIX . "/$route" );
 	}
 
 	public function addRestRoute( string $route, RequestHandler $handler, array $methods = array( 'GET' ) ) {
-		$this->addRoute( $route, $handler );
+		$route_with_prefix = self::PREFIX . "/$route";
+		if ( array_key_exists( $route_with_prefix, $this->rest_routes ) ) {
+			return;
+		}
+
+		$this->rest_routes[ $route_with_prefix ] = $handler;
 
 		add_action(
 			'rest_api_init',
@@ -44,32 +40,34 @@ class Router {
 		);
 	}
 
+	/**
+	 * This method is meant for internal use in this class only.
+	 * It must not be used elsewhere.
+	 * It's only public since it's used as a callback.
+	 *
+	 * @param $wp_request
+	 *
+	 * @return Response|void
+	 */
 	public function handleRestRequest( $wp_request ) {
 		$request  = Request::createFromGlobals();
 		$response = new Response();
 
-		$route = $this->getRoute( $wp_request );
-		if ( ! array_key_exists( $route, $this->routes ) ) {
+		$route = $wp_request->get_route();
+		// Remove leading slashes.
+		$route = ltrim( $route, '/' );
+
+		if ( ! array_key_exists( $route, $this->rest_routes ) ) {
 			$response->setStatusCode( 404 );
 
 			return $response;
 		}
 
 		/** @var RequestHandler $handler */
-		$handler = $this->routes[ $route ];
+		$handler = $this->rest_routes[ $route ];
 
 		$response = $handler->handle( $request, $response );
 		$response->send();
 		exit();
-	}
-
-	private function getRoute( $wp_request ): string {
-		$route_with_prefix = $wp_request->get_route();
-
-		// Remove prefix.
-		$route = str_replace( self::PREFIX, '', $route_with_prefix );
-
-		// Remove leading slashes.
-		return ltrim( $route, '/' );
 	}
 }
