@@ -7,14 +7,17 @@ use OAuth2\Response;
 use OpenIDConnectServer\Http\RequestHandler;
 use OpenIDConnectServer\Http\Router;
 use OpenIDConnectServer\Storage\ConsentStorage;
+use OpenIDConnectServer\Templating;
 
 class AuthenticateHandler extends RequestHandler {
 	private ConsentStorage $consent_storage;
+	private Templating $templating;
 	private array $clients;
 
-	public function __construct( ConsentStorage $consent_storage, array $clients ) {
-		$this->clients         = $clients;
+	public function __construct( ConsentStorage $consent_storage, Templating $templating, array $clients ) {
 		$this->consent_storage = $consent_storage;
+		$this->templating      = $templating;
+		$this->clients         = $clients;
 	}
 
 	public function handle( Request $request, Response $response ): Response {
@@ -35,18 +38,21 @@ class AuthenticateHandler extends RequestHandler {
 			exit;
 		}
 
-		$parameters = array(
-			'user_nicename'   => wp_get_current_user()->user_nicename,
-			'client_name'     => $client_name,
-			'body_class_attr' => implode( ' ', array_diff( get_body_class( 'openid-connect-authentication' ), array( 'error404' ) ) ),
-			'has_permission'  => current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) ),
-			'account_name'    => get_bloginfo( 'name' ),
-			'cancel_url'      => Router::make_url(),
-			'form_url'        => Router::make_rest_url( 'authorize' ),
-			'form_fields'     => $request->getAllQueryParameters(),
+		// phpcs:disable
+		echo $this->templating->render(
+			'authorize.php',
+			array(
+				'user_nicename'   => wp_get_current_user()->user_nicename,
+				'client_name'     => $client_name,
+				'body_class_attr' => implode( ' ', array_diff( get_body_class( 'openid-connect-authentication' ), array( 'error404' ) ) ),
+				'has_permission'  => current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) ),
+				'account_name'    => get_bloginfo( 'name' ),
+				'cancel_url'      => Router::make_url(),
+				'form_url'        => Router::make_rest_url( 'authorize' ),
+				'form_fields'     => $request->getAllQueryParameters(),
+			)
 		);
-
-		include __DIR__ . '/../../Template/Authorize.php';
+		// phpcs:enable
 
 		// TODO: return response instead of exiting.
 		exit;
