@@ -12,7 +12,11 @@ class Router {
 
 	private array $rest_routes = array();
 
-	public static function make_rest_url( $route ): string {
+	public static function make_url( string $route = '' ): string {
+		return home_url( "/$route" );
+	}
+
+	public static function make_rest_url( string $route ): string {
 		return rest_url( self::PREFIX . "/$route" );
 	}
 

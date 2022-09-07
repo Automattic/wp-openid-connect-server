@@ -4,6 +4,7 @@ namespace OpenIDConnectServer;
 
 use OAuth2\Request;
 use OpenIDConnectServer\Http\Handlers\AuthorizeHandler;
+use OpenIDConnectServer\Http\Handlers\ConfigurationHandler;
 use OpenIDConnectServer\Http\Handlers\WebKeySetsHandler;
 use OpenIDConnectServer\Http\Handlers\TokenHandler;
 use OpenIDConnectServer\Http\Handlers\UserInfoHandler;
@@ -14,8 +15,6 @@ use OpenIDConnectServer\Storage\ClientCredentialsStorage;
 use OpenIDConnectServer\Storage\ConsentStorage;
 use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
-use function openssl_pkey_get_details;
-use function openssl_pkey_get_public;
 
 class OpenIDConnectServer {
 	private $router;
@@ -51,32 +50,10 @@ class OpenIDConnectServer {
 		$this->router->add_rest_route( 'userinfo', new UserInfoHandler( $server ), array( 'GET', 'POST' ) );
 
 		// Declare non-rest routes.
-		$this->router->add_route( '.well-known/jwks.json', new WebKeySetsHandler( $this->public_key) );
+		$this->router->add_route( '.well-known/jwks.json', new WebKeySetsHandler( $this->public_key ) );
+		$this->router->add_route( '.well-known/openid-configuration', new ConfigurationHandler() );
 
-		add_action( 'template_redirect', array( $this, 'openid_configuration' ) );
 		add_action( 'template_redirect', array( $this, 'openid_authenticate' ) );
-	}
-
-	public function openid_configuration() {
-		if ( empty( $_SERVER['REQUEST_URI'] ) || '/.well-known/openid-configuration' !== $_SERVER['REQUEST_URI'] ) {
-			return;
-		}
-		status_header( 200 );
-		header( 'Content-type: application/json' );
-		header( 'Access-Control-Allow-Origin: *' );
-		echo wp_json_encode(
-			array(
-				'issuer'                                => home_url( '/' ),
-				'authorization_endpoint'                => rest_url( 'openid-connect/authorize' ),
-				'token_endpoint'                        => rest_url( 'openid-connect/token' ),
-				'userinfo_endpoint'                     => rest_url( 'openid-connect/userinfo' ),
-				'jwks_uri'                              => home_url( '/.well-known/jwks.json' ),
-				'scopes_supported'                      => array( 'openid', 'profile' ),
-				'response_types_supported'              => array( 'code' ),
-				'id_token_signing_alg_values_supported' => array( 'RS256' ),
-			)
-		);
-		exit;
 	}
 
 	public function openid_authenticate() {
