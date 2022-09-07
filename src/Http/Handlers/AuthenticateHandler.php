@@ -7,7 +7,7 @@ use OAuth2\Response;
 use OpenIDConnectServer\Http\RequestHandler;
 use OpenIDConnectServer\Http\Router;
 use OpenIDConnectServer\Storage\ConsentStorage;
-use OpenIDConnectServer\Templating;
+use OpenIDConnectServer\Templating\Templating;
 
 class AuthenticateHandler extends RequestHandler {
 	private ConsentStorage $consent_storage;

@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenIDConnectServer;
+namespace OpenIDConnectServer\Templating;
 
 class Templating {
 	private string $path_to_templates_dir;
