@@ -42,11 +42,10 @@ class AuthenticateHandler extends RequestHandler {
 		echo $this->templating->render(
 			'authenticate/main',
 			array(
-				'user_nicename'   => wp_get_current_user()->user_nicename,
+				'user'            => wp_get_current_user(),
 				'client_name'     => $client_name,
 				'body_class_attr' => implode( ' ', array_diff( get_body_class( 'openid-connect-authentication' ), array( 'error404' ) ) ),
 				'has_permission'  => current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) ),
-				'account_name'    => get_bloginfo( 'name' ),
 				'cancel_url'      => Router::make_url(),
 				'form_url'        => Router::make_rest_url( 'authorize' ),
 				'form_fields'     => $request->getAllQueryParameters(),

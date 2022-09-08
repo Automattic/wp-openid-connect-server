@@ -20,7 +20,7 @@
 		sprintf(
 		// translators: %s is a username.
 			__( 'Hi %s!', 'wp-openid-connect-server' ),
-			$data->user_nicename
+			$data->user->user_nicename
 		)
 	);
 	?>
@@ -36,7 +36,7 @@
 				// translators: %1$s is the site name, %2$s is the username.
 					__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
 					$data->client_name,
-					$data->account_name
+					get_bloginfo( 'name' )
 				),
 				array(
 					'em' => array(),
