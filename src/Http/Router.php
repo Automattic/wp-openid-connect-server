@@ -25,7 +25,7 @@ class Router {
 	}
 
 	public function add_route( string $route, RequestHandler $handler ) {
-		if ( array_key_exists( $route, $this->rest_routes ) ) {
+		if ( isset( $this->rest_routes[ $route ] ) ) {
 			return;
 		}
 
@@ -34,7 +34,7 @@ class Router {
 
 	public function add_rest_route( string $route, RequestHandler $handler, array $methods = array( 'GET' ) ) {
 		$route_with_prefix = self::PREFIX . "/$route";
-		if ( array_key_exists( $route_with_prefix, $this->rest_routes ) ) {
+		if ( isset( $this->rest_routes[ $route_with_prefix ] ) ) {
 			return;
 		}
 
@@ -70,7 +70,7 @@ class Router {
 		$route = strtok( $uri, '?' );
 		$route = ltrim( $route, '/' );
 
-		if ( ! array_key_exists( $route, $this->routes ) ) {
+		if ( ! isset( $this->routes[ $route ] ) ) {
 			return;
 		}
 
@@ -88,7 +88,7 @@ class Router {
 		// Remove leading slashes.
 		$route = ltrim( $route, '/' );
 
-		if ( ! array_key_exists( $route, $this->rest_routes ) ) {
+		if ( ! isset( $this->rest_routes[ $route ] ) ) {
 			$response = new Response();
 			$response->setStatusCode( 404 );
 			$response->send();

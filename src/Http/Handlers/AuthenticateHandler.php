@@ -55,7 +55,7 @@ class AuthenticateHandler extends RequestHandler {
 	private function get_client_name( Request $request ): string {
 		$client_id = $request->query( 'client_id' );
 
-		if ( ! array_key_exists( $client_id, $this->clients ) ) {
+		if ( ! isset( $this->clients[ $client_id ] ) ) {
 			return '';
 		}
 

@@ -32,7 +32,7 @@ class ClientCredentialsStorage implements ClientCredentialsInterface {
 
 		$client = $this->get( $client_id );
 
-		if ( ! array_key_exists( 'scope', $client ) ) {
+		if ( ! isset( $client['scope'] ) ) {
 			return '';
 		}
 
@@ -46,7 +46,7 @@ class ClientCredentialsStorage implements ClientCredentialsInterface {
 
 		$client = $this->get( $client_id );
 
-		if ( ! array_key_exists( 'grant_types', $client ) ) {
+		if ( ! isset( $client['grant_types'] ) ) {
 			return false;
 		}
 
