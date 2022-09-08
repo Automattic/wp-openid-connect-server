@@ -33,7 +33,7 @@ class AuthorizeHandler extends RequestHandler {
 		}
 
 		$user = wp_get_current_user();
-		if ( $this->consent_storage->needs_consent( get_current_user_id() ) ) {
+		if ( $this->consent_storage->needs_consent( $user->ID ) ) {
 			if ( ! isset( $_POST['authorize'] ) || 'Authorize' !== $_POST['authorize'] ) {
 				$response->send();
 				exit;
