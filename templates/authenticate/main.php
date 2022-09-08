@@ -25,28 +25,25 @@
 	);
 	?>
 </p>
-<?php if ( ! $data->has_permission ) : ?>
-	<p><?php esc_html_e( "Unfortunately your user doesn't have sufficient permissions to use OpenID Connect on this server.", 'wp-openid-connect-server' ); ?></p>
-<?php else : ?>
-	<p>
-		<label>
-			<?php
-			echo wp_kses(
-				sprintf(
-				// translators: %1$s is the site name, %2$s is the username.
-					__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
-					$data->client_name,
-					get_bloginfo( 'name' )
-				),
-				array(
-					'em' => array(),
-				)
-			);
-			?>
-		</label>
-	</p>
-	<?php $data->templates->partial( 'authenticate/form' ); ?>
-<?php endif; ?>
+<p>
+	<label>
+		<?php
+		echo wp_kses(
+			sprintf(
+			// translators: %1$s is the site name, %2$s is the username.
+				__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
+				$data->client_name,
+				get_bloginfo( 'name' )
+			),
+			array(
+				'em' => array(),
+			)
+		);
+		?>
+	</label>
+</p>
+<?php $data->templates->partial( 'authenticate/form' ); ?>
+
 <?php wp_footer(); ?>
 </body>
 </html>

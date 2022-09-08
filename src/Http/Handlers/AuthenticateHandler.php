@@ -38,20 +38,24 @@ class AuthenticateHandler extends RequestHandler {
 			exit;
 		}
 
-		// phpcs:disable
-		echo $this->templating->render(
-			'authenticate/main',
-			array(
-				'user'            => wp_get_current_user(),
-				'client_name'     => $client_name,
-				'body_class_attr' => implode( ' ', array_diff( get_body_class( 'openid-connect-authentication' ), array( 'error404' ) ) ),
-				'has_permission'  => current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) ),
-				'cancel_url'      => Router::make_url(),
-				'form_url'        => Router::make_rest_url( 'authorize' ),
-				'form_fields'     => $request->getAllQueryParameters(),
-			)
+		$data = array(
+			'user'            => wp_get_current_user(),
+			'client_name'     => $client_name,
+			'body_class_attr' => implode( ' ', array_diff( get_body_class( 'openid-connect-authentication' ), array( 'error404' ) ) ),
+			'cancel_url'      => Router::make_url(),
+			'form_url'        => Router::make_rest_url( 'authorize' ),
+			'form_fields'     => $request->getAllQueryParameters(),
 		);
-		// phpcs:enable
+
+		$has_permission = current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) );
+		if ( ! $has_permission ) {
+			// phpcs:ignore
+			echo $this->templating->render( 'authenticate/forbidden', $data );
+			exit;
+		}
+
+		// phpcs:ignore
+		echo $this->templating->render( 'authenticate/main', $data );
 
 		// TODO: return response instead of exiting.
 		exit;
