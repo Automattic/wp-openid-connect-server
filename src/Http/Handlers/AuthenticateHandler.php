@@ -40,7 +40,7 @@ class AuthenticateHandler extends RequestHandler {
 
 		// phpcs:disable
 		echo $this->templating->render(
-			'authorize',
+			'authenticate/main',
 			array(
 				'user_nicename'   => wp_get_current_user()->user_nicename,
 				'client_name'     => $client_name,

@@ -45,7 +45,7 @@
 			?>
 		</label>
 	</p>
-	<?php $data->templates->partial( 'authorize-form' ); ?>
+	<?php $data->templates->partial( 'authenticate/form' ); ?>
 <?php endif; ?>
 <?php wp_footer(); ?>
 </body>
