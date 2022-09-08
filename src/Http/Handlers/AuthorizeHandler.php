@@ -39,7 +39,7 @@ class AuthorizeHandler extends RequestHandler {
 				exit;
 			}
 
-			$this->consent_storage->update_timestamp( get_current_user_id() );
+			$this->consent_storage->update_timestamp( $user->ID );
 		}
 
 		return $this->server->handleAuthorizeRequest( $request, $response, true, $user->user_login );
