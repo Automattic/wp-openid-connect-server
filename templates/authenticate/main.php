@@ -4,11 +4,7 @@
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php wp_head(); ?>
-	<style>
-		.openid-connect-authentication {
-			padding: 4em;
-		}
-	</style>
+	<?php $data->templates->partial( 'authenticate/style' ); ?>
 	<title>OpenID Connect</title>
 </head>
 
