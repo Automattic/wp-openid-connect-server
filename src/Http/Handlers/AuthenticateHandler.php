@@ -41,7 +41,7 @@ class AuthenticateHandler extends RequestHandler {
 		$data = array(
 			'user'            => wp_get_current_user(),
 			'client_name'     => $client_name,
-			'body_class_attr' => implode( ' ', array_diff( get_body_class( 'openid-connect-authenticate' ), array( 'error404' ) ) ),
+			'body_class_attr' => implode( ' ', array_diff( get_body_class(), array( 'error404' ) ) ),
 			'cancel_url'      => Router::make_url(),
 			'form_url'        => Router::make_rest_url( 'authorize' ),
 			'form_fields'     => $request->getAllQueryParameters(),

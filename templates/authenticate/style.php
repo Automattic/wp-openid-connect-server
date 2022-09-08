@@ -1,5 +1,7 @@
 <style>
 	.openid-connect-authenticate {
-		padding: 4em;
+		width: 320px;
+		padding: 5% 0 0;
+		margin: auto;
 	}
 </style>
