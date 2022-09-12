@@ -5,9 +5,9 @@ namespace OpenIDConnectServer;
 use OpenIDConnectServer\Http\Handlers\AuthenticateHandler;
 use OpenIDConnectServer\Http\Handlers\AuthorizeHandler;
 use OpenIDConnectServer\Http\Handlers\ConfigurationHandler;
-use OpenIDConnectServer\Http\Handlers\WebKeySetsHandler;
 use OpenIDConnectServer\Http\Handlers\TokenHandler;
 use OpenIDConnectServer\Http\Handlers\UserInfoHandler;
+use OpenIDConnectServer\Http\Handlers\WebKeySetsHandler;
 use OpenIDConnectServer\Http\Router;
 use OpenIDConnectServer\Overrides\Server;
 use OpenIDConnectServer\Storage\AuthorizationCodeStorage;
@@ -15,18 +15,21 @@ use OpenIDConnectServer\Storage\ClientCredentialsStorage;
 use OpenIDConnectServer\Storage\ConsentStorage;
 use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
+use OpenIDConnectServer\Templating\Templating;
 
 class OpenIDConnectServer {
 	private string $public_key;
 	private array $clients;
 	private Router $router;
 	private ConsentStorage $consent_storage;
+	private Templating $templating;
 
 	public function __construct( string $public_key, string $private_key, array $clients ) {
 		$this->public_key      = $public_key;
 		$this->clients         = $clients;
-		$this->consent_storage = new ConsentStorage();
 		$this->router          = new Router();
+		$this->consent_storage = new ConsentStorage();
+		$this->templating      = new Templating();
 
 		$config = array(
 			'use_jwt_access_tokens' => true,
@@ -51,6 +54,6 @@ class OpenIDConnectServer {
 		// Declare non-rest routes.
 		$this->router->add_route( '.well-known/jwks.json', new WebKeySetsHandler( $this->public_key ) );
 		$this->router->add_route( '.well-known/openid-configuration', new ConfigurationHandler() );
-		$this->router->add_route( 'openid-connect/authenticate', new AuthenticateHandler( $this->consent_storage, $this->clients ) );
+		$this->router->add_route( 'openid-connect/authenticate', new AuthenticateHandler( $this->consent_storage, $this->templating, $this->clients ) );
 	}
 }

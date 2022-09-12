@@ -7,19 +7,22 @@ use OAuth2\Response;
 use OpenIDConnectServer\Http\RequestHandler;
 use OpenIDConnectServer\Http\Router;
 use OpenIDConnectServer\Storage\ConsentStorage;
+use OpenIDConnectServer\Templating\Templating;
 
 class AuthenticateHandler extends RequestHandler {
 	private ConsentStorage $consent_storage;
+	private Templating $templating;
 	private array $clients;
 
-	public function __construct( ConsentStorage $consent_storage, array $clients ) {
-		$this->clients         = $clients;
+	public function __construct( ConsentStorage $consent_storage, Templating $templating, array $clients ) {
 		$this->consent_storage = $consent_storage;
+		$this->templating      = $templating;
+		$this->clients         = $clients;
 	}
 
 	public function handle( Request $request, Response $response ): Response {
 		$client_name = $this->get_client_name( $request );
-		if ( ! $client_name ) {
+		if ( empty( $client_name ) ) {
 			$response->setStatusCode( 404 );
 
 			return $response;
@@ -29,24 +32,46 @@ class AuthenticateHandler extends RequestHandler {
 			auth_redirect();
 		}
 
-		if ( $this->consent_storage->needs_consent( get_current_user_id() ) ) {
-			define( 'OIDC_DISPLAY_AUTHORIZE', true );
-			include __DIR__ . '/../../Template/Authorize.php';
-		} else {
-			// rebuild request with all parameters and send to authorize endpoint.
-			wp_safe_redirect(
-				add_query_arg(
-					array_merge(
-						array( '_wpnonce' => wp_create_nonce( 'wp_rest' ) ),
-						$request->getAllQueryParameters()
-					),
-					Router::make_rest_url( 'authorize' )
-				)
-			);
+		if ( ! $this->consent_storage->needs_consent( get_current_user_id() ) ) {
+			$this->redirect( $request );
+			// TODO: return response instead of exiting.
+			exit;
 		}
+
+		$data = array(
+			'user'            => wp_get_current_user(),
+			'client_name'     => $client_name,
+			'body_class_attr' => implode( ' ', array_diff( get_body_class(), array( 'error404' ) ) ),
+			'cancel_url'      => Router::make_url(),
+			'form_url'        => Router::make_rest_url( 'authorize' ),
+			'form_fields'     => $request->getAllQueryParameters(),
+		);
+
+		$has_permission = current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) );
+		if ( ! $has_permission ) {
+			// phpcs:ignore
+			echo $this->templating->render( 'authenticate/forbidden', $data );
+			exit;
+		}
+
+		// phpcs:ignore
+		echo $this->templating->render( 'authenticate/main', $data );
 
 		// TODO: return response instead of exiting.
 		exit;
+	}
+
+	private function redirect( Request $request ) {
+		// Rebuild request with all parameters and send to authorize endpoint.
+		wp_safe_redirect(
+			add_query_arg(
+				array_merge(
+					array( '_wpnonce' => wp_create_nonce( 'wp_rest' ) ),
+					$request->getAllQueryParameters()
+				),
+				Router::make_rest_url( 'authorize' )
+			)
+		);
 	}
 
 	/**
