@@ -7,8 +7,14 @@ namespace OpenIDConnectServer\Overrides\OpenID\Controller;
 
 use OAuth2\OpenID\Controller\AuthorizeController as BaseOpenIDAuthorizeController;
 use OAuth2\OpenID\ResponseType\IdToken;
+use OAuth2\Storage\ClientInterface;
+use OAuth2\ScopeInterface;
 
 class AuthorizeController extends BaseOpenIDAuthorizeController {
+	public function __construct( ClientInterface $clientStorage, array $responseTypes, array $config, ScopeInterface $scopeUtil ) {
+		parent::__construct( $clientStorage, $responseTypes, $config, $scopeUtil );
+	}
+
 	protected function buildAuthorizeParameters( $request, $response, $user_id ) {
 		$params = parent::buildAuthorizeParameters( $request, $response, $user_id );
 		if ( ! $params ) {
