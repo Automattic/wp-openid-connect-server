@@ -65,8 +65,10 @@ function oidc_clients() {
 }
 ```
 
-## Override templates
-You can override templates provided by this plugin from a theme. To do so, you should create an `openid-connect/` directory under your theme's root:
+## Overriding templates
+The pages provided by this plugin are rendered using templates. If you so wish, you can use your own templates instead of this plugins's [default templates](templates).
+
+To do so, you should create an `openid-connect/` directory under your theme, containing only the templates you wish to override. For example, if you wanted to override `authenticate/main.php` and `authenticate/forbidden.php` you would create them under an `openid-connect/` directory in your theme:
 
 ```shell
 wp-content/themes/my-theme/
@@ -74,3 +76,33 @@ wp-content/themes/my-theme/
  │──── main.php
  └──── forbidden.php
 ```
+
+Templates are passed a single `$data` variable containing the values necessary to render said template. For example, you can access the current user as follows:
+
+```php
+// wp-content/themes/my-theme/main.php
+
+/** @var stdClass $data **/
+
+/** @var string $user The OIDC client name */
+$client_name = $data->client_name;
+```
+
+You can of course also call any other WordPress function, like you would in any other file in your theme.
+
+### Partials
+In your templates, you can include partial templates (aka partials) by calling `$data->templates->partial()`:
+
+```php
+// wp-content/themes/my-theme/main.php
+
+/** @var stdClass $data **/
+
+/** @var \OpenIDConnectServer\Templating\Templating $templates */
+$templates = $data->templates;
+
+// Renders the <form> in the 'authenticate/form.php' partial.
+$templates->partial( 'authenticate/form' )
+```
+
+Partials are also passed the `$data` variable.
