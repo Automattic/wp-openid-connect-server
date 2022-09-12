@@ -56,6 +56,19 @@ class Router {
 		);
 	}
 
+	private function get_current_route() {
+		$wp_url        = get_site_url();
+		$installed_dir = parse_url( $wp_url, PHP_URL_PATH );
+
+		// requested uri relative to WP install
+		$request_uri = str_replace( $installed_dir, '', $_SERVER['REQUEST_URI'] );
+
+		$uri   = sanitize_text_field( wp_unslash( $request_uri ) );
+		$route = strtok( $uri, '?' );
+
+		return trim( $route, '/' );
+	}
+
 	/**
 	 * This method is meant for internal use in this class only.
 	 * It must not be used elsewhere.
@@ -66,9 +79,7 @@ class Router {
 			return;
 		}
 
-		$uri   = sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) );
-		$route = strtok( $uri, '?' );
-		$route = ltrim( $route, '/' );
+		$route = $this->get_current_route();
 
 		if ( ! isset( $this->routes[ $route ] ) ) {
 			return;
