@@ -1,5 +1,7 @@
 <?php
 
+//phpcs:disable WordPress.Security.NonceVerification.Recommended
+
 namespace OpenIDConnectServer\Storage;
 
 use OAuth2\OpenID\Storage\UserClaimsInterface;
