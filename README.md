@@ -64,3 +64,13 @@ function oidc_clients() {
 	);
 }
 ```
+
+## Override templates
+You can override templates provided by this plugin from a theme. To do so, you should create an `openid-connect/` directory under your theme's root:
+
+```shell
+wp-content/themes/my-theme/
+ │── openid-connect/
+ │──── main.php
+ └──── forbidden.php
+```
