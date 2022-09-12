@@ -17,8 +17,11 @@ class AuthorizeController extends BaseOpenIDAuthorizeController {
 		// Generate an id token if needed.
 		if ( $this->needsIdToken( $this->getScope() ) && $this->getResponseType() === self::RESPONSE_TYPE_AUTHORIZATION_CODE ) {
 			// START MODIFICATION.
-			$userClaims         = $this->clientStorage->getUserClaims( $user_id, $params['scope'] );
-			$params['id_token'] = $this->responseTypes['id_token']->createIdToken( $this->getClientId(), $user_id, $this->getNonce(), $userClaims );
+			// we obtain response and parse out id_token from it, since we need user claims for the right token, which we don't have access to here
+			list( $redirect_uri, $response ) = $this->responseTypes['id_token']->getAuthorizeResponse(
+				array( 'client_id' => $this->getClientId(), 'nonce' => $this->getNonce(), 'scope' => $this->getScope(), 'state' => $this->getState(), 'redirect_uri' => $this->getRedirectUri() )
+			);
+			$params['id_token'] = $response['fragment']['id_token'];
 			// END MODIFICATION.
 		}
 
