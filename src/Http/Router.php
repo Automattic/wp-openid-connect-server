@@ -63,7 +63,7 @@ class Router {
 		// requested uri relative to WP install
 		$request_uri = str_replace( $installed_dir, '', $_SERVER['REQUEST_URI'] );
 
-		$uri   = sanitize_url( wp_unslash( $request_uri ) );
+		$uri   = esc_url_raw( wp_unslash( $request_uri ) );
 		$route = strtok( $uri, '?' );
 
 		return trim( $route, '/' );
