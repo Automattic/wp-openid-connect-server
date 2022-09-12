@@ -77,6 +77,9 @@ wp-content/themes/my-theme/
  └──── forbidden.php
 ```
 
+If your theme is a child theme, this plugin will first look for templates under the child theme, and then in the parent theme. If it doesn't find a template, it will fall back to using the default template.
+
+### Data
 Templates are passed a single `$data` variable containing the values necessary to render said template. For example, you can access the name of the OIDC client as follows:
 
 ```php
