@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:disable WordPress.Security.NonceVerification.Missing
+
 namespace OpenIDConnectServer\Http\Handlers;
 
 use OAuth2\Request;
