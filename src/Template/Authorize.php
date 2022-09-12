@@ -2,6 +2,9 @@
 
 namespace OpenIDConnectServer;
 
+use OpenIDConnectServer\Http\Router;
+use const OpenIDConnectServer\Http\Handlers\OIDC_DEFAULT_MINIMAL_CAPABILITY;
+
 if ( ! defined( 'OIDC_DISPLAY_AUTHORIZE' ) || ! OIDC_DISPLAY_AUTHORIZE ) {
 	return;
 }
@@ -34,7 +37,7 @@ if ( ! defined( 'OIDC_DISPLAY_AUTHORIZE' ) || ! OIDC_DISPLAY_AUTHORIZE ) {
 <?php if ( ! current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) ) ) : ?>
 	<p><?php esc_html_e( "Unfortunately your user doesn't have sufficient permissions to use OpenID Connect on this server.", 'wp-openid-connect-server' ); ?></p>
 <?php else : ?>
-	<form method="post" action="<?php echo esc_url( rest_url( Rest::NAMESPACE . '/authorize' ) ); ?>">
+	<form method="post" action="<?php echo esc_url( Router::make_rest_url( 'authorize' ) ); ?>">
 		<?php wp_nonce_field( 'wp_rest' ); /* The nonce will give the REST call the userdata. */ ?>
 		<?php foreach ( $request->getAllQueryParameters() as $key => $value ) : ?>
 			<input type="hidden" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>"/>
@@ -46,7 +49,7 @@ if ( ! defined( 'OIDC_DISPLAY_AUTHORIZE' ) || ! OIDC_DISPLAY_AUTHORIZE ) {
 					sprintf(
 					// translators: %1$s is the site name, %2$s is the username.
 						__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
-						OAuth2Storage::getClientName( $request->query( 'client_id' ) ),
+						$client_name,
 						get_bloginfo( 'name' )
 					),
 					array(
