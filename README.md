@@ -77,14 +77,14 @@ wp-content/themes/my-theme/
  └──── forbidden.php
 ```
 
-Templates are passed a single `$data` variable containing the values necessary to render said template. For example, you can access the current user as follows:
+Templates are passed a single `$data` variable containing the values necessary to render said template. For example, you can access the name of the OIDC client as follows:
 
 ```php
 // wp-content/themes/my-theme/main.php
 
 /** @var stdClass $data **/
 
-/** @var string $user The OIDC client name */
+/** @var string $client_name The OIDC client name */
 $client_name = $data->client_name;
 ```
 
