@@ -15,14 +15,15 @@ class AuthorizeController extends BaseOpenIDAuthorizeController {
 			return;
 		}
 
-		// Generate an id token if needed.
-		if ( $this->needsIdToken( $this->getScope() ) && $this->getResponseType() === self::RESPONSE_TYPE_AUTHORIZATION_CODE ) {
-			$userClaims         = $this->clientStorage->getUserClaims( $user_id, $params['scope'] );
-
-			/** @var IdToken $id_token */
-			$id_token = $this->responseTypes['id_token'];
-			$params['id_token'] = $id_token->createIdToken( $this->getClientId(), $user_id, $this->getNonce(), $userClaims );
+		if ( ! $this->needsIdToken( $this->getScope() ) || self::RESPONSE_TYPE_AUTHORIZATION_CODE !== $this->getResponseType() ) {
+			return $params;
 		}
+
+		/** @var IdToken $id_token */
+		$id_token = $this->responseTypes['id_token'];
+
+		$userClaims         = $this->clientStorage->getUserClaims( $user_id, $params['scope'] );
+		$params['id_token'] = $id_token->createIdToken( $this->getClientId(), $user_id, $this->getNonce(), $userClaims );
 
 		return $params;
 	}
