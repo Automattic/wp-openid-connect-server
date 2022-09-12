@@ -7,6 +7,7 @@ namespace OpenIDConnectServer\Overrides;
 use OAuth2\Server as BaseServer;
 use OAuth2\OpenID\Controller\AuthorizeController as BaseAuthorizeController;
 use OpenIDConnectServer\Overrides\OpenID\Controller\AuthorizeController;
+use OpenIDConnectServer\Storage\UserClaimsStorage;
 
 class Server extends BaseServer {
 	protected function createDefaultAuthorizeController() {
@@ -15,7 +16,7 @@ class Server extends BaseServer {
 		if ( $controller instanceof BaseAuthorizeController ) {
 			// Override it with our own controller.
 			$config     = array_intersect_key( $this->config, array_flip( explode( ' ', 'allow_implicit enforce_state require_exact_redirect_uri' ) ) );
-			$controller = new AuthorizeController( $this->storages['client'], $this->responseTypes, $config, $this->getScopeUtil() );
+			$controller = new AuthorizeController( $this->storages['client'], $this->responseTypes, $config, $this->getScopeUtil(), new UserClaimsStorage() );
 		}
 
 		return $controller;
