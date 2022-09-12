@@ -24,9 +24,6 @@ class AuthorizeController extends BaseOpenIDAuthorizeController {
 			$params['id_token'] = $id_token->createIdToken( $this->getClientId(), $user_id, $this->getNonce(), $userClaims );
 		}
 
-		// Add the nonce to return with the redirect URI.
-		$params['nonce'] = $this->getNonce();
-
 		return $params;
 	}
 }
