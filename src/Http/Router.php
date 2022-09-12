@@ -56,14 +56,14 @@ class Router {
 		);
 	}
 
-	private function get_current_route() {
+	private function get_current_route(): string {
 		$wp_url        = get_site_url();
-		$installed_dir = parse_url( $wp_url, PHP_URL_PATH );
+		$installed_dir = wp_parse_url( $wp_url, PHP_URL_PATH );
 
-		// requested uri relative to WP install
-		$request_uri = str_replace( $installed_dir, '', $_SERVER['REQUEST_URI'] );
+		// Requested URI relative to WP install.
+		$uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		$uri = str_replace( $installed_dir, '', $uri );
 
-		$uri   = sanitize_text_field( wp_unslash( $request_uri ) );
 		$route = strtok( $uri, '?' );
 
 		return trim( $route, '/' );
