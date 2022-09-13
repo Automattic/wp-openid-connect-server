@@ -73,8 +73,9 @@ To do so, you should create an `openid-connect/` directory under your theme, con
 ```shell
 wp-content/themes/my-theme/
  │── openid-connect/
- │──── main.php
- └──── forbidden.php
+ │──── authenticate/
+ │────── main.php
+ └────── forbidden.php
 ```
 
 If your theme is a child theme, this plugin will first look for templates under the child theme, and then in the parent theme. If it doesn't find a template, it will fall back to using the default template.
@@ -83,7 +84,7 @@ If your theme is a child theme, this plugin will first look for templates under 
 Templates are passed a single `$data` variable containing the values necessary to render said template. For example, you can access the name of the OIDC client as follows:
 
 ```php
-// wp-content/themes/my-theme/main.php
+// wp-content/themes/my-theme/openid-connect/authenticate/main.php
 
 /** @var stdClass $data **/
 
@@ -97,7 +98,7 @@ You can of course also call any other WordPress function, like you would in any 
 In your templates, you can include partial templates (aka partials) by calling `$data->templates->partial()`:
 
 ```php
-// wp-content/themes/my-theme/main.php
+// wp-content/themes/my-theme/openid-connect/authenticate/main.php
 
 /** @var stdClass $data **/
 
