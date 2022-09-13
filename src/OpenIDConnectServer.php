@@ -9,13 +9,13 @@ use OpenIDConnectServer\Http\Handlers\TokenHandler;
 use OpenIDConnectServer\Http\Handlers\UserInfoHandler;
 use OpenIDConnectServer\Http\Handlers\WebKeySetsHandler;
 use OpenIDConnectServer\Http\Router;
-use OpenIDConnectServer\Overrides\Server;
 use OpenIDConnectServer\Storage\AuthorizationCodeStorage;
 use OpenIDConnectServer\Storage\ClientCredentialsStorage;
 use OpenIDConnectServer\Storage\ConsentStorage;
 use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
 use OpenIDConnectServer\Templating\Templating;
+use OAuth2\Server;
 
 class OpenIDConnectServer {
 	private string $public_key;
