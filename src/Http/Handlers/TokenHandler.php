@@ -4,8 +4,8 @@ namespace OpenIDConnectServer\Http\Handlers;
 
 use OAuth2\Request;
 use OAuth2\Response;
+use OAuth2\Server as OAuth2Server;
 use OpenIDConnectServer\Http\RequestHandler;
-use OpenIDConnectServer\Overrides\Server as OAuth2Server;
 
 class TokenHandler extends RequestHandler {
 	private OAuth2Server $server;
