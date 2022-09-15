@@ -18,7 +18,7 @@ class UserClaimsStorage implements UserClaimsInterface {
 		}
 
 		$scopes = explode( ' ', $scope );
-		if ( ! isset( $scopes['profile'] ) ) {
+		if ( ! in_array( 'profile', $scopes, true ) ) {
 			return $claims;
 		}
 

@@ -6,8 +6,8 @@ namespace OpenIDConnectServer\Http\Handlers;
 
 use OAuth2\Request;
 use OAuth2\Response;
+use OAuth2\Server as OAuth2Server;
 use OpenIDConnectServer\Http\RequestHandler;
-use OpenIDConnectServer\Overrides\Server as OAuth2Server;
 use OpenIDConnectServer\Storage\ConsentStorage;
 
 const OIDC_DEFAULT_MINIMAL_CAPABILITY = 'edit_posts';

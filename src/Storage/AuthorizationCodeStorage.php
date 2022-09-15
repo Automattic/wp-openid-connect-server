@@ -77,6 +77,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 					'expires'      => 'expires',
 					'redirect_uri' => 'redirect_uri',
 					'scope'        => 'scope',
+					'id_token'     => 'id_token',
 				) as $key => $meta_key
 			) {
 				$authorization_code[ $key ] = get_term_meta( $term->term_id, $meta_key, true );
