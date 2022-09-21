@@ -1,6 +1,6 @@
 <?php /** @var stdClass $data */ ?>
 
-<form method="post" action="<?php echo esc_url( $data->form_url ); ?>">
+<form method="GET" action="<?php echo esc_url( $data->form_url ); ?>">
 	<?php wp_nonce_field( 'wp_rest' ); /* The nonce will give the REST call the userdata. */ ?>
 	<?php foreach ( $data->form_fields as $key => $value ) : ?>
 		<input type="hidden" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>"/>
