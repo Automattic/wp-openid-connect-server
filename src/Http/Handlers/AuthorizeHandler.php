@@ -36,7 +36,7 @@ class AuthorizeHandler extends RequestHandler {
 
 		$user = wp_get_current_user();
 		if ( $this->consent_storage->needs_consent( $user->ID ) ) {
-			// phpcs:disable WordPress.Security.NonceVerification.Recommended We already have REST API nonce validating the user intention with this request
+			// phpcs:disable WordPress.Security.NonceVerification.Recommended -- We already have REST API nonce validating the user intention with this request
 			if ( ! isset( $_REQUEST['authorize'] ) || 'Authorize' !== $_REQUEST['authorize'] ) {
 				$response->send();
 				exit;
