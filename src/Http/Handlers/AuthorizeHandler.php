@@ -22,6 +22,13 @@ class AuthorizeHandler extends RequestHandler {
 	}
 
 	public function handle( Request $request, Response $response ): Response {
+		// Our dependency bshaffer's OAuth library currently has a bug where it doesn't pick up nonce correctly if it's a POST request to the Authorize endpoint.
+		// Fix has been contributed upstream (https://github.com/bshaffer/oauth2-server-php/pull/1032) but it doesn't look it would be merged anytime soon based on recent activity.
+		// Hence, as a temporary fix, we are copying over the nonce from parsed $_POST values to parsed $_GET values in $request object here.
+		if ( isset( $request->request['nonce'] ) && ! isset( $request->query['nonce'] ) ) {
+			$request->query['nonce'] = $request->request['nonce'];
+		}
+
 		if ( ! $this->server->validateAuthorizeRequest( $request, $response ) ) {
 			return $response;
 		}
