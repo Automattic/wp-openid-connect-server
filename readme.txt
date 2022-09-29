@@ -8,7 +8,6 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Stable tag: trunk
 GitHub Plugin URI: https://github.com/Automattic/wp-openid-connect-server
-Primary Branch: trunk
 
 Use OpenID Connect to log in to other webservices using your own WordPress.
 
@@ -51,9 +50,10 @@ define( 'OIDC_PRIVATE_KEY', file_get_contents( '/web-inaccessible/private.key' )
 
 = Define the clients =
 
-Define your clients like so (this needs to be added before WordPress loads):
+Define your clients by adding a filter to `oidc_registered_clients` in a separate plugin file or `functions.php` of your theme or in a MU-plugin like:
 ```
-function oidc_clients() {
+add_filter( 'oidc_registered_clients', 'my_oidc_clients' );
+function my_oidc_clients() {
 	return array(
 		'client_id_random_string' => array(
 			'name' => 'The name of the Client',
@@ -65,3 +65,49 @@ function oidc_clients() {
 	);
 }
 ```
+
+== Overriding templates ==
+The pages provided by this plugin are rendered using templates. If you so wish, you can use your own templates instead of this plugins's [default templates](templates).
+
+To do so, you should create an `openid-connect/` directory under your theme, containing only the templates you wish to override. For example, if you wanted to override `authenticate/main.php` and `authenticate/forbidden.php` you would create them under an `openid-connect/` directory in your theme:
+
+```shell
+wp-content/themes/my-theme/
+ │── openid-connect/
+ │──── authenticate/
+ │────── main.php
+ └────── forbidden.php
+```
+
+If your theme is a child theme, this plugin will first look for templates under the child theme, and then in the parent theme. If it doesn't find a template, it will fall back to using the default template.
+
+= Data =
+Templates are passed a single `$data` variable containing the values necessary to render said template. For example, you can access the name of the OIDC client as follows:
+
+```php
+// wp-content/themes/my-theme/openid-connect/authenticate/main.php
+
+/** @var stdClass $data **/
+
+/** @var string $client_name The OIDC client name */
+$client_name = $data->client_name;
+```
+
+You can of course also call any other WordPress function, like you would in any other file in your theme.
+
+= Partials =
+In your templates, you can include partial templates (aka partials) by calling `$data->templates->partial()`:
+
+```php
+// wp-content/themes/my-theme/openid-connect/authenticate/main.php
+
+/** @var stdClass $data **/
+
+/** @var \OpenIDConnectServer\Templating\Templating $templates */
+$templates = $data->templates;
+
+// Renders the <form> in the 'authenticate/form.php' partial.
+$templates->partial( 'authenticate/form' )
+```
+
+Partials are also passed the `$data` variable.
