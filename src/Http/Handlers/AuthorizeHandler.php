@@ -42,13 +42,15 @@ class AuthorizeHandler extends RequestHandler {
 		}
 
 		$user = wp_get_current_user();
-		if ( $this->consent_storage->needs_consent( $user->ID ) ) {
+
+		$client_id = $request->request['client_id'];
+		if ( $this->consent_storage->needs_consent( $user->ID, $client_id ) ) {
 			if ( ! isset( $_POST['authorize'] ) || 'Authorize' !== $_POST['authorize'] ) {
 				$response->send();
 				exit;
 			}
 
-			$this->consent_storage->update_timestamp( $user->ID );
+			$this->consent_storage->update_timestamp( $user->ID, $client_id );
 		}
 
 		return $this->server->handleAuthorizeRequest( $request, $response, true, $user->user_login );
