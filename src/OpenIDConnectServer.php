@@ -2,6 +2,8 @@
 
 namespace OpenIDConnectServer;
 
+use OAuth2\Request;
+use OAuth2\Response;
 use OpenIDConnectServer\Http\Handlers\AuthenticateHandler;
 use OpenIDConnectServer\Http\Handlers\AuthorizeHandler;
 use OpenIDConnectServer\Http\Handlers\ConfigurationHandler;
@@ -54,6 +56,14 @@ class OpenIDConnectServer {
 		// Declare non-rest routes.
 		$this->router->add_route( '.well-known/jwks.json', new WebKeySetsHandler( $this->public_key ) );
 		$this->router->add_route( '.well-known/openid-configuration', new ConfigurationHandler() );
-		$this->router->add_route( 'openid-connect/authenticate', new AuthenticateHandler( $this->consent_storage, $this->templating, $this->clients ) );
+		add_action( 'login_form_openid-authenticate', array( $this, 'authenticate_handler' ) );
+	}
+
+	public function authenticate_handler() {
+		$request  = Request::createFromGlobals();
+		$response = new Response();
+
+		$authenticate_handler = new AuthenticateHandler( $this->consent_storage, $this->templating, $this->clients );
+		$authenticate_handler->handle( $request, $response );
 	}
 }

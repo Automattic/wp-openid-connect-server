@@ -35,9 +35,9 @@ class AuthorizeHandler extends RequestHandler {
 
 		// The initial OIDC request will come without a nonce, thus unauthenticated.
 		if ( ! is_user_logged_in() || ! current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) ) ) {
-			// This is handled in the main plugin file and will display a form asking the user to confirm.
+			// This is handled by a hook in wp-login.php which will display a form asking the user to consent.
 			// TODO: Redirect with $response->setRedirect().
-			wp_safe_redirect( add_query_arg( $request->getAllQueryParameters(), home_url( '/openid-connect/authenticate' ) ) );
+			wp_safe_redirect( add_query_arg( $request->getAllQueryParameters(), home_url( '/wp-login.php?action=openid-authenticate' ) ) );
 			exit;
 		}
 
