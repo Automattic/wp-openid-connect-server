@@ -23,7 +23,7 @@ add_action(
 			return;
 		}
 
-		$clients = function_exists( '\oidc_clients' ) ? \oidc_clients() : array();
+		$clients = apply_filters( 'oidc_registered_clients', array() ); // Currently the only way to add clients is to use this filter
 		new OpenIDConnectServer( OIDC_PUBLIC_KEY, OIDC_PRIVATE_KEY, $clients );
 	}
 );
