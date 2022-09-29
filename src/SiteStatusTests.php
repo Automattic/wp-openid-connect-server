@@ -111,7 +111,7 @@ class SiteStatusTests {
 	}
 
 	public function site_status_test_clients(): array {
-		$clients = function_exists( '\oidc_clients' ) ? \oidc_clients() : array();
+		$clients = apply_filters( 'oidc_registered_clients', array() );
 		if ( empty( $clients ) ) {
 			$label  = __( 'No clients have been defined.', 'wp-openid-connect-server' );
 			$status = 'critical';

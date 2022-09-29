@@ -50,9 +50,10 @@ define( 'OIDC_PRIVATE_KEY', file_get_contents( '/web-inaccessible/private.key' )
 
 ### Define the clients
 
-Define your clients like so (this needs to be added before WordPress loads):
+Define your clients by adding a filter to `oidc_registered_clients` in a separate plugin file or `functions.php` of your theme or in a MU-plugin like:
 ```
-function oidc_clients() {
+add_filter( 'oidc_registered_clients', 'my_oidc_clients' );
+function my_oidc_clients() {
 	return array(
 		'client_id_random_string' => array(
 			'name' => 'The name of the Client',
