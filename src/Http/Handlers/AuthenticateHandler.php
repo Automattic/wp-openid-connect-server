@@ -58,8 +58,7 @@ class AuthenticateHandler extends RequestHandler {
 		// phpcs:ignore
 		echo $this->templating->render( 'authenticate/main', $data );
 
-		// TODO: return response instead of exiting.
-		exit;
+		return $response;
 	}
 
 	private function redirect( Request $request ) {
