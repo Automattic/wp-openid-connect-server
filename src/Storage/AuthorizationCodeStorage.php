@@ -21,10 +21,12 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
-		$users = get_users( array(
-			'meta_key'   => self::META_KEY_PREFIX . '_code',
-			'meta_value' => $code,
-		) );
+		$users = get_users(
+			array(
+				'meta_key'   => self::META_KEY_PREFIX . '_code', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value' => $code, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+			)
+		);
 
 		if ( empty( $users ) ) {
 			return null;
@@ -33,9 +35,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		$user    = $users[0];
 		$user_id = absint( $user->ID );
 
-		$authorization_code = array(
-			'user_id' => $user->user_login
-		);
+		$authorization_code = array( 'user_id' => $user->user_login );
 		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
 			$meta_key                   = self::META_KEY_PREFIX . '_' . $key;
 			$authorization_code[ $key ] = get_user_meta( $user_id, $meta_key, true );
@@ -49,11 +49,11 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return;
 		}
 
-		$user = get_user_by( 'login', $user_id ); // We have chosen WordPress' user_login as the user identifier for OIDC context
+		$user = get_user_by( 'login', $user_id ); // We have chosen WordPress' user_login as the user identifier for OIDC context.
 
 		if ( $user ) {
 			foreach ( self::$authorization_code_data as $key => $data_type ) {
-				if ( $data_type === 'int' ) {
+				if ( 'int' === $data_type ) {
 					$value = absint( $$key );
 				} else {
 					$value = sanitize_text_field( $$key );
@@ -69,11 +69,13 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return;
 		}
 
-		$users = get_users( array(
-			'meta_key'   => self::META_KEY_PREFIX . '_code',
-			'meta_value' => $code,
-			'fields'     => 'ID',
-		) );
+		$users = get_users(
+			array(
+				'meta_key'   => self::META_KEY_PREFIX . '_code', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value' => $code, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				'fields'     => 'ID',
+			)
+		);
 
 		if ( empty( $users ) ) {
 			return;
