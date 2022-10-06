@@ -23,7 +23,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery phpcs: WordPress.DB.DirectDatabaseQuery.NoCaching
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$meta_row = $wpdb->get_row(
 			$wpdb->prepare(
 				"SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE %s;",
