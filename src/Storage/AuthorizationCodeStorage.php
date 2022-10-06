@@ -23,9 +23,10 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery phpcs: WordPress.DB.DirectDatabaseQuery.NoCaching
 		$meta_row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE '%s';",
+				"SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE %s;",
 				'%' . $wpdb->esc_like( $code ),
 			)
 		);
@@ -46,7 +47,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
-		$user_id = $meta['user_id'];
+		$user_id   = $meta['user_id'];
 		$client_id = $meta['client_id'];
 
 		$authorization_code = array(
@@ -59,7 +60,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 				continue;
 			}
 
-			$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
+			$meta_key                   = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
 			$authorization_code[ $key ] = get_user_meta( $user_id, $meta_key, true );
 		}
 
@@ -82,7 +83,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 				}
 
 				if ( 'code' === $key ) {
-					// store code in meta_key itself, so that SQL query is efficient since meta_key has index defined on it
+					// store code in meta_key itself, so that SQL query is efficient since meta_key has index defined on it.
 					$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key . '_' . $code;
 				} else {
 					$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
@@ -99,7 +100,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
-		$user_id = $meta['user_id'];
+		$user_id   = $meta['user_id'];
 		$client_id = $meta['client_id'];
 
 		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
