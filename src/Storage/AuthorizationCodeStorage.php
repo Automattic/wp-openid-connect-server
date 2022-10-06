@@ -23,6 +23,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		$users = get_users(
 			array(
+				'number'     => 1,
 				'meta_key'   => self::META_KEY_PREFIX . '_code', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 				'meta_value' => $code, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 			)
@@ -71,6 +72,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		$users = get_users(
 			array(
+				'number'     => 1,
 				'meta_key'   => self::META_KEY_PREFIX . '_code', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 				'meta_value' => $code, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				'fields'     => 'ID',
