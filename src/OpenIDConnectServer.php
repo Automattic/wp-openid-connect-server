@@ -60,10 +60,17 @@ class OpenIDConnectServer {
 	}
 
 	public function authenticate_handler() {
+		if ( ! is_user_logged_in() ) {
+			auth_redirect();
+		}
+
 		$request  = Request::createFromGlobals();
 		$response = new Response();
 
 		$authenticate_handler = new AuthenticateHandler( $this->consent_storage, $this->templating, $this->clients );
+		login_header( 'OIDC Connect' );
 		$authenticate_handler->handle( $request, $response );
+		login_footer();
+		exit;
 	}
 }

@@ -12,7 +12,3 @@
         </a>
     </p>
 </form>
-
-<style>
-    #login { display: none; }
-</style>
