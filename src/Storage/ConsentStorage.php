@@ -3,11 +3,10 @@
 namespace OpenIDConnectServer\Storage;
 
 const STICKY_CONSENT_DURATION = 7 * DAY_IN_SECONDS;
-const META_KEY_PREFIX         = 'oidc_consent_timestamp';
 
 class ConsentStorage {
 	private function get_meta_key( $client_id ) : string {
-		return META_KEY_PREFIX . '_' . $client_id;
+		return 'oidc_' . $client_id . 'consent_timestamp';
 	}
 
 	public function needs_consent( $user_id, $client_id ): bool {
