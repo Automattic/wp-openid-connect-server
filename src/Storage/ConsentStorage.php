@@ -6,7 +6,7 @@ const STICKY_CONSENT_DURATION = 7 * DAY_IN_SECONDS;
 
 class ConsentStorage {
 	private function get_meta_key( $client_id ) : string {
-		return 'oidc_' . $client_id . 'consent_timestamp';
+		return 'oidc_' . $client_id . '_consent_timestamp';
 	}
 
 	public function needs_consent( $user_id, $client_id ): bool {
