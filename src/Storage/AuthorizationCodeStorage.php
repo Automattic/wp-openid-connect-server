@@ -16,29 +16,50 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		'id_token'     => 'string', // The OpenID Connect id_token.
 	);
 
-	public function getAuthorizationCode( $code ) {
+	private function getCodeMeta( $code ) {
+		global $wpdb;
+
 		if ( empty( $code ) ) {
 			return null;
 		}
 
-		$users = get_users(
-			array(
-				'number'     => 1,
-				'meta_key'   => self::META_KEY_PREFIX . '_code', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_value' => $code, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+		$meta_row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE '%s';",
+				'%' . $wpdb->esc_like( $code ),
 			)
 		);
 
-		if ( empty( $users ) ) {
+		if ( empty( $meta_row ) ) {
 			return null;
 		}
 
-		$user    = $users[0];
-		$user_id = absint( $user->ID );
+		return array(
+			'user_id'   => absint( $meta_row->user_id ),
+			'client_id' => str_replace( 'oidc_', '', str_replace( '_code_' . $code, '', $meta_row->meta_key ) ),
+		);
+	}
 
-		$authorization_code = array( 'user_id' => $user->user_login );
+	public function getAuthorizationCode( $code ) {
+		$meta = $this->getCodeMeta( $code );
+		if ( empty( $meta ) ) {
+			return null;
+		}
+
+		$user_id = $meta['user_id'];
+		$client_id = $meta['client_id'];
+
+		$authorization_code = array(
+			'user_id'   => $user_id,
+			'client_id' => $client_id,
+			'code'      => $code,
+		);
 		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
-			$meta_key                   = self::META_KEY_PREFIX . '_' . $key;
+			if ( 'code' === $key || 'client_id' === $key ) {
+				continue;
+			}
+
+			$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
 			$authorization_code[ $key ] = get_user_meta( $user_id, $meta_key, true );
 		}
 
@@ -59,33 +80,35 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 				} else {
 					$value = sanitize_text_field( $$key );
 				}
-				$meta_key = self::META_KEY_PREFIX . '_' . $key;
+
+				if ( 'code' === $key ) {
+					// store code in meta_key itself, so that SQL query is efficient since meta_key has index defined on it
+					$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key . '_' . $code;
+				} else {
+					$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
+				}
+
 				update_user_meta( $user->ID, $meta_key, $value );
 			}
 		}
 	}
 
 	public function expireAuthorizationCode( $code ) {
-		if ( empty( $code ) ) {
-			return;
+		$meta = $this->getCodeMeta( $code );
+		if ( empty( $meta ) ) {
+			return null;
 		}
 
-		$users = get_users(
-			array(
-				'number'     => 1,
-				'meta_key'   => self::META_KEY_PREFIX . '_code', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_value' => $code, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-				'fields'     => 'ID',
-			)
-		);
+		$user_id = $meta['user_id'];
+		$client_id = $meta['client_id'];
 
-		if ( empty( $users ) ) {
-			return;
-		}
+		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
+			if ( 'code' === $key ) {
+				$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key . '_' . $code;
+			} else {
+				$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
+			}
 
-		$user_id = absint( $users[0] );
-
-		foreach ( array_keys( self::$authorization_code_data ) as $meta_key ) {
 			delete_user_meta( $user_id, $meta_key );
 		}
 	}
