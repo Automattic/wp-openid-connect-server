@@ -32,7 +32,7 @@ class AuthenticateHandler extends RequestHandler {
 			auth_redirect();
 		}
 
-		$client_id = $request->query['client_id'];
+		$client_id = $request->query( 'client_id' );
 		if ( ! $this->consent_storage->needs_consent( get_current_user_id(), $client_id ) ) {
 			$this->redirect( $request );
 			// TODO: return response instead of exiting.
