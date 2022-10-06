@@ -26,8 +26,8 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$meta_row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE %s;",
-				'%' . $wpdb->esc_like( $code ),
+				"SELECT user_id, meta_value FROM $wpdb->usermeta WHERE meta_key = %s;",
+				self::META_KEY_PREFIX . '_code_' . $code,
 			)
 		);
 
@@ -37,7 +37,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		return array(
 			'user_id'   => absint( $meta_row->user_id ),
-			'client_id' => str_replace( 'oidc_', '', str_replace( '_code_' . $code, '', $meta_row->meta_key ) ),
+			'client_id' => $meta_row->meta_value,
 		);
 	}
 
@@ -76,6 +76,10 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		if ( $user ) {
 			foreach ( self::$authorization_code_data as $key => $data_type ) {
+				if ( 'client_id' === $key ) {
+					continue;
+				}
+
 				if ( 'int' === $data_type ) {
 					$value = absint( $$key );
 				} else {
@@ -84,7 +88,8 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 				if ( 'code' === $key ) {
 					// store code in meta_key itself, so that SQL query is efficient since meta_key has index defined on it.
-					$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key . '_' . $code;
+					$meta_key = self::META_KEY_PREFIX . '_' . $key . '_' . $code;
+					$value    = sanitize_text_field( $client_id ); // store client id as meta_value for meta key containing code.
 				} else {
 					$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
 				}
@@ -105,7 +110,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
 			if ( 'code' === $key ) {
-				$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key . '_' . $code;
+				$meta_key = self::META_KEY_PREFIX . '_' . $key . '_' . $code;
 			} else {
 				$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
 			}
