@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "019e74282cc55d83914600153c740124",
+    "content-hash": "7da1bd3c97e0e48eb21d81d68a28f16a",
     "packages": [
         {
             "name": "bshaffer/oauth2-server-php",
@@ -68,63 +68,6 @@
                 "source": "https://github.com/bshaffer/oauth2-server-php/tree/v1.12.1"
             },
             "time": "2022-05-31T16:12:58+00:00"
-        },
-        {
-            "name": "gamajo/template-loader",
-            "version": "1.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/GaryJones/Gamajo-Template-Loader.git",
-                "reference": "fa92a37b780d945463f7fea328dce14933558752"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/GaryJones/Gamajo-Template-Loader/zipball/fa92a37b780d945463f7fea328dce14933558752",
-                "reference": "fa92a37b780d945463f7fea328dce14933558752",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2.4"
-            },
-            "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
-                "php": ">=7.1",
-                "phpcompatibility/phpcompatibility-wp": "^1",
-                "roave/security-advisories": "dev-master",
-                "squizlabs/php_codesniffer": "^3.3",
-                "wp-coding-standards/wpcs": "^1"
-            },
-            "suggest": {
-                "coenjacobs/mozart": "Easily wrap this library with your own prefix, to prevent collisions when multiple plugins use this library"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "class-gamajo-template-loader.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Gary Jones",
-                    "homepage": "https://gamajo.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A class for your WordPress plugin, to allow loading template parts with fallback through the child theme > parent theme > plugin",
-            "homepage": "https://github.com/GaryJones/Gamajo-Template-Loader",
-            "keywords": [
-                "templates",
-                "wordpress"
-            ],
-            "support": {
-                "issues": "https://github.com/GaryJones/Gamajo-Template-Loader/issues",
-                "source": "https://github.com/GaryJones/Gamajo-Template-Loader/tree/develop"
-            },
-            "time": "2018-09-24T10:23:49+00:00"
         }
     ],
     "packages-dev": [

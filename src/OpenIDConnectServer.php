@@ -16,22 +16,20 @@ use OpenIDConnectServer\Storage\ClientCredentialsStorage;
 use OpenIDConnectServer\Storage\ConsentStorage;
 use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
-use OpenIDConnectServer\Templating\Templating;
 use OAuth2\Server;
+use const OpenIDConnectServer\Http\Handlers\OIDC_DEFAULT_MINIMAL_CAPABILITY;
 
 class OpenIDConnectServer {
 	private string $public_key;
 	private array $clients;
 	private Router $router;
 	private ConsentStorage $consent_storage;
-	private Templating $templating;
 
 	public function __construct( string $public_key, string $private_key, array $clients ) {
 		$this->public_key      = $public_key;
 		$this->clients         = $clients;
 		$this->router          = new Router();
 		$this->consent_storage = new ConsentStorage();
-		$this->templating      = new Templating();
 
 		$config = array(
 			'use_jwt_access_tokens' => true,
@@ -60,17 +58,11 @@ class OpenIDConnectServer {
 	}
 
 	public function authenticate_handler() {
-		if ( ! is_user_logged_in() ) {
-			auth_redirect();
-		}
-
 		$request  = Request::createFromGlobals();
 		$response = new Response();
 
-		$authenticate_handler = new AuthenticateHandler( $this->consent_storage, $this->templating, $this->clients );
-		login_header( 'OIDC Connect' );
+		$authenticate_handler = new AuthenticateHandler( $this->consent_storage, $this->clients );
 		$authenticate_handler->handle( $request, $response );
-		login_footer();
 		exit;
 	}
 }
