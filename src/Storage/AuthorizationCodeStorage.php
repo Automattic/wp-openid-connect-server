@@ -8,7 +8,6 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 	const META_KEY_PREFIX = 'oidc';
 
 	private static array $authorization_code_data = array(
-		'code'         => 'string', // authorization code.
 		'client_id'    => 'string', // client identifier.
 		'redirect_uri' => 'string', // redirect URI.
 		'expires'      => 'int',    // expires as unix timestamp.
@@ -16,52 +15,43 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		'id_token'     => 'string', // The OpenID Connect id_token.
 	);
 
-	private function getCodeMeta( $code ) {
-		global $wpdb;
-
+	private function getUserIdByCode( $code ) {
 		if ( empty( $code ) ) {
 			return null;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$meta_row = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT user_id, meta_value FROM $wpdb->usermeta WHERE meta_key = %s;",
-				self::META_KEY_PREFIX . '_code_' . $code,
+		$users = get_users(
+			array(
+				'number'     => 1,
+				'meta_key'   => self::META_KEY_PREFIX . '_client_id_' . $code, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key see
 			)
 		);
 
-		if ( empty( $meta_row ) ) {
+		if ( empty( $users ) ) {
 			return null;
 		}
 
-		return array(
-			'user_id'   => absint( $meta_row->user_id ),
-			'client_id' => $meta_row->meta_value,
-		);
+		return absint( $users[0]->ID );
 	}
 
 	public function getAuthorizationCode( $code ) {
-		$meta = $this->getCodeMeta( $code );
-		if ( empty( $meta ) ) {
+		$user_id = $this->getUserIdByCode( $code );
+		if ( empty( $user_id ) ) {
 			return null;
 		}
 
-		$user_id   = $meta['user_id'];
-		$client_id = $meta['client_id'];
-
 		$authorization_code = array(
 			'user_id'   => $user_id,
-			'client_id' => $client_id,
 			'code'      => $code,
 		);
-		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
-			if ( 'code' === $key || 'client_id' === $key ) {
-				continue;
-			}
 
-			$meta_key                   = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
-			$authorization_code[ $key ] = get_user_meta( $user_id, $meta_key, true );
+		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
+			$authorization_code[ $key ] = get_user_meta( $user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code, true );
+		}
+
+		if ( $authorization_code["expires"] < time() ) {
+			// Remove it right now to avoid cleanup work later.
+			$this->expireAuthorizationCode( $code );
 		}
 
 		return $authorization_code;
@@ -76,46 +66,25 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		if ( $user ) {
 			foreach ( self::$authorization_code_data as $key => $data_type ) {
-				if ( 'client_id' === $key ) {
-					continue;
-				}
-
 				if ( 'int' === $data_type ) {
 					$value = absint( $$key );
 				} else {
 					$value = sanitize_text_field( $$key );
 				}
 
-				if ( 'code' === $key ) {
-					// store code in meta_key itself, so that SQL query is efficient since meta_key has index defined on it.
-					$meta_key = self::META_KEY_PREFIX . '_' . $key . '_' . $code;
-					$value    = sanitize_text_field( $client_id ); // store client id as meta_value for meta key containing code.
-				} else {
-					$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
-				}
-
-				update_user_meta( $user->ID, $meta_key, $value );
+				update_user_meta( $user->ID, self::META_KEY_PREFIX . '_' . $key . '_' . $code, $value );
 			}
 		}
 	}
 
 	public function expireAuthorizationCode( $code ) {
-		$meta = $this->getCodeMeta( $code );
-		if ( empty( $meta ) ) {
+		$user_id = $this->getUserIdByCode( $code );
+		if ( empty( $user_id ) ) {
 			return null;
 		}
 
-		$user_id   = $meta['user_id'];
-		$client_id = $meta['client_id'];
-
 		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
-			if ( 'code' === $key ) {
-				$meta_key = self::META_KEY_PREFIX . '_' . $key . '_' . $code;
-			} else {
-				$meta_key = self::META_KEY_PREFIX . '_' . $client_id . '_' . $key;
-			}
-
-			delete_user_meta( $user_id, $meta_key );
+			delete_user_meta( $user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code );
 		}
 	}
 }
