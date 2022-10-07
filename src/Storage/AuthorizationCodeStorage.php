@@ -20,6 +20,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
+		// @akirk: get_users() is better than a direct db query: in a Multiuser installation, it adds a query that checks whether the user is a member of the blog.
 		$users = get_users(
 			array(
 				'number'       => 1,
