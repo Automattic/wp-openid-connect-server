@@ -56,7 +56,7 @@ class OpenIDConnectServer {
 		$this->router->add_route( '.well-known/openid-configuration', new ConfigurationHandler() );
 		add_action( 'login_form_openid-authenticate', array( $this, 'authenticate_handler' ) );
 
-		// Cleanup
+		// Cleanup.
 		$this->setup_cleanup_routine();
 	}
 

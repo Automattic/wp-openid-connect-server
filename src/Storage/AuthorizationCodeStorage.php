@@ -90,10 +90,13 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		}
 	}
 
-	// This function cleans up auth codes that are sitting in the database because of interrupted/abandoned OAuth flows
+	/**
+	 * This function cleans up auth codes that are sitting in the database because of interrupted/abandoned OAuth flows.
+	 */
 	public function cleanupOldCodes() {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$data = $wpdb->get_results( "SELECT user_id, meta_key, meta_value FROM $wpdb->usermeta WHERE meta_key LIKE 'oidc_expires_%';" );
 		if ( empty( $data ) ) {
 			return;
@@ -101,7 +104,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		foreach ( $data as $row ) {
 			$expiry = absint( $row->meta_value );
-			$code = str_replace( 'oidc_expires_', '', $row->meta_key );
+			$code   = str_replace( 'oidc_expires_', '', $row->meta_key );
 
 			// wait for an hour past expiry, to offer a chance at debug.
 			if ( time() > $expiry + 3600 ) {
