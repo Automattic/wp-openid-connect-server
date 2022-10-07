@@ -22,8 +22,11 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		$users = get_users(
 			array(
-				'number'     => 1,
-				'meta_key'   => self::META_KEY_PREFIX . '_client_id_' . $code, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key see
+				'number'       => 1,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_key'     => self::META_KEY_PREFIX . '_client_id_' . $code,
+				// Using a meta_key EXISTS query is not slow, see https://github.com/WordPress/WordPress-Coding-Standards/issues/1871.
+				'meta_compare' => 'EXISTS',
 			)
 		);
 
@@ -41,15 +44,15 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		}
 
 		$authorization_code = array(
-			'user_id'   => $user_id,
-			'code'      => $code,
+			'user_id' => $user_id,
+			'code'    => $code,
 		);
 
 		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
 			$authorization_code[ $key ] = get_user_meta( $user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code, true );
 		}
 
-		if ( $authorization_code["expires"] < time() ) {
+		if ( $authorization_code['expires'] < time() ) {
 			// Remove it right now to avoid cleanup work later.
 			$this->expireAuthorizationCode( $code );
 		}
