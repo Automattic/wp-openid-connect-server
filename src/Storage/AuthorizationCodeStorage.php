@@ -5,120 +5,84 @@ namespace OpenIDConnectServer\Storage;
 use OAuth2\OpenID\Storage\AuthorizationCodeInterface;
 
 class AuthorizationCodeStorage implements AuthorizationCodeInterface {
-	const TAXONOMY = 'oidc-authorization-code';
+	const META_KEY_PREFIX = 'oidc';
 
 	private static array $authorization_code_data = array(
-		'code'         => 'string', // authorization code.
 		'client_id'    => 'string', // client identifier.
-		'user_login'   => 'string', // The WordPress user id.
 		'redirect_uri' => 'string', // redirect URI.
 		'expires'      => 'int',    // expires as unix timestamp.
 		'scope'        => 'string', // scope as space-separated string.
 		'id_token'     => 'string', // The OpenID Connect id_token.
 	);
 
-	public function __construct() {
-		// Store the authorization codes in a taxonomy.
-		register_taxonomy( self::TAXONOMY, null );
-		foreach ( self::$authorization_code_data as $key => $type ) {
-			register_term_meta(
-				self::TAXONOMY,
-				$key,
-				array(
-					'type'              => $type,
-					'single'            => true,
-					'sanitize_callback' => array( __CLASS__, 'sanitize_' . $key ),
-				)
-			);
+	private function getUserIdByCode( $code ) {
+		if ( empty( $code ) ) {
+			return null;
 		}
-	}
 
-	public static function sanitize_string_length( $string, $length ) {
-		return substr( $string, 0, $length );
-	}
+		// @akirk: get_users() is better than a direct db query: in a Multiuser installation, it adds a query that checks whether the user is a member of the blog.
+		$users = get_users(
+			array(
+				'number'       => 1,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_key'     => self::META_KEY_PREFIX . '_client_id_' . $code,
+				// Using a meta_key EXISTS query is not slow, see https://github.com/WordPress/WordPress-Coding-Standards/issues/1871.
+				'meta_compare' => 'EXISTS',
+			)
+		);
 
-	public static function sanitize_code( $code ) {
-		return self::sanitize_string_length( $code, 40 );
-	}
+		if ( empty( $users ) ) {
+			return null;
+		}
 
-	public static function sanitize_client_id( $client_id ) {
-		return self::sanitize_string_length( $client_id, 200 );
-	}
-
-	public static function sanitize_redirect_uri( $redirect_uri ) {
-		return self::sanitize_string_length( $redirect_uri, 2000 );
-	}
-
-	public static function sanitize_scope( $scope ) {
-		return self::sanitize_string_length( $scope, 100 );
-	}
-
-	public static function sanitize_id_token( $id_token ) {
-		return self::sanitize_string_length( $id_token, 2000 );
-	}
-
-	public static function sanitize_user_login( $user_login ) {
-		return self::sanitize_string_length( $user_login, 60 );
-	}
-
-	public static function sanitize_expires( $expires ) {
-		return intval( $expires );
+		return absint( $users[0]->ID );
 	}
 
 	public function getAuthorizationCode( $code ) {
-		$term = get_term_by( 'slug', $code, self::TAXONOMY );
-
-		if ( $term ) {
-			$authorization_code = array();
-			foreach (
-				array(
-					'client_id'    => 'client_id',
-					'user_id'      => 'user_login',
-					'expires'      => 'expires',
-					'redirect_uri' => 'redirect_uri',
-					'scope'        => 'scope',
-					'id_token'     => 'id_token',
-				) as $key => $meta_key
-			) {
-				$authorization_code[ $key ] = get_term_meta( $term->term_id, $meta_key, true );
-			}
-
-			return $authorization_code;
+		$user_id = $this->getUserIdByCode( $code );
+		if ( empty( $user_id ) ) {
+			return null;
 		}
 
-		return null;
+		$authorization_code = array(
+			'user_id' => $user_id,
+			'code'    => $code,
+		);
+		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
+			$authorization_code[ $key ] = get_user_meta( $user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code, true );
+		}
+
+		return $authorization_code;
 	}
 
-	public function setAuthorizationCode( $code, $client_id, $user_login, $redirect_uri, $expires, $scope = null, $id_token = null ) {
-		if ( $code ) {
-			$this->expireAuthorizationCode( $code );
+	public function setAuthorizationCode( $code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null ) {
+		if ( empty( $code ) ) {
+			return;
+		}
 
-			$term = wp_insert_term( $code, self::TAXONOMY );
-			if ( is_wp_error( $term ) || ! isset( $term['term_id'] ) ) {
-				status_header( 500 );
-				exit;
-			}
+		$user = get_user_by( 'login', $user_id ); // We have chosen WordPress' user_login as the user identifier for OIDC context.
 
-			foreach (
-				array(
-					'client_id'    => $client_id,
-					'user_login'   => $user_login,
-					'redirect_uri' => $redirect_uri,
-					'expires'      => $expires,
-					'scope'        => $scope,
-					'id_token'     => $id_token,
-				) as $key => $value
-			) {
-				add_term_meta( $term['term_id'], $key, $value );
+		if ( $user ) {
+			foreach ( self::$authorization_code_data as $key => $data_type ) {
+				if ( 'int' === $data_type ) {
+					$value = absint( $$key );
+				} else {
+					$value = sanitize_text_field( $$key );
+				}
+
+				update_user_meta( $user->ID, self::META_KEY_PREFIX . '_' . $key . '_' . $code, $value );
 			}
 		}
 	}
 
 	public function expireAuthorizationCode( $code ) {
-		$term = get_term_by( 'slug', $code, self::TAXONOMY );
+		$user_id = $this->getUserIdByCode( $code );
+		if ( empty( $user_id ) ) {
+			return null;
+		}
 
-		if ( $term ) {
-			wp_delete_term( $term->term_id, self::TAXONOMY );
+		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
+			delete_user_meta( $user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code );
 		}
 	}
 }
