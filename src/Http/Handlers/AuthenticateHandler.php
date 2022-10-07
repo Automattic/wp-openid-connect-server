@@ -40,7 +40,7 @@ class AuthenticateHandler extends RequestHandler {
 			'user'            => wp_get_current_user(),
 			'client_name'     => $client_name,
 			'body_class_attr' => implode( ' ', array_diff( get_body_class(), array( 'error404' ) ) ),
-			'cancel_url'      => Router::make_url(),
+			'cancel_url'      => $this->get_cancel_url( $request ),
 			'form_url'        => Router::make_rest_url( 'authorize' ),
 			'form_fields'     => $request->getAllQueryParameters(),
 		);
@@ -172,5 +172,16 @@ class AuthenticateHandler extends RequestHandler {
 		}
 
 		return $client['name'];
+	}
+
+	private function get_cancel_url( Request $request ) {
+		return add_query_arg(
+			array(
+				'error'             => 'access_denied',
+				'error_description' => 'Access denied! Permission not granted.',
+				'state'             => $request->query( 'state' ),
+			),
+			$request->query( 'redirect_uri' ),
+		);
 	}
 }
