@@ -15,6 +15,10 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		'id_token'     => 'string', // The OpenID Connect id_token.
 	);
 
+	public function __construct() {
+		add_action( 'oidc_cron_hook', array( $this, 'cleanupOldCodes' ) );
+	}
+
 	private function getUserIdByCode( $code ) {
 		if ( empty( $code ) ) {
 			return null;
@@ -83,6 +87,28 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
 			delete_user_meta( $user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code );
+		}
+	}
+
+	// This function cleans up auth codes that are sitting in the database because of interrupted/abandoned OAuth flows
+	public function cleanupOldCodes() {
+		global $wpdb;
+
+		$data = $wpdb->get_results( "SELECT user_id, meta_key, meta_value FROM $wpdb->usermeta WHERE meta_key LIKE 'oidc_expires_%';" );
+		if ( empty( $data ) ) {
+			return;
+		}
+
+		foreach ( $data as $row ) {
+			$expiry = absint( $row->meta_value );
+			$code = str_replace( 'oidc_expires_', '', $row->meta_key );
+
+			// wait for an hour past expiry, to offer a chance at debug.
+			if ( time() > $expiry + 3600 ) {
+				foreach ( array_keys( self::$authorization_code_data ) as $key ) {
+					delete_user_meta( $row->user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code );
+				}
+			}
 		}
 	}
 }

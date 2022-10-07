@@ -55,6 +55,9 @@ class OpenIDConnectServer {
 		$this->router->add_route( '.well-known/jwks.json', new WebKeySetsHandler( $this->public_key ) );
 		$this->router->add_route( '.well-known/openid-configuration', new ConfigurationHandler() );
 		add_action( 'login_form_openid-authenticate', array( $this, 'authenticate_handler' ) );
+
+		// Cleanup
+		$this->setup_cleanup_routine();
 	}
 
 	public function authenticate_handler() {
@@ -64,5 +67,11 @@ class OpenIDConnectServer {
 		$authenticate_handler = new AuthenticateHandler( $this->consent_storage, $this->clients );
 		$authenticate_handler->handle( $request, $response );
 		exit;
+	}
+
+	public function setup_cleanup_routine() {
+		if ( ! wp_next_scheduled( 'oidc_cron_hook' ) ) {
+			wp_schedule_event( time(), 'weekly', 'oidc_cron_hook' );
+		}
 	}
 }
