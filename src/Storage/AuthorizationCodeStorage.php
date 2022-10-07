@@ -48,14 +48,8 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			'user_id' => $user_id,
 			'code'    => $code,
 		);
-
 		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
 			$authorization_code[ $key ] = get_user_meta( $user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code, true );
-		}
-
-		if ( $authorization_code['expires'] < time() ) {
-			// Remove it right now to avoid cleanup work later.
-			$this->expireAuthorizationCode( $code );
 		}
 
 		return $authorization_code;
