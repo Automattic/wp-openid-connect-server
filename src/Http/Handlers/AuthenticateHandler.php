@@ -7,29 +7,26 @@ use OAuth2\Response;
 use OpenIDConnectServer\Http\RequestHandler;
 use OpenIDConnectServer\Http\Router;
 use OpenIDConnectServer\Storage\ConsentStorage;
-use OpenIDConnectServer\Templating\Templating;
 
 class AuthenticateHandler extends RequestHandler {
 	private ConsentStorage $consent_storage;
-	private Templating $templating;
 	private array $clients;
 
-	public function __construct( ConsentStorage $consent_storage, Templating $templating, array $clients ) {
+	public function __construct( ConsentStorage $consent_storage, array $clients ) {
 		$this->consent_storage = $consent_storage;
-		$this->templating      = $templating;
 		$this->clients         = $clients;
 	}
 
-	public function handle( Request $request, Response $response ): Response {
+	public function handle( Request $request, Response $response ) : Response {
+		if ( ! is_user_logged_in() ) {
+			auth_redirect();
+		}
+
 		$client_name = $this->get_client_name( $request );
 		if ( empty( $client_name ) ) {
 			$response->setStatusCode( 404 );
 
 			return $response;
-		}
-
-		if ( ! is_user_logged_in() ) {
-			auth_redirect();
 		}
 
 		$client_id = $request->query( 'client_id' );
@@ -50,16 +47,99 @@ class AuthenticateHandler extends RequestHandler {
 
 		$has_permission = current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) );
 		if ( ! $has_permission ) {
-			// phpcs:ignore
-			echo $this->templating->render( 'authenticate/forbidden', $data );
-			exit;
+			login_header( 'OIDC Connect', null, new \WP_Error( 'OIDC_NO_PERMISSION', __( "You don't have permission to use OpenID Connect.", 'wp-openid-connect-server' ) ) );
+			$this->render_no_permission_screen( $data );
+		} else {
+			login_header( 'OIDC Connect' );
+			$this->render_consent_screen( $data );
 		}
 
-		// phpcs:ignore
-		echo $this->templating->render( 'authenticate/main', $data );
+		login_footer();
 
-		// TODO: return response instead of exiting.
-		exit;
+		return $response;
+	}
+
+	private function render_no_permission_screen( $data ) {
+		?>
+		<div id="openid-connect-authenticate">
+			<div id="openid-connect-authenticate-form-container" class="login">
+				<form class="wp-core-ui">
+					<h2>
+						<?php
+						echo esc_html(
+							sprintf(
+							// translators: %s is a username.
+								__( 'Hi %s!', 'wp-openid-connect-server' ),
+								$data['user']->user_nicename
+							)
+						);
+						?>
+					</h2>
+					<br/>
+					<p><?php esc_html_e( "You don't have permission to use OpenID Connect.", 'wp-openid-connect-server' ); ?></p>
+					<br/>
+					<p><?php esc_html_e( 'Contact your administrator for more details.', 'wp-openid-connect-server' ); ?></p>
+					<br/>
+					<p class="submit">
+						<a class="button button-large" href="<?php echo esc_url( $data['cancel_url'] ); ?>" target="_top">
+							<?php esc_html_e( 'Cancel', 'wp-openid-connect-server' ); ?>
+						</a>
+					</p>
+				</form>
+			</div>
+		</div>
+		<?php
+	}
+
+	private function render_consent_screen( $data ) {
+		?>
+		<div id="openid-connect-authenticate">
+			<div id="openid-connect-authenticate-form-container" class="login">
+				<form method="post" action="<?php echo esc_url( $data['form_url'] ); ?>" class="wp-core-ui">
+					<h2>
+						<?php
+						echo esc_html(
+							sprintf(
+							// translators: %s is a username.
+								__( 'Hi %s!', 'wp-openid-connect-server' ),
+								$data['user']->user_nicename
+							)
+						);
+						?>
+					</h2>
+					<br/>
+					<p>
+						<label>
+							<?php
+							echo wp_kses(
+								sprintf(
+								// translators: %1$s is the site name, %2$s is the username.
+									__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
+									$data['client_name'],
+									get_bloginfo( 'name' )
+								),
+								array(
+									'em' => array(),
+								)
+							);
+							?>
+						</label>
+					</p>
+					<br/>
+					<?php wp_nonce_field( 'wp_rest' ); /* The nonce will give the REST call the userdata. */ ?>
+					<?php foreach ( $data['form_fields'] as $key => $value ) : ?>
+						<input type="hidden" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>"/>
+					<?php endforeach; ?>
+					<p class="submit">
+						<input type="submit" name="authorize" class="button button-primary button-large" value="<?php esc_attr_e( 'Authorize', 'wp-openid-connect-server' ); ?>"/>
+						<a href="<?php echo esc_url( $data['cancel_url'] ); ?>" target="_top">
+							<?php esc_html_e( 'Cancel', 'wp-openid-connect-server' ); ?>
+						</a>
+					</p>
+				</form>
+			</div>
+		</div>
+		<?php
 	}
 
 	private function redirect( Request $request ) {
