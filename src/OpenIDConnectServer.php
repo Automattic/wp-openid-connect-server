@@ -57,7 +57,7 @@ class OpenIDConnectServer {
 		add_action( 'login_form_openid-authenticate', array( $this, 'authenticate_handler' ) );
 
 		// Cleanup.
-		$this->setup_cleanup_routine();
+		$this->setup_cron_hook();
 	}
 
 	public function authenticate_handler() {
@@ -69,7 +69,7 @@ class OpenIDConnectServer {
 		exit;
 	}
 
-	public function setup_cleanup_routine() {
+	public function setup_cron_hook() {
 		if ( ! wp_next_scheduled( 'oidc_cron_hook' ) ) {
 			wp_schedule_event( time(), 'weekly', 'oidc_cron_hook' );
 		}
