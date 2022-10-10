@@ -109,7 +109,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		}
 
 		foreach ( $data as $row ) {
-			$code   = substr( $row->meta_key, strlen( 'oidc_expires_' ) );
+			$code = substr( $row->meta_key, strlen( 'oidc_expires_' ) );
 			foreach ( array_keys( self::$authorization_code_data ) as $key ) {
 				delete_user_meta( $row->user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code );
 			}
