@@ -97,7 +97,13 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		global $wpdb;
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$data = $wpdb->get_results( $wpdb->prepare( "SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE 'oidc_expires_%' AND meta_value < %d", time() - 3600 ) );
+		$data = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE %s AND meta_value < %d",
+				'oidc_expires_%',
+				time() - 3600 // wait for an hour past expiry, to offer a chance at debug.
+			)
+		);
 		if ( empty( $data ) ) {
 			return;
 		}
