@@ -104,7 +104,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		foreach ( $data as $row ) {
 			$expiry = absint( $row->meta_value );
-			$code   = str_replace( 'oidc_expires_', '', $row->meta_key );
+			$code   = substr( $row->meta_key, strlen( 'oidc_expires_' ) );
 
 			// wait for an hour past expiry, to offer a chance at debug.
 			if ( time() > $expiry + 3600 ) {
