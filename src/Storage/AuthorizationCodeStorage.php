@@ -26,12 +26,14 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		// @akirk: get_users() is better than a direct db query: in a Multiuser installation, it adds a query that checks whether the user is a member of the blog.
 		$users = get_users(
-			array(
-				'number'       => 1,
-				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_key'     => self::META_KEY_PREFIX . '_client_id_' . $code,
-				// Using a meta_key EXISTS query is not slow, see https://github.com/WordPress/WordPress-Coding-Standards/issues/1871.
-				'meta_compare' => 'EXISTS',
+			apply_filters( 'oidc_authorization_code_query',
+				array(
+					'number'       => 1,
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+					'meta_key'     => self::META_KEY_PREFIX . '_client_id_' . $code,
+					// Using a meta_key EXISTS query is not slow, see https://github.com/WordPress/WordPress-Coding-Standards/issues/1871.
+					'meta_compare' => 'EXISTS',
+				)
 			)
 		);
 
