@@ -21,4 +21,26 @@ class ConsentStorage {
 	public function update_timestamp( $user_id, $client_id ) {
 		update_user_meta( $user_id, $this->get_meta_key( $client_id ), time() );
 	}
+
+	public static function uninstall() {
+		global $wpdb;
+
+		// Following query is only possible via a direct query since meta_key is not a fixed string
+		// and since it only runs at uninstall, we don't need it cached
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$data = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE %s",
+				'oidc_consent_timestamp_%',
+			)
+		);
+		if ( empty( $data ) ) {
+			return;
+		}
+
+		foreach ( $data as $row ) {
+			$client_id = substr( $row->meta_key, strlen( 'oidc_consent_timestamp_' ) );
+			delete_user_meta( $row->user_id, 'oidc_consent_timestamp_' . $client_id );
+		}
+	}
 }
