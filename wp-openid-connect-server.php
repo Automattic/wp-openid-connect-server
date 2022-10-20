@@ -1,11 +1,16 @@
 <?php
 /**
- * Plugin Name: OpenID Connect Server
- * Description: Use OpenID Connect to log in to other webservices using your own WordPress.
- * Author: Automattic
- * Author URI: https://automattic.com/
- * Plugin URI: https://github.com/Automattic/wp-openid-connect-server
- * Version: 1.0
+ * Plugin Name:       OpenID Connect Server
+ * Plugin URI:        https://github.com/Automattic/wp-openid-connect-server
+ * Description:       Use OpenID Connect to log in to other webservices using your own WordPress.
+ * Version:           1.0
+ * Requires at least: 6.0
+ * Requires PHP:      7.4
+ * Author:            Automattic
+ * Author URI:        https://automattic.com/
+ * License:           GPL v2
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       wp-openid-connect-server
  */
 
 use OpenIDConnectServer\OpenIDConnectServer;
