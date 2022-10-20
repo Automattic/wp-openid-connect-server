@@ -26,7 +26,7 @@ class ConsentStorage {
 		global $wpdb;
 
 		// Following query is only possible via a direct query since meta_key is not a fixed string
-		// and since it only runs at uninstall, we don't need it cached
+		// and since it only runs at uninstall, we don't need it cached.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$data = $wpdb->get_results(
 			$wpdb->prepare(
