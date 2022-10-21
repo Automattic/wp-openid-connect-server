@@ -118,4 +118,28 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			}
 		}
 	}
+
+	public static function uninstall() {
+		global $wpdb;
+
+		// Following query is only possible via a direct query since meta_key is not a fixed string
+		// and since it only runs at uninstall, we don't need it cached.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+		$data = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE %s",
+				'oidc_expires_%',
+			)
+		);
+		if ( empty( $data ) ) {
+			return;
+		}
+
+		foreach ( $data as $row ) {
+			$code = substr( $row->meta_key, strlen( 'oidc_expires_' ) );
+			foreach ( array_keys( self::$authorization_code_data ) as $key ) {
+				delete_user_meta( $row->user_id, self::META_KEY_PREFIX . '_' . $key . '_' . $code );
+			}
+		}
+	}
 }

@@ -74,4 +74,16 @@ class OpenIDConnectServer {
 			wp_schedule_event( time(), 'weekly', 'oidc_cron_hook' );
 		}
 	}
+
+	/**
+	 * This function is invoked from uninstall.php
+	 *
+	 * As of v1.0 we have two things that are being stored and should be removed on uninstall:
+	 * 1) Consent storage
+	 * 2) Auth code storage
+	 */
+	public static function uninstall() {
+		ConsentStorage::uninstall();
+		AuthorizationCodeStorage::uninstall();
+	}
 }
