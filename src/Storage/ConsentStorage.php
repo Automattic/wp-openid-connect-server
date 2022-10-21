@@ -3,11 +3,12 @@
 namespace OpenIDConnectServer\Storage;
 
 const STICKY_CONSENT_DURATION = 7 * DAY_IN_SECONDS;
-const META_KEY_PREFIX         = 'oidc_consent_timestamp';
 
 class ConsentStorage {
+	const META_KEY_PREFIX = 'oidc_consent_timestamp_';
+
 	private function get_meta_key( $client_id ) : string {
-		return META_KEY_PREFIX . '_' . $client_id;
+		return self::META_KEY_PREFIX . $client_id;
 	}
 
 	public function needs_consent( $user_id, $client_id ): bool {
@@ -31,7 +32,7 @@ class ConsentStorage {
 		$data = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT user_id, meta_key FROM $wpdb->usermeta WHERE meta_key LIKE %s",
-				'oidc_consent_timestamp_%',
+				self::META_KEY_PREFIX . '%',
 			)
 		);
 		if ( empty( $data ) ) {
