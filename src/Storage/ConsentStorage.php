@@ -39,8 +39,7 @@ class ConsentStorage {
 		}
 
 		foreach ( $data as $row ) {
-			$client_id = substr( $row->meta_key, strlen( 'oidc_consent_timestamp_' ) );
-			delete_user_meta( $row->user_id, 'oidc_consent_timestamp_' . $client_id );
+			delete_user_meta( $row->user_id, $row->meta_key );
 		}
 	}
 }
