@@ -40,10 +40,10 @@ jobs:
           rm -rf /tmp/release/phpcs.xml
 
       - name: Move and rename release directory
-        run: mv /tmp/release wp-openid-connect-server
+        run: mv /tmp/release openid-connect-server
 
-      - name: Create archive for release
-        run: tar -cvzf wp-openid-connect-server-${{ github.ref_name }}.tar.gz wp-openid-connect-server
+      - name: Create tar archive file for release
+        run: tar -cvzf wp-openid-connect-server-${{ github.ref_name }}.tar.gz openid-connect-server
 
       - name: Create release
         uses: ncipollo/release-action@v1
