@@ -20,14 +20,14 @@ The plugin is currently only configured using constants and hooks as follows:
 = Define the RSA keys =
 
 If you don't have keys that you want to use yet, generate them using these commands:
-```
+~~~console
 openssl genrsa -out oidc.key 4096
 openssl rsa -in oidc.key -pubout -out public.key
-```
+~~~
 
 And make them available to the plugin as follows (this needs to be added before WordPress loads):
 
-```
+~~~php
 define( 'OIDC_PUBLIC_KEY', <<<OIDC_PUBLIC_KEY
 -----BEGIN RSA PUBLIC KEY-----
 ...
@@ -41,17 +41,17 @@ define( 'OIDC_PRIVATE_KEY', <<<OIDC_PRIVATE_KEY
 -----END RSA PRIVATE KEY-----
 OIDC_PRIVATE_KEY
 );
-```
+~~~
 Alternatively, you can also put them outside the webroot and load them from the files like this:
-```
+~~~php
 define( 'OIDC_PUBLIC_KEY', file_get_contents( '/web-inaccessible/oidc.key' ) );
 define( 'OIDC_PRIVATE_KEY', file_get_contents( '/web-inaccessible/private.key' ) );
-```
+~~~
 
 = Define the clients =
 
 Define your clients by adding a filter to `oidc_registered_clients` in a separate plugin file or `functions.php` of your theme or in a MU-plugin like:
-```
+~~~php
 add_filter( 'oidc_registered_clients', 'my_oidc_clients' );
 function my_oidc_clients() {
 	return array(
@@ -64,4 +64,4 @@ function my_oidc_clients() {
 		),
 	);
 }
-```
+~~~
