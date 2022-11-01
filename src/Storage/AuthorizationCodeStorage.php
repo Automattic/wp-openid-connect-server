@@ -51,8 +51,10 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
+		$user = new \WP_User( $user_id );
+
 		$authorization_code = array(
-			'user_id' => $user_id,
+			'user_id' => $user->user_login,
 			'code'    => $code,
 		);
 		foreach ( array_keys( self::$authorization_code_data ) as $key ) {
