@@ -5,7 +5,7 @@ Use OpenID Connect to log in to other webservices using your own WordPress.
 **Contributors:** automattic, akirk, ashfame, psrpinto
 **Tags:** oidc, oauth, openid, openid connect, oauth server
 **Requires at least:** 6.0
-**Tested up to:** 6.0
+**Tested up to:** 6.1
 **Requires PHP:** 7.4
 **License:** [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html)
 **Stable tag:** 1.0
@@ -65,3 +65,6 @@ function my_oidc_clients() {
 	);
 }
 ~~~
+
+### Github Repo
+You can report any issues you encounter directly on [Github repo: Automattic/wp-openid-connect-server](https://github.com/Automattic/wp-openid-connect-server)
