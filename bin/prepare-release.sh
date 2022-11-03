@@ -16,7 +16,8 @@ mv composer.json.tmp composer.json
 git add composer.json
 
 sed -i"" -e "s/\(Version: \)\(.*\)/\1          $VERSION/g" wp-openid-connect-server.php
-rm -f wp-openid-connect-server.php-e
+sed -i"" -e "s/\(Stable tag: \)\(.*\)/\1$VERSION/g" README.md
+rm -f wp-openid-connect-server.php-e README.md-e
 git add wp-openid-connect-server.php
 
 git commit -m "Release v$VERSION"
