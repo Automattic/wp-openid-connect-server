@@ -2,7 +2,7 @@
 <ruleset name="Coding Style Checks">
     <description>Coding Style Checks.</description>
 
-    <file>./wp-openid-connect-server.php</file>
+    <file>./openid-connect-server.php</file>
     <file>./src/</file>
 
     <arg value="sp"/>
