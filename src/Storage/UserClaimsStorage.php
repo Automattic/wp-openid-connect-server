@@ -22,7 +22,7 @@ class UserClaimsStorage implements UserClaimsInterface {
 			return $claims;
 		}
 
-		$user = get_user_by( 'login', $user_id );
+		$user = get_user_by( 'ID', $user_id );
 		if ( ! $user ) {
 			return $claims;
 		}
