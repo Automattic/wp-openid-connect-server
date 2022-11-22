@@ -10,6 +10,7 @@ class UserClaimsStorage implements UserClaimsInterface {
 	public function getUserClaims( $user_id, $scope ) {
 		// We use WordPress user_login as the user identifier.
 		$user_login = $user_id;
+
 		$claims = array(
 			// We expose the scope here so that it's in the token (unclear from the specs but the userinfo endpoint reads the scope from the token).
 			'scope' => $scope,
