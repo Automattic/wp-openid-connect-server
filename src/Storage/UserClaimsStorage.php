@@ -7,7 +7,7 @@ namespace OpenIDConnectServer\Storage;
 use OAuth2\OpenID\Storage\UserClaimsInterface;
 
 class UserClaimsStorage implements UserClaimsInterface {
-	public function getUserClaims( $user_id, $scope ) {
+	public function getUserClaims( $user_login, $scope ) {
 		$claims = array(
 			// We expose the scope here so that it's in the token (unclear from the specs but the userinfo endpoint reads the scope from the token).
 			'scope' => $scope,
@@ -22,7 +22,7 @@ class UserClaimsStorage implements UserClaimsInterface {
 			return $claims;
 		}
 
-		$user = get_user_by( 'ID', $user_id );
+		$user = get_user_by( 'login', $user_login );
 		if ( ! $user ) {
 			return $claims;
 		}
