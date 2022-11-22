@@ -65,7 +65,7 @@ function my_oidc_clients() {
 	);
 }
 ~~~
-Note: Currently only [POST based client authentication - `client_secret_post`](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication) is supported.
+**Note:** Currently only [POST based client authentication - `client_secret_post`](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication) is supported.
 
 ### Github Repo
 You can report any issues you encounter directly on [Github repo: Automattic/wp-openid-connect-server](https://github.com/Automattic/wp-openid-connect-server)
