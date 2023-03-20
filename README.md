@@ -1,6 +1,6 @@
 # OpenID Connect Server
 
-- Contributors: automattic, akirk, ashfame, psrpinto
+- Contributors: wordpressdotorg, akirk, ashfame, psrpinto
 - Tags: oidc, oauth, openid, openid connect, oauth server
 - Requires at least: 6.0
 - Tested up to: 6.1
