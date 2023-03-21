@@ -6,8 +6,8 @@
  * Version:           1.1.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
- * Author:            Automattic
- * Author URI:        https://automattic.com/
+ * Author:            WordPress.Org Community
+ * Author URI:        https://wordpress.org/
  * License:           GPL v2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-openid-connect-server
