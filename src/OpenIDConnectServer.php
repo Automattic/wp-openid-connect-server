@@ -99,7 +99,6 @@ class OpenIDConnectServer {
 						'type' => 'string',
 					),
 				);
-				break;
 			case 'token':
 				return array(
 					'grant_type'    => array(
@@ -123,7 +122,6 @@ class OpenIDConnectServer {
 						'required' => true,
 					),
 				);
-				break;
 			case 'userinfo':
 				return array();
 		}
