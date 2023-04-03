@@ -47,19 +47,19 @@ class OpenIDConnectServer {
 			'token',
 			new TokenHandler( $server ),
 			array( 'POST' ),
-			$this->required_arguments_specification( 'token' ),
+			$this->expected_arguments_specification( 'token' ),
 		);
 		$this->router->add_rest_route(
 			'authorize',
 			new AuthorizeHandler( $server, $this->consent_storage ),
 			array( 'GET', 'POST' ),
-			$this->required_arguments_specification( 'authorize' ),
+			$this->expected_arguments_specification( 'authorize' ),
 		);
 		$this->router->add_rest_route(
 			'userinfo',
 			new UserInfoHandler( $server ),
 			array( 'GET', 'POST' ),
-			$this->required_arguments_specification( 'userinfo' ),
+			$this->expected_arguments_specification( 'userinfo' ),
 		);
 
 		// Declare non-rest routes.
@@ -80,7 +80,7 @@ class OpenIDConnectServer {
 		exit;
 	}
 
-	private function required_arguments_specification( $route ) {
+	private function expected_arguments_specification( $route ) {
 		switch ( $route ) {
 			case 'authorize':
 				return array(
