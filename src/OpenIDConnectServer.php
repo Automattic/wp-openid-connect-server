@@ -47,7 +47,22 @@ class OpenIDConnectServer {
 		$this->router->add_rest_route(
 			'authorize',
 			new AuthorizeHandler( $server, $this->consent_storage ),
-			array( 'GET', 'POST' )
+			array( 'GET', 'POST' ),
+			array(
+				'client_id'     => array(
+					'type'     => 'string',
+					'required' => true,
+				),
+				'redirect_uri'  => array(
+					'type' => 'string',
+				),
+				'response_type' => array(
+					'type' => 'string',
+				),
+				'state'         => array(
+					'type' => 'string',
+				),
+			)
 		);
 		$this->router->add_rest_route( 'userinfo', new UserInfoHandler( $server ), array( 'GET', 'POST' ) );
 
