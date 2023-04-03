@@ -57,7 +57,8 @@ class OpenIDConnectServer {
 					'type' => 'string',
 				),
 				'response_type' => array(
-					'type' => 'string',
+					'type'     => 'string',
+					'required' => true,
 				),
 				'state'         => array(
 					'type' => 'string',
