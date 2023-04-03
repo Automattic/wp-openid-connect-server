@@ -43,29 +43,24 @@ class OpenIDConnectServer {
 		$server->addStorage( new UserClaimsStorage(), 'user_claims' );
 
 		// Declare rest routes.
-		$this->router->add_rest_route( 'token', new TokenHandler( $server ), array( 'POST' ) );
+		$this->router->add_rest_route(
+			'token',
+			new TokenHandler( $server ),
+			array( 'POST' ),
+			$this->required_arguments_specification( 'token' ),
+		);
 		$this->router->add_rest_route(
 			'authorize',
 			new AuthorizeHandler( $server, $this->consent_storage ),
 			array( 'GET', 'POST' ),
-			array(
-				'client_id'     => array(
-					'type'     => 'string',
-					'required' => true,
-				),
-				'redirect_uri'  => array(
-					'type' => 'string',
-				),
-				'response_type' => array(
-					'type'     => 'string',
-					'required' => true,
-				),
-				'state'         => array(
-					'type' => 'string',
-				),
-			)
+			$this->required_arguments_specification( 'authorize' ),
 		);
-		$this->router->add_rest_route( 'userinfo', new UserInfoHandler( $server ), array( 'GET', 'POST' ) );
+		$this->router->add_rest_route(
+			'userinfo',
+			new UserInfoHandler( $server ),
+			array( 'GET', 'POST' ),
+			$this->required_arguments_specification( 'userinfo' ),
+		);
 
 		// Declare non-rest routes.
 		$this->router->add_route( '.well-known/jwks.json', new WebKeySetsHandler( $this->public_key ) );
@@ -83,6 +78,55 @@ class OpenIDConnectServer {
 		$authenticate_handler = new AuthenticateHandler( $this->consent_storage, $this->clients );
 		$authenticate_handler->handle( $request, $response );
 		exit;
+	}
+
+	private function required_arguments_specification( $route ) {
+		switch ( $route ) {
+			case 'authorize':
+				return array(
+					'client_id'     => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+					'redirect_uri'  => array(
+						'type' => 'string',
+					),
+					'response_type' => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+					'state'         => array(
+						'type' => 'string',
+					),
+				);
+				break;
+			case 'token':
+				return array(
+					'grant_type'    => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+					'client_id'     => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+					'client_secret' => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+					'redirect_uri'  => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+					'code'          => array(
+						'type'     => 'string',
+						'required' => true,
+					),
+				);
+				break;
+			case 'userinfo':
+				return array();
+		}
 	}
 
 	public function setup_cron_hook() {
