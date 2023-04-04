@@ -7,7 +7,7 @@ const STICKY_CONSENT_DURATION = 7 * DAY_IN_SECONDS;
 class ConsentStorage {
 	const META_KEY_PREFIX = 'oidc_consent_timestamp_';
 
-	private function get_meta_key( $client_id ) : string {
+	private function get_meta_key( $client_id ): string {
 		return self::META_KEY_PREFIX . $client_id;
 	}
 
