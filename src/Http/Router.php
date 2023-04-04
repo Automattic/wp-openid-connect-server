@@ -32,7 +32,7 @@ class Router {
 		$this->routes[ $route ] = $handler;
 	}
 
-	public function add_rest_route( string $route, RequestHandler $handler, array $methods = array( 'GET' ) ) {
+	public function add_rest_route( string $route, RequestHandler $handler, array $methods = array( 'GET' ), array $args = array() ) {
 		$route_with_prefix = self::PREFIX . "/$route";
 		if ( isset( $this->rest_routes[ $route_with_prefix ] ) ) {
 			return;
@@ -42,7 +42,7 @@ class Router {
 
 		add_action(
 			'rest_api_init',
-			function () use ( $route, $methods ) {
+			function () use ( $route, $methods, $args ) {
 				register_rest_route(
 					self::PREFIX,
 					$route,
@@ -50,6 +50,7 @@ class Router {
 						'methods'             => $methods,
 						'permission_callback' => '__return_true',
 						'callback'            => array( $this, 'handle_rest_request' ),
+						'args'                => $args,
 					)
 				);
 			}
