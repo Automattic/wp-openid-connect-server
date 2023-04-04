@@ -17,7 +17,7 @@ class AuthenticateHandler extends RequestHandler {
 		$this->clients         = $clients;
 	}
 
-	public function handle( Request $request, Response $response ) : Response {
+	public function handle( Request $request, Response $response ): Response {
 		if ( ! is_user_logged_in() ) {
 			auth_redirect();
 		}
