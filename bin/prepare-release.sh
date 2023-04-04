@@ -15,10 +15,10 @@ jq ".version = \"$VERSION\"" composer.json > composer.json.tmp
 mv composer.json.tmp composer.json
 git add composer.json
 
-sed -i"" -e "s/\(Version: \)\(.*\)/\1          $VERSION/g" wp-openid-connect-server.php
+sed -i"" -e "s/\(Version: \)\(.*\)/\1          $VERSION/g" openid-connect-server.php
 sed -i"" -e "s/\(Stable tag: \)\(.*\)/\1$VERSION/g" README.md
-rm -f wp-openid-connect-server.php-e README.md-e
-git add wp-openid-connect-server.php
+rm -f openid-connect-server.php-e README.md-e
+git add openid-connect-server.php
 
 git commit -m "Release v$VERSION"
 git tag "v$VERSION"
