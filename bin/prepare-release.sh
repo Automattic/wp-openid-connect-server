@@ -7,6 +7,11 @@ fi
 
 VERSION=$1
 
+# Remove the "v" character (v1.2.3 to 1.2.3)
+if [[ $VERSION == v* ]]; then
+    VERSION="${VERSION#v}"
+fi
+
 git checkout main
 git fetch
 git pull origin main
