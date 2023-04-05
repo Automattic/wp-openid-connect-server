@@ -11,47 +11,49 @@ class Router {
 	private array $routes = array();
 
 	private array $rest_routes = array();
+
 	/**
-	* Creates a URL from a given route.
+	 * Creates a URL from a given route.
 	 *
 	 * @param string $route The route to create the URL from.
 	 *
 	 * @return string The URL created from the given route.
-	*/
+	 */
 
 	public static function make_url( string $route = '' ): string {
 		return home_url( "/$route" );
 	}
+
 	/**
-	* Constructs a REST URL for the given route.
+	 * Constructs a REST URL for the given route.
 	 *
 	 * @param string $route The route to construct the URL for.
 	 *
 	 * @return string The constructed REST URL.
-	*/
+	 */
 
 	public static function make_rest_url( string $route ): string {
 		return rest_url( self::PREFIX . "/$route" );
 	}
+
 	/**
-	* Constructor
-	 * 
-	 * @since 1.0.0
-	 * 
-	 * @access public
-	 * 
+	 * Constructor
+	 *
 	 * @return void
-	*/
+	 * @since  1.0.0
+	 * @access public
+	 */
 
 	public function __construct() {
 		add_action( 'template_redirect', array( $this, 'handle_request' ) );
 	}
+
 	/**
-	* Add a route to the router
+	 * Add a route to the router
 	 *
-	 * @param string $route The route to add
+	 * @param string         $route   The route to add
 	 * @param RequestHandler $handler The request handler for the route
-	*/
+	 */
 
 	public function add_route( string $route, RequestHandler $handler ) {
 		if ( isset( $this->rest_routes[ $route ] ) ) {
@@ -60,13 +62,14 @@ class Router {
 
 		$this->routes[ $route ] = $handler;
 	}
+
 	/**
-	* Add a new REST route
-	 * 
-	 * @param string $route The route to add
+	 * Add a new REST route
+	 *
+	 * @param string         $route   The route to add
 	 * @param RequestHandler $handler The handler for the route
-	 * @param array $methods The HTTP methods to allow for the route (defaults to GET)
-	*/
+	 * @param array          $methods The HTTP methods to allow for the route (defaults to GET)
+	 */
 
 	public function add_rest_route( string $route, RequestHandler $handler, array $methods = array( 'GET' ), array $args = array() ) {
 		$route_with_prefix = self::PREFIX . "/$route";
@@ -92,11 +95,12 @@ class Router {
 			}
 		);
 	}
+
 	/**
-	* Get the current route of the request
+	 * Get the current route of the request
 	 *
 	 * @return string The current route of the request
-	*/
+	 */
 
 	private function get_current_route(): string {
 		$wp_url        = get_site_url();
@@ -151,13 +155,14 @@ class Router {
 		$handler = $this->rest_routes[ $route ];
 		$this->do_handle_request( $handler );
 	}
+
 	/**
-	* Handles a request and sends a response
+	 * Handles a request and sends a response
 	 *
 	 * @param RequestHandler $handler The request handler
 	 *
 	 * @return void
-	*/
+	 */
 
 	private function do_handle_request( RequestHandler $handler ) {
 		$request  = Request::createFromGlobals();

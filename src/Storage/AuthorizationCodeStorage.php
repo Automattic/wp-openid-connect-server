@@ -15,21 +15,21 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		'id_token'     => 'string', // The OpenID Connect id_token.
 	);
 	/**
-	* Constructor for the class.
-	 *
+	 * Constructor for the class.
 	 * Adds an action to the 'oidc_cron_hook' hook to call the 'cleanupOldCodes' method.
-	*/
+	 */
 
 	public function __construct() {
 		add_action( 'oidc_cron_hook', array( $this, 'cleanupOldCodes' ) );
 	}
+
 	/**
-	* Retrieve the user ID associated with a given auth code.
+	 * Retrieve the user ID associated with a given auth code.
 	 *
 	 * @param string $code The auth code to lookup.
 	 *
 	 * @return int|null The user ID associated with the auth code, or null if not found.
-	*/
+	 */
 
 	private function getUserIdByCode( $code ) {
 		if ( empty( $code ) ) {
@@ -56,13 +56,14 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		return absint( $users[0]->ID );
 	}
+
 	/**
-	* Retrieve the authorization code for a given code.
+	 * Retrieve the authorization code for a given code.
 	 *
 	 * @param string $code The code to retrieve the authorization code for.
 	 *
 	 * @return array|null An array containing the authorization code data, or null if no code was found.
-	*/
+	 */
 
 	public function getAuthorizationCode( $code ) {
 		$user_id = $this->getUserIdByCode( $code );
@@ -82,17 +83,18 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		return $authorization_code;
 	}
+
 	/**
-	* Sets the authorization code for a user
+	 * Sets the authorization code for a user
 	 *
-	 * @param string $code The authorization code
-	 * @param string $client_id The client ID
-	 * @param string $user_id The user ID
-	 * @param string $redirect_uri The redirect URI
-	 * @param int $expires The expiration time
-	 * @param string|null $scope The scope
-	 * @param string|null $id_token The ID token
-	*/
+	 * @param string      $code         The authorization code
+	 * @param string      $client_id    The client ID
+	 * @param string      $user_id      The user ID
+	 * @param string      $redirect_uri The redirect URI
+	 * @param int         $expires      The expiration time
+	 * @param string|null $scope        The scope
+	 * @param string|null $id_token     The ID token
+	 */
 
 	public function setAuthorizationCode( $code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null ) {
 		if ( empty( $code ) ) {
@@ -113,13 +115,14 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			}
 		}
 	}
+
 	/**
-	* Expire an authorization code
-	 * 
+	 * Expire an authorization code
+	 *
 	 * @param string $code The authorization code to expire
-	 * 
+	 *
 	 * @return null
-	*/
+	 */
 
 	public function expireAuthorizationCode( $code ) {
 		$user_id = $this->getUserIdByCode( $code );
@@ -157,11 +160,11 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			}
 		}
 	}
+
 	/**
-	* Uninstall function for the OIDC plugin.
-	 *
+	 * Uninstall function for the OIDC plugin.
 	 * This function deletes all user meta data associated with the OIDC plugin.
-	*/
+	 */
 
 	public static function uninstall() {
 		global $wpdb;

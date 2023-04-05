@@ -8,13 +8,13 @@ use OAuth2\OpenID\Storage\UserClaimsInterface;
 
 class UserClaimsStorage implements UserClaimsInterface {
 	/**
-	* Get user claims for the given user ID and scope.
+	 * Get user claims for the given user ID and scope.
 	 *
 	 * @param string $user_id The user ID.
-	 * @param string $scope The scope of the claims.
+	 * @param string $scope   The scope of the claims.
 	 *
 	 * @return array The user claims.
-	*/
+	 */
 	public function getUserClaims( $user_id, $scope ) {
 		// We use WordPress user_login as the user identifier.
 		$user_login = $user_id;

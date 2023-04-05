@@ -4,22 +4,22 @@ namespace OpenIDConnectServer;
 
 class SiteStatusTests {
 	/**
-	* Constructor for the class.
-	 *
-	 * @since 1.0.0
+	 * Constructor for the class.
 	 *
 	 * @return void
-	*/
+	 * @since 1.0.0
+	 */
 	public function __construct() {
 		add_filter( 'site_status_tests', array( $this, 'register_site_status_tests' ) );
 	}
+
 	/**
-	* Register site status tests for OpenID Connect
+	 * Register site status tests for OpenID Connect
 	 *
 	 * @param array $tests An array of tests to be registered
 	 *
 	 * @return array An array of tests registered
-	*/
+	 */
 
 	public function register_site_status_tests( $tests ): array {
 		$tests['direct']['oidc-public-key'] = array(
@@ -39,11 +39,12 @@ class SiteStatusTests {
 
 		return $tests;
 	}
+
 	/**
-	* Test the public key constant OIDC_PUBLIC_KEY.
+	 * Test the public key constant OIDC_PUBLIC_KEY.
 	 *
 	 * @return array An array containing the label, status, badge, description and test name.
-	*/
+	 */
 
 	public function site_status_test_public_key(): array {
 		if ( ! defined( 'OIDC_PUBLIC_KEY' ) ) {
@@ -86,11 +87,13 @@ class SiteStatusTests {
 			'test'        => 'oidc-public-key',
 		);
 	}
+
 	/**
-	* This function checks if the OIDC_PRIVATE_KEY constant is defined and in the right format.
+	 * This function checks if the OIDC_PRIVATE_KEY constant is defined and in the right format.
 	 *
-	 * @return array An array containing the label, status, badge, description and test of the OIDC_PRIVATE_KEY constant.
-	*/
+	 * @return array An array containing the label, status, badge, description and test of the OIDC_PRIVATE_KEY
+	 *               constant.
+	 */
 
 	public function site_status_test_private_key(): array {
 		if ( ! defined( 'OIDC_PRIVATE_KEY' ) ) {
@@ -133,13 +136,14 @@ class SiteStatusTests {
 			'test'        => 'oidc-private-key',
 		);
 	}
+
 	/**
-	* This function tests the status of the OpenID Connect Server clients.
-	 * 
-	 * It checks if the clients have been defined, if the client id is a random string, if the redirect_uri is a HTTPS URL, and if the name is specified.
-	 * 
+	 * This function tests the status of the OpenID Connect Server clients.
+	 * It checks if the clients have been defined, if the client id is a random string, if the redirect_uri is a HTTPS
+	 * URL, and if the name is specified.
+	 *
 	 * @return array An array containing the label, status, badge, description, and test of the clients.
-	*/
+	 */
 
 	public function site_status_test_clients(): array {
 		$clients = apply_filters( 'oidc_registered_clients', array() );

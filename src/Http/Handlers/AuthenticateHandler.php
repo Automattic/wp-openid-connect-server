@@ -11,25 +11,27 @@ use OpenIDConnectServer\Storage\ConsentStorage;
 class AuthenticateHandler extends RequestHandler {
 	private ConsentStorage $consent_storage;
 	private array $clients;
+
 	/**
-	* Constructor for the ConsentManager class
+	 * Constructor for the ConsentManager class
 	 *
 	 * @param ConsentStorage $consent_storage The ConsentStorage object
-	 * @param array $clients An array of clients
-	*/
+	 * @param array          $clients         An array of clients
+	 */
 
 	public function __construct( ConsentStorage $consent_storage, array $clients ) {
 		$this->consent_storage = $consent_storage;
 		$this->clients         = $clients;
 	}
+
 	/**
-	* Handle the request for consent.
+	 * Handle the request for consent.
 	 *
-	 * @param Request $request The request object.
+	 * @param Request  $request  The request object.
 	 * @param Response $response The response object.
 	 *
 	 * @return Response The response object.
-	*/
+	 */
 
 	public function handle( Request $request, Response $response ): Response {
 		if ( ! is_user_logged_in() ) {
@@ -72,11 +74,12 @@ class AuthenticateHandler extends RequestHandler {
 
 		return $response;
 	}
+
 	/**
-	* Render the no permission screen.
+	 * Render the no permission screen.
 	 *
 	 * @param array $data The data to be used to render the screen.
-	*/
+	 */
 
 	private function render_no_permission_screen( $data ) {
 		?>
@@ -109,11 +112,12 @@ class AuthenticateHandler extends RequestHandler {
 		</div>
 		<?php
 	}
+
 	/**
-	* Render the consent screen for the user to authorize a request.
+	 * Render the consent screen for the user to authorize a request.
 	 *
 	 * @param array $data The data needed to render the consent screen.
-	*/
+	 */
 
 	private function render_consent_screen( $data ) {
 		?>
@@ -165,11 +169,12 @@ class AuthenticateHandler extends RequestHandler {
 		</div>
 		<?php
 	}
+
 	/**
-	* Redirects the request to the authorize endpoint.
+	 * Redirects the request to the authorize endpoint.
 	 *
 	 * @param Request $request The request object.
-	*/
+	 */
 
 	private function redirect( Request $request ) {
 		// Rebuild request with all parameters and send to authorize endpoint.
@@ -202,13 +207,14 @@ class AuthenticateHandler extends RequestHandler {
 
 		return $client['name'];
 	}
+
 	/**
-	* Get the cancel URL.
+	 * Get the cancel URL.
 	 *
 	 * @param Request $request The request object.
 	 *
 	 * @return string The cancel URL.
-	*/
+	 */
 
 	private function get_cancel_url( Request $request ) {
 		return add_query_arg(

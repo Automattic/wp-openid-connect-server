@@ -9,13 +9,13 @@ use OpenIDConnectServer\Http\Router;
 
 class ConfigurationHandler extends RequestHandler {
 	/**
-	* Handle a Request and Response object
+	 * Handle a Request and Response object
 	 *
-	 * @param Request $request The Request object
+	 * @param Request  $request  The Request object
 	 * @param Response $response The Response object
 	 *
 	 * @return Response The modified Response object
-	*/
+	 */
 	public function handle( Request $request, Response $response ): Response {
 		$response->addHttpHeaders(
 			array(
@@ -28,11 +28,12 @@ class ConfigurationHandler extends RequestHandler {
 
 		return $response;
 	}
+
 	/**
-	* Configuration function to set up the OAuth2 server.
+	 * Configuration function to set up the OAuth2 server.
 	 *
 	 * @return array An array of configuration settings.
-	*/
+	 */
 
 	private function configuration(): array {
 		return array(
