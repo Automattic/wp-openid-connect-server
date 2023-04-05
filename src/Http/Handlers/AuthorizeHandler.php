@@ -15,11 +15,27 @@ const OIDC_DEFAULT_MINIMAL_CAPABILITY = 'edit_posts';
 class AuthorizeHandler extends RequestHandler {
 	private OAuth2Server $server;
 	private ConsentStorage $consent_storage;
+	/**
+	* Constructor
+	 *
+	 * @param OAuth2Server $server          The OAuth2 server instance
+	 * @param ConsentStorage $consent_storage The consent storage instance
+	*/
 
 	public function __construct( OAuth2Server $server, ConsentStorage $consent_storage ) {
 		$this->server          = $server;
 		$this->consent_storage = $consent_storage;
 	}
+	/**
+	* Handle an OIDC Authorize request.
+	 *
+	 * This function will check if the request is valid and if the user is logged in. If the user is not logged in, the user will be redirected to the login page. If the user is logged in, the request will be handled and the response will be returned.
+	 *
+	 * @param Request $request The request object.
+	 * @param Response $response The response object.
+	 *
+	 * @return Response The response object.
+	*/
 
 	public function handle( Request $request, Response $response ): Response {
 		// Our dependency bshaffer's OAuth library currently has a bug where it doesn't pick up nonce correctly if it's a POST request to the Authorize endpoint.

@@ -24,6 +24,13 @@ class OpenIDConnectServer {
 	private array $clients;
 	private Router $router;
 	private ConsentStorage $consent_storage;
+	/**
+	* Constructor for the class.
+	 *
+	 * @param string $public_key    The public key.
+	 * @param string $private_key   The private key.
+	 * @param array  $clients       An array of clients.
+	*/
 
 	public function __construct( string $public_key, string $private_key, array $clients ) {
 		$this->public_key      = $public_key;
@@ -70,6 +77,12 @@ class OpenIDConnectServer {
 		// Cleanup.
 		$this->setup_cron_hook();
 	}
+	/**
+	* Handles authentication requests
+	 *
+	 * @param Request $request The request object
+	 * @param Response $response The response object
+	*/
 
 	public function authenticate_handler() {
 		$request  = Request::createFromGlobals();
@@ -79,6 +92,13 @@ class OpenIDConnectServer {
 		$authenticate_handler->handle( $request, $response );
 		exit;
 	}
+	/**
+	* Specifies the expected arguments for a given route.
+	 *
+	 * @param string $route The route to get the arguments for.
+	 *
+	 * @return array An array of arguments for the given route.
+	*/
 
 	private function expected_arguments_specification( $route ) {
 		switch ( $route ) {
@@ -126,6 +146,11 @@ class OpenIDConnectServer {
 				return array();
 		}
 	}
+	/**
+	* Sets up a cron hook to run weekly
+	 *
+	 * @return void
+	*/
 
 	public function setup_cron_hook() {
 		if ( ! wp_next_scheduled( 'oidc_cron_hook' ) ) {
