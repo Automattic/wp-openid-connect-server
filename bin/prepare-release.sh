@@ -28,3 +28,5 @@ git add openid-connect-server.php README.md
 git commit -m "Release v$VERSION"
 git tag "v$VERSION"
 git push --tags origin main
+
+echo "Edit the draft release on GitHub and then commit to SVN manually"
