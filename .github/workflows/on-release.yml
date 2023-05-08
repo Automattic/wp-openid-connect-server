@@ -1,0 +1,18 @@
+name: On new release, publish to plugin directory
+run-name: Publish ${{ github.event.release.tag_name }} to plugin directory
+
+on:
+  # Trigger manually from https://github.com/Automattic/wp-openid-connect-server/actions/workflows/on-release-published.yml
+  workflow_dispatch:
+
+  release:
+    types: [released]
+
+jobs:
+  call-publish-release:
+    uses: ./.github/workflows/publish-release.yml
+    with:
+      version: ${{ github.event.release.tag_name }}
+    secrets:
+      SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+      SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
