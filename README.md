@@ -6,7 +6,7 @@
 - Tested up to: 6.2
 - Requires PHP: 7.4
 - License: [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html)
-- Stable tag: 1.1.1
+- Stable tag: 1.2.0
 - GitHub Plugin URI: https://github.com/Automattic/wp-openid-connect-server
 
 Use OpenID Connect to log in to other webservices using your own WordPress.
