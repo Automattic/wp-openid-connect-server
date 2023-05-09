@@ -3,7 +3,7 @@
  * Plugin Name:       OpenID Connect Server
  * Plugin URI:        https://github.com/Automattic/wp-openid-connect-server
  * Description:       Use OpenID Connect to log in to other webservices using your own WordPress.
- * Version:           1.2.0
+ * Version:           1.2.1
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            WordPress.Org Community
