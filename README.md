@@ -71,6 +71,10 @@ You can report any issues you encounter directly on [Github repo: Automattic/wp-
 
 ## Changelog
 
+### 1.2.1
+
+- No user facing changes
+
 ### 1.2.0
 
 - Add `oidc_user_claims` filter [[#82](https://github.com/Automattic/wp-openid-connect-server/pull/82)]
