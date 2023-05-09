@@ -45,6 +45,6 @@ class UserClaimsStorage implements UserClaimsInterface {
 
 		$claims['picture'] = get_avatar_url( $user->user_email );
 
-		return apply_filters( 'oidc_user_claims', $claims );
+		return apply_filters( 'oidc_user_claims', $claims, $user );
 	}
 }
