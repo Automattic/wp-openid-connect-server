@@ -38,6 +38,7 @@ jobs:
         with:
           generate-zip: false
         env:
+          SLUG: openid-connect-server
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           BUILD_DIR: release/${{ inputs.version }}
