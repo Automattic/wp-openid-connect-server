@@ -68,3 +68,9 @@ function my_oidc_clients() {
 
 ### Github Repo
 You can report any issues you encounter directly on [Github repo: Automattic/wp-openid-connect-server](https://github.com/Automattic/wp-openid-connect-server)
+
+## Changelog
+
+### 1.2.0
+
+- Add `oidc_user_claims` filter [[#82](https://github.com/Automattic/wp-openid-connect-server/pull/82)]
