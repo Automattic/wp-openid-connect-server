@@ -17,7 +17,6 @@ use OpenIDConnectServer\Storage\ConsentStorage;
 use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
 use OAuth2\Server;
-use const OpenIDConnectServer\Http\Handlers\OIDC_DEFAULT_MINIMAL_CAPABILITY;
 
 class OpenIDConnectServer {
 	private string $public_key;
