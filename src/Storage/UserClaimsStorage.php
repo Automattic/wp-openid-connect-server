@@ -32,6 +32,7 @@ class UserClaimsStorage implements UserClaimsInterface {
 
 		$field_map = array(
 			'username'    => 'user_login',
+			'name'        => 'display_name',
 			'given_name'  => 'first_name',
 			'family_name' => 'last_name',
 			'nickname'    => 'user_nicename',
