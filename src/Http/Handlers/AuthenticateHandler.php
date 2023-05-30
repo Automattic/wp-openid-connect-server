@@ -47,7 +47,7 @@ class AuthenticateHandler extends RequestHandler {
 
 		$has_permission = current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) );
 		if ( ! $has_permission ) {
-			login_header( 'OIDC Connect', null, new \WP_Error( 'OIDC_NO_PERMISSION', __( "You don't have permission to use OpenID Connect.", 'wp-openid-connect-server' ) ) );
+			login_header( 'OIDC Connect', null, new \WP_Error( 'OIDC_NO_PERMISSION', __( "You don't have permission to use OpenID Connect.", 'openid-connect-server' ) ) );
 			$this->render_no_permission_screen( $data );
 		} else {
 			login_header( 'OIDC Connect' );
@@ -69,20 +69,20 @@ class AuthenticateHandler extends RequestHandler {
 						echo esc_html(
 							sprintf(
 							// translators: %s is a username.
-								__( 'Hi %s!', 'wp-openid-connect-server' ),
+								__( 'Hi %s!', 'openid-connect-server' ),
 								$data['user']->user_nicename
 							)
 						);
 						?>
 					</h2>
 					<br/>
-					<p><?php esc_html_e( "You don't have permission to use OpenID Connect.", 'wp-openid-connect-server' ); ?></p>
+					<p><?php esc_html_e( "You don't have permission to use OpenID Connect.", 'openid-connect-server' ); ?></p>
 					<br/>
-					<p><?php esc_html_e( 'Contact your administrator for more details.', 'wp-openid-connect-server' ); ?></p>
+					<p><?php esc_html_e( 'Contact your administrator for more details.', 'openid-connect-server' ); ?></p>
 					<br/>
 					<p class="submit">
 						<a class="button button-large" href="<?php echo esc_url( $data['cancel_url'] ); ?>" target="_top">
-							<?php esc_html_e( 'Cancel', 'wp-openid-connect-server' ); ?>
+							<?php esc_html_e( 'Cancel', 'openid-connect-server' ); ?>
 						</a>
 					</p>
 				</form>
@@ -101,7 +101,7 @@ class AuthenticateHandler extends RequestHandler {
 						echo esc_html(
 							sprintf(
 							// translators: %s is a username.
-								__( 'Hi %s!', 'wp-openid-connect-server' ),
+								__( 'Hi %s!', 'openid-connect-server' ),
 								$data['user']->user_nicename
 							)
 						);
@@ -114,7 +114,7 @@ class AuthenticateHandler extends RequestHandler {
 							echo wp_kses(
 								sprintf(
 								// translators: %1$s is the site name, %2$s is the username.
-									__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'wp-openid-connect-server' ),
+									__( 'Do you want to log in to <em>%1$s</em> with your <em>%2$s</em> account?', 'openid-connect-server' ),
 									$data['client_name'],
 									get_bloginfo( 'name' )
 								),
@@ -131,9 +131,9 @@ class AuthenticateHandler extends RequestHandler {
 						<input type="hidden" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>"/>
 					<?php endforeach; ?>
 					<p class="submit">
-						<input type="submit" name="authorize" class="button button-primary button-large" value="<?php esc_attr_e( 'Authorize', 'wp-openid-connect-server' ); ?>"/>
+						<input type="submit" name="authorize" class="button button-primary button-large" value="<?php esc_attr_e( 'Authorize', 'openid-connect-server' ); ?>"/>
 						<a href="<?php echo esc_url( $data['cancel_url'] ); ?>" target="_top">
-							<?php esc_html_e( 'Cancel', 'wp-openid-connect-server' ); ?>
+							<?php esc_html_e( 'Cancel', 'openid-connect-server' ); ?>
 						</a>
 					</p>
 				</form>

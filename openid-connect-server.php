@@ -10,7 +10,7 @@
  * Author URI:        https://wordpress.org/
  * License:           GPL v2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       wp-openid-connect-server
+ * Text Domain:       openid-connect-server
  */
 
 use OpenIDConnectServer\OpenIDConnectServer;
