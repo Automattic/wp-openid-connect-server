@@ -6,7 +6,7 @@
 - Tested up to: 6.2
 - Requires PHP: 7.4
 - License: [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html)
-- Stable tag: 1.2.1
+- Stable tag: 1.3.0
 - GitHub Plugin URI: https://github.com/Automattic/wp-openid-connect-server
 
 Use OpenID Connect to log in to other webservices using your own WordPress.
@@ -70,6 +70,11 @@ function my_oidc_clients() {
 You can report any issues you encounter directly on [Github repo: Automattic/wp-openid-connect-server](https://github.com/Automattic/wp-openid-connect-server)
 
 ## Changelog
+
+### 1.3.0
+
+- Return `display_name` as the `name` property [[#87](https://github.com/Automattic/wp-openid-connect-server/pull/87)]
+- Change text domain to `openid-connect-server`, instead of `wp-openid-connect-server` [[#88](https://github.com/Automattic/wp-openid-connect-server/pull/88)]
 
 ### 1.2.1
 
