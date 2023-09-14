@@ -43,34 +43,11 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
-		if ( count( $users ) > 1 ) {
+		if ( count( $users ) === 1 ) {
 			// This should never happen.
 			// If it does, something is wrong, so only return the right user if only one user had the auth code stored.
 			// otherwise not return any user at all.
-			$debug_log     = "[CONCURRENTLOGINS] more than 1 user found for code: $code.";
-			$found         = 0;
-			$found_user_id = 0;
-			foreach ( $users as $user ) {
-				if ( '' === get_user_meta( $user->ID, $key, true ) ) {
-					$debug_log .= " ($user->ID empty meta) ";
-				} else {
-					++$found;
-					$found_user_id = $user->ID; // only used when $found is 1, so overwrite is fine.
-					$debug_log    .= " ($user->ID meta exists) ";
-				}
-			}
-
-			if ( 1 === $found ) {
-				$debug_log .= ' RECOVERED ';
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-				error_log( $debug_log . print_r( $users, true ) );
-				return $found_user_id;
-			}
-
-			$debug_log .= " FAILED (found:$found)";
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-			error_log( $debug_log . print_r( $users, true ) );
-			return null;
+			return $this->handleMultipleTokens( $users, $key, $code );
 		}
 
 		$user = $users[0];
@@ -81,6 +58,33 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		}
 
 		return absint( $user->ID );
+	}
+
+	private function handleMultipleTokens( $users, $key, $code ) {
+		$debug_log     = "[CONCURRENTLOGINS] more than 1 user found for code: $code.";
+		$found         = 0;
+		$found_user_id = 0;
+		foreach ( $users as $user ) {
+			if ( '' === get_user_meta( $user->ID, $key, true ) ) {
+				$debug_log .= " ($user->ID empty meta) ";
+			} else {
+				++$found;
+				$found_user_id = $user->ID; // only used when $found is 1, so overwrite is fine.
+				$debug_log    .= " ($user->ID meta exists) ";
+			}
+		}
+
+		if ( 1 === $found ) {
+			$debug_log .= ' RECOVERED ';
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions
+			error_log( $debug_log . print_r( $users, true ) );
+			return $found_user_id;
+		}
+
+		$debug_log .= " FAILED (found:$found)";
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions
+		error_log( $debug_log . print_r( $users, true ) );
+		return null;
 	}
 
 	public function getAuthorizationCode( $code ) {
