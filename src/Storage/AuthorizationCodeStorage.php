@@ -45,7 +45,8 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		if ( count( $users ) > 1 ) {
 			// This should never happen.
-			// If it does, something is wrong, so it's best to not return any user.
+			// If it does, something is wrong, so only return the right user if only one user had the auth code stored.
+			// otherwise not return any user at all.
 			$debug_log     = "[CONCURRENTLOGINS] more than 1 user found for code: $code.";
 			$found         = 0;
 			$found_user_id = 0;
