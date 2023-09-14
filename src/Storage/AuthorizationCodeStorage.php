@@ -52,7 +52,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		$user = $users[0];
 
 		// Double-check that the user actually has the meta key.
-		if ( false === get_user_meta( $user, $key, true ) ) {
+		if ( '' === get_user_meta( $user, $key, true ) ) {
 			return null;
 		}
 
