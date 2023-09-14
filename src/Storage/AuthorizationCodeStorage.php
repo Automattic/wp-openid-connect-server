@@ -61,11 +61,13 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 			if ( 1 === $found ) {
 				$debug_log .= ' RECOVERED ';
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 				error_log( $debug_log . print_r( $users, true ) );
 				return $found_user_id;
 			}
 
 			$debug_log .= " FAILED (found:$found)";
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions
 			error_log( $debug_log . print_r( $users, true ) );
 			return null;
 		}
