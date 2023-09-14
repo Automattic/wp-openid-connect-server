@@ -19,7 +19,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		add_action( 'oidc_cron_hook', array( $this, 'cleanupOldCodes' ) );
 	}
 
-	private function getUserIdByCode( $code ) {
+	private function getUserIdByCode( $code, $operation ) {
 		if ( empty( $code ) ) {
 			return null;
 		}
@@ -43,11 +43,11 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
-		if ( count( $users ) === 1 ) {
+		if ( count( $users ) > 1 ) {
 			// This should never happen.
 			// If it does, something is wrong, so only return the right user if only one user had the auth code stored.
 			// otherwise not return any user at all.
-			return $this->handleMultipleTokens( $users, $key, $code );
+			return $this->handleMultipleTokens( $users, $key, $code, $operation );
 		}
 
 		$user = $users[0];
@@ -60,8 +60,8 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		return absint( $user->ID );
 	}
 
-	private function handleMultipleTokens( $users, $key, $code ) {
-		$debug_log     = "[CONCURRENTLOGINS] more than 1 user found for code: $code.";
+	private function handleMultipleTokens( $users, $key, $code, $operation ) {
+		$debug_log     = "[CONCURRENTLOGINS: $operation] more than 1 user found for code: $code.";
 		$found         = 0;
 		$found_user_id = 0;
 		foreach ( $users as $user ) {
@@ -88,7 +88,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 	}
 
 	public function getAuthorizationCode( $code ) {
-		$user_id = $this->getUserIdByCode( $code );
+		$user_id = $this->getUserIdByCode( $code, 'get' );
 		if ( empty( $user_id ) ) {
 			return null;
 		}
@@ -127,7 +127,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 	}
 
 	public function expireAuthorizationCode( $code ) {
-		$user_id = $this->getUserIdByCode( $code );
+		$user_id = $this->getUserIdByCode( $code, 'expire' );
 		if ( empty( $user_id ) ) {
 			return null;
 		}
