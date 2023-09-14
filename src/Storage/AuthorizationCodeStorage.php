@@ -42,6 +42,12 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
+		if ( count( $users ) > 1 ) {
+			// This should never happen.
+			// If it does, something is wrong, so it's best to not return any user.
+			return null;
+		}
+
 		return absint( $users[0]->ID );
 	}
 
