@@ -26,7 +26,6 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 
 		$users = get_users(
 			array(
-				'number'       => 1,
 				// Specifying blog_id does nothing for non-MultiSite installs. But for MultiSite installs, it allows you
 				// to customize users of which site is supposed to be available for whatever sites
 				// this plugin is meant to be activated on.
