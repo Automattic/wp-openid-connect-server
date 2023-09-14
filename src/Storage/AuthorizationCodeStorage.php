@@ -65,7 +65,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 				return $found_user_id;
 			}
 
-			$debug_log .= ' FAILED ';
+			$debug_log .= " FAILED (found:$found)";
 			error_log( $debug_log . print_r( $users, true ) );
 			return null;
 		}
