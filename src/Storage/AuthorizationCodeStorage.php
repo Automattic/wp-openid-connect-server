@@ -24,6 +24,8 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
+		$key = self::META_KEY_PREFIX . '_client_id_' . $code;
+
 		$users = get_users(
 			array(
 				// Specifying blog_id does nothing for non-MultiSite installs. But for MultiSite installs, it allows you
@@ -31,7 +33,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 				// this plugin is meant to be activated on.
 				'blog_id'      => apply_filters( 'oidc_auth_code_storage_blog_id', get_current_blog_id() ),
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_key'     => self::META_KEY_PREFIX . '_client_id_' . $code,
+				'meta_key'     => $key,
 				// Using a meta_key EXISTS query is not slow, see https://github.com/WordPress/WordPress-Coding-Standards/issues/1871.
 				'meta_compare' => 'EXISTS',
 			)
@@ -47,7 +49,14 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
-		return absint( $users[0]->ID );
+		$user = $users[0];
+
+		// Double-check that the user actually has the meta key.
+		if ( false === get_user_meta( $user, $key, true ) ) {
+			return null;
+		}
+
+		return absint( $user->ID );
 	}
 
 	public function getAuthorizationCode( $code ) {
