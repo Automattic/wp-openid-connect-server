@@ -71,6 +71,10 @@ You can report any issues you encounter directly on [Github repo: Automattic/wp-
 
 ## Changelog
 
+### 1.3.1
+
+- Add debug logging to identify potential issue [[#95](https://github.com/Automattic/wp-openid-connect-server/pull/95)]
+
 ### 1.3.0
 
 - Return `display_name` as the `name` property [[#87](https://github.com/Automattic/wp-openid-connect-server/pull/87)]
