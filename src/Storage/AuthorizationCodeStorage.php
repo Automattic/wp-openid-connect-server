@@ -49,7 +49,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			$debug_log     = "[CONCURRENTLOGINS] more than 1 user found for code: $code.";
 			$found         = 0;
 			$found_user_id = 0;
-			foreach ( $users as $index => $user ) {
+			foreach ( $users as $user ) {
 				if ( '' === get_user_meta( $user->ID, $key, true ) ) {
 					$debug_log .= " ($user->ID empty meta) ";
 				} else {
