@@ -39,6 +39,8 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			)
 		);
 
+		var_dump( $users );
+
 		if ( empty( $users ) ) {
 			return null;
 		}

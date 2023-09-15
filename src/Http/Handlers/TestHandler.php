@@ -21,11 +21,16 @@ class TestHandler extends RequestHandler {
 		$redirect_uri = 'https//example.org';
 		$expires      = 1000;
 
-		$this->storage->setAuthorizationCode( 'foo', $client_id, 'admin', $redirect_uri, $expires );
-		$this->storage->setAuthorizationCode( 'bar', $client_id, 'test1', $redirect_uri, $expires );
+		$this->storage->expireAuthorizationCode( 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo' );
+		$this->storage->expireAuthorizationCode( 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bar' );
+		$this->storage->expireAuthorizationCode( 'foo' );
+		$this->storage->expireAuthorizationCode( 'bar' );
 
-		var_dump( $this->storage->getAuthorizationCode( 'foo' ) );
-		var_dump( $this->storage->getAuthorizationCode( 'bar' ) );
+		$this->storage->setAuthorizationCode( 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo', $client_id, 'admin', $redirect_uri, $expires );
+		$this->storage->setAuthorizationCode( 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bar', $client_id, 'test1', $redirect_uri, $expires );
+
+		var_dump( $this->storage->getAuthorizationCode( 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-foo' ) );
+//		var_dump( $this->storage->getAuthorizationCode( 'foo' ) );
 		exit;
 	}
 
