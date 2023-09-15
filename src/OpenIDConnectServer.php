@@ -7,6 +7,7 @@ use OAuth2\Response;
 use OpenIDConnectServer\Http\Handlers\AuthenticateHandler;
 use OpenIDConnectServer\Http\Handlers\AuthorizeHandler;
 use OpenIDConnectServer\Http\Handlers\ConfigurationHandler;
+use OpenIDConnectServer\Http\Handlers\TestHandler;
 use OpenIDConnectServer\Http\Handlers\TokenHandler;
 use OpenIDConnectServer\Http\Handlers\UserInfoHandler;
 use OpenIDConnectServer\Http\Handlers\WebKeySetsHandler;
@@ -59,6 +60,10 @@ class OpenIDConnectServer {
 			new UserInfoHandler( $server ),
 			array( 'GET', 'POST' ),
 			$this->expected_arguments_specification( 'userinfo' ),
+		);
+		$this->router->add_rest_route(
+			'test',
+			new TestHandler(),
 		);
 
 		// Declare non-rest routes.
