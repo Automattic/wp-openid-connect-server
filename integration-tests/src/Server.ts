@@ -1,9 +1,9 @@
-import http from "node:http";
+import http, {IncomingMessage, ServerResponse} from "node:http";
 import https, {Server as BaseServer} from "node:https";
 import {createHttpTerminator, HttpTerminator} from "http-terminator";
 
 type Options = {
-    baseUrl: string,
+    baseUrl: URL,
     tlsCert: Buffer,
     tlsKey: Buffer,
     requestListener: (request: http.IncomingMessage, response: http.ServerResponse, terminator: HttpTerminator) => void,
@@ -24,10 +24,9 @@ export class Server {
     }
 
     start() {
-        const baseUrl = new URL(this.options.baseUrl);
         // @ts-ignore
-        this.server.listen(baseUrl.port, baseUrl.hostname, () => {
-            console.info(`Server listening at ${baseUrl}`);
+        this.server.listen(this.options.baseUrl.port, this.options.baseUrl.hostname, () => {
+            console.info(`Server listening at ${this.options.baseUrl.toString()}`);
         });
     }
 }

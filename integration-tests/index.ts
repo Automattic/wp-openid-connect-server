@@ -29,28 +29,39 @@ async function run() {
         caCert,
     });
 
-    // Generate authorization URL.
-    const authorizationUrl = await openIdClient.authorizationUrl();
-    console.debug(`Got authorization URL: ${authorizationUrl}`);
-
-    // Handle redirect after authorization is granted.
-    new Server({
-        baseUrl: env.APP_BASE_URL,
+    const app = new Server({
+        baseUrl: new URL(env.APP_BASE_URL),
         tlsCert: fs.readFileSync(path.resolve(env.TLS_CERT)),
         tlsKey: fs.readFileSync(path.resolve(env.TLS_KEY)),
         requestListener: afterAuthorization,
-    }).start();
+    });
 
-    // Call authorization URL.
     const httpsClient = new HttpsClient({
         caCert,
     })
-    const response = await httpsClient.get(new URL(authorizationUrl));
-    console.debug(response.statusCode, response.statusMessage);
+
+    // Generate authorization URL.
+    const authorizationUrl = await openIdClient.authorizationUrl();
+
+    // Call authorization URL.
+    console.info(`Calling authorization URL: ${authorizationUrl}`);
+    const authorizeResponse = await httpsClient.get(new URL(authorizationUrl));
+    if (authorizeResponse.statusCode !== 301 || !authorizeResponse.headers.location) {
+        console.error(authorizeResponse.headers)
+        throw `Authorization failed: ${authorizeResponse.statusCode} ${authorizeResponse.statusMessage}`;
+    }
+
+    // Redirect in a bit, so we give the app time to boot.
+    setTimeout(() => {
+        httpsClient.get(new URL(authorizeResponse.headers.location));
+    }, 100);
+
+    app.start();
 }
 
 function afterAuthorization(request: http.IncomingMessage, response: http.ServerResponse, terminator: HttpTerminator) {
+    response.end();
     void terminator.terminate();
 }
 
-void run();
+void run().catch(error => console.error(error));
