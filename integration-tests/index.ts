@@ -1,21 +1,23 @@
 import { Issuer } from "openid-client";
 import * as dotenv from "dotenv"
 import * as fs from "fs";
-
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
+import { custom as openidOptions} from 'openid-client';
 
 dotenv.config({ path: ".env" });
 if (fs.existsSync(".env.local")) {
     dotenv.config({ path: ".env.local", override: true });
 }
 
-const issuerUrl = process.env.ISSUER_URL;
-if (!issuerUrl) {
-    console.error("ISSUER_URL environment variable must be set");
+const env = process.env;
+if (!env.ISSUER_URL || !env.CLIENT_ID || !env.CLIENT_SECRET || !env.TLS_CA_CERT) {
+    console.error("Some or all required environment variables were not defined. Set them in the .env file.");
     process.exit(1);
 }
 
-console.log(`Using issuer ${issuerUrl}`);
+openidOptions.setHttpOptionsDefaults({
+    ca: fs.readFileSync(env.TLS_CA_CERT),
+});
 
-const issuer = await Issuer.discover(issuerUrl);
+console.log(`Discovering issuer at ${env.ISSUER_URL}`);
+const issuer = await Issuer.discover(env.ISSUER_URL);
 console.log('Discovered issuer %s %O', issuer.issuer, issuer.metadata);
