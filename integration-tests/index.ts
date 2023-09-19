@@ -22,7 +22,7 @@ async function run() {
         issuerUrl: env.ISSUER_URL,
         clientId: env.CLIENT_ID,
         clientSecret: env.CLIENT_SECRET,
-        redirectUri: "http://localhost:3000/cb",
+        redirectUri: env.APP_BASE_URL,
         caCertAbsolutePath: path.resolve(env.TLS_CA_CERT),
     });
 
