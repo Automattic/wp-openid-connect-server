@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "license": "MIT",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "start": "ts-node-esm index.ts"
   },
