@@ -1,9 +1,9 @@
-import * as dotenv from "dotenv"
-import * as fs from "fs";
+import fs from "node:fs";
 import path from "node:path";
+import http from "node:http";
+import dotenv from "dotenv"
 import {OpenIdClient} from "./src/OpenIdClient";
 import {Server} from "./src/Server";
-import http from "http";
 import {HttpTerminator} from "http-terminator";
 import {HttpsClient} from "./src/HttpsClient";
 
@@ -21,7 +21,7 @@ async function run() {
 
     const caCert = fs.readFileSync(path.resolve(env.TLS_CA_CERT));
 
-    const client = new OpenIdClient({
+    const openIdClient = new OpenIdClient({
         issuerUrl: env.ISSUER_URL,
         clientId: env.CLIENT_ID,
         clientSecret: env.CLIENT_SECRET,
@@ -30,7 +30,7 @@ async function run() {
     });
 
     // Generate authorization URL.
-    const authorizationUrl = await client.authorizationUrl();
+    const authorizationUrl = await openIdClient.authorizationUrl();
     console.debug(`Got authorization URL: ${authorizationUrl}`);
 
     // Handle redirect after authorization is granted.

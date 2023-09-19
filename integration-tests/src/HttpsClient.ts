@@ -1,4 +1,4 @@
-import * as https from "https";
+import https from "node:https";
 import {IncomingMessage} from "node:http";
 
 type Options = {
@@ -19,8 +19,8 @@ export class HttpsClient {
                 path: url.pathname,
                 search: url.search,
             });
-            request.on('response', response => resolve(response));
-            request.on('error', error => reject(error));
+            request.on("response", response => resolve(response));
+            request.on("error", error => reject(error));
             request.end();
         });
     }

@@ -1,6 +1,5 @@
-import * as https from "https";
-import {Server as BaseServer} from "node:https";
-import * as http from "http";
+import http from "node:http";
+import https, {Server as BaseServer} from "node:https";
 import {createHttpTerminator, HttpTerminator} from "http-terminator";
 
 type Options = {
