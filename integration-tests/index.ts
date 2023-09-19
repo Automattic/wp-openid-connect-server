@@ -5,7 +5,6 @@ import {OpenIdClient} from "./src/OpenIdClient";
 import {Server} from "./src/Server";
 import http from "http";
 import {HttpTerminator} from "http-terminator";
-import * as https from "https";
 import {HttpsClient} from "./src/HttpsClient";
 
 dotenv.config({ path: ".env" });
@@ -20,36 +19,37 @@ async function run() {
         process.exit(1);
     }
 
+    const caCert = fs.readFileSync(path.resolve(env.TLS_CA_CERT));
+
     const client = new OpenIdClient({
         issuerUrl: env.ISSUER_URL,
         clientId: env.CLIENT_ID,
         clientSecret: env.CLIENT_SECRET,
         redirectUri: env.APP_BASE_URL,
-        caCertAbsolutePath: path.resolve(env.TLS_CA_CERT),
+        caCert,
     });
 
     // Generate authorization URL.
     const authorizationUrl = await client.authorizationUrl();
     console.debug(`Got authorization URL: ${authorizationUrl}`);
 
+    // Handle redirect after authorization is granted.
+    new Server({
+        baseUrl: env.APP_BASE_URL,
+        tlsCert: fs.readFileSync(path.resolve(env.TLS_CERT)),
+        tlsKey: fs.readFileSync(path.resolve(env.TLS_KEY)),
+        requestListener: afterAuthorization,
+    }).start();
+
     // Call authorization URL.
     const httpsClient = new HttpsClient({
-        caCertAbsolutePath: path.resolve(env.TLS_CA_CERT),
+        caCert,
     })
     const response = await httpsClient.get(new URL(authorizationUrl));
     console.debug(response.statusCode, response.statusMessage);
-
-    // Handle redirect after authorization is granted.
-    // const server = new Server({
-    //     baseUrl: env.APP_BASE_URL,
-    //     tlsCertAbsolutePath: path.resolve(env.TLS_CERT),
-    //     tlsKeyAbsolutePath: path.resolve(env.TLS_KEY),
-    //     requestListener: handleRequest,
-    // })
-    // server.start();
 }
 
-function handleRequest(request: http.IncomingMessage, response: http.ServerResponse, terminator: HttpTerminator) {
+function afterAuthorization(request: http.IncomingMessage, response: http.ServerResponse, terminator: HttpTerminator) {
     void terminator.terminate();
 }
 

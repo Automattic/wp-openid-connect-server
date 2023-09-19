@@ -1,13 +1,12 @@
 import * as https from "https";
-import fs from "fs";
 import {Server as BaseServer} from "node:https";
 import * as http from "http";
 import {createHttpTerminator, HttpTerminator} from "http-terminator";
 
 type Options = {
     baseUrl: string,
-    tlsCertAbsolutePath: string,
-    tlsKeyAbsolutePath: string,
+    tlsCert: Buffer,
+    tlsKey: Buffer,
     requestListener: (request: http.IncomingMessage, response: http.ServerResponse, terminator: HttpTerminator) => void,
 };
 
@@ -17,8 +16,8 @@ export class Server {
 
     constructor(private readonly options: Options) {
         this.server = https.createServer({
-            key: fs.readFileSync(options.tlsKeyAbsolutePath, "utf8"),
-            cert: fs.readFileSync(options.tlsCertAbsolutePath, "utf8"),
+            key: options.tlsKey,
+            cert: options.tlsCert,
         }, (request, response) => {
             options.requestListener(request, response, this.terminator)
         });

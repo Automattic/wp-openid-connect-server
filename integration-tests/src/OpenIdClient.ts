@@ -1,12 +1,11 @@
 import {Client, custom as openidOptions, generators, Issuer} from "openid-client";
-import fs from "fs";
 
 type Options = {
     issuerUrl: string,
     clientId: string,
     clientSecret: string,
     redirectUri: string,
-    caCertAbsolutePath: string,
+    caCert: Buffer,
 };
 
 export class OpenIdClient {
@@ -17,7 +16,7 @@ export class OpenIdClient {
 
     constructor(private readonly options: Options) {
         openidOptions.setHttpOptionsDefaults({
-            ca: fs.readFileSync(options.caCertAbsolutePath),
+            ca: options.caCert,
         });
         this.codeVerifier = generators.codeVerifier();
         this.codeChallenge = generators.codeChallenge(this.codeVerifier);
