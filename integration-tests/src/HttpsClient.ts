@@ -1,5 +1,4 @@
 import https from "node:https";
-import {IncomingMessage} from "node:http";
 import axios, {AxiosError, AxiosInstance, AxiosResponse} from "axios";
 
 type Options = {

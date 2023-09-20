@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import dotenv from "dotenv"
 import {OpenIdClient} from "./src/OpenIdClient";
-import {Server} from "./src/Server";
+import {HttpsServer} from "./src/HttpsServer";
 import {HttpsClient} from "./src/HttpsClient";
 import crypto from "crypto";
 
@@ -32,7 +32,7 @@ async function run() {
         caCert,
     })
 
-    const httpServer = new Server({
+    const httpServer = new HttpsServer({
         baseUrl: new URL(env.APP_BASE_URL),
         tlsCert: fs.readFileSync(path.resolve(env.TLS_CERT)),
         tlsKey: fs.readFileSync(path.resolve(env.TLS_KEY)),
@@ -52,9 +52,13 @@ async function run() {
         throw `Authorization failed: ${authorizeResponse.status} ${authorizeResponse.statusText}, ${redirectUrl}`;
     }
 
+    // Login, if needed.
     if (redirectUrl.includes("wp-login.php")) {
         throw `Authorization failed: user is not logged in. ${redirectUrl}`;
     }
+
+    // Grant authorization, if needed.
+    // TODO
 
     console.info(`Authorization granted, redirecting to ${redirectUrl}`);
 

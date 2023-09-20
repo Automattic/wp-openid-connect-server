@@ -8,7 +8,7 @@ type Options = {
     tlsKey: Buffer,
 };
 
-export class Server {
+export class HttpsServer {
     private readonly server: BaseServer<typeof http.IncomingMessage, typeof http.ServerResponse>;
     private readonly terminator: HttpTerminator;
 
