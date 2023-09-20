@@ -6,7 +6,6 @@ type Options = {
     baseUrl: URL,
     tlsCert: Buffer,
     tlsKey: Buffer,
-    requestListener: (request: http.IncomingMessage, response: http.ServerResponse, terminator: HttpTerminator) => void,
 };
 
 export class Server {
@@ -17,10 +16,19 @@ export class Server {
         this.server = https.createServer({
             key: options.tlsKey,
             cert: options.tlsCert,
-        }, (request, response) => {
-            options.requestListener(request, response, this.terminator)
         });
         this.terminator = createHttpTerminator({server: this.server});
+    }
+
+    async once(): Promise<IncomingMessage> {
+        return new Promise((resolve, reject) => {
+            this.server.on("error", error => reject(error));
+            this.server.on("request", (request, response) => {
+                this.stop(response);
+                resolve(request);
+            });
+            this.start();
+        });
     }
 
     start() {
@@ -28,5 +36,11 @@ export class Server {
         this.server.listen(this.options.baseUrl.port, this.options.baseUrl.hostname, () => {
             console.info(`Server listening at ${this.options.baseUrl.toString()}`);
         });
+    }
+
+    private async stop(response: ServerResponse) {
+        response.end();
+        this.server.removeAllListeners();
+        void this.terminator.terminate();
     }
 }

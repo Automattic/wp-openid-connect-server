@@ -1,10 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import http from "node:http";
 import dotenv from "dotenv"
 import {OpenIdClient} from "./src/OpenIdClient";
 import {Server} from "./src/Server";
-import {HttpTerminator} from "http-terminator";
 import {HttpsClient} from "./src/HttpsClient";
 
 dotenv.config({ path: ".env" });
@@ -29,16 +27,15 @@ async function run() {
         caCert,
     });
 
-    const app = new Server({
-        baseUrl: new URL(env.APP_BASE_URL),
-        tlsCert: fs.readFileSync(path.resolve(env.TLS_CERT)),
-        tlsKey: fs.readFileSync(path.resolve(env.TLS_KEY)),
-        requestListener: afterAuthorization,
-    });
-
     const httpsClient = new HttpsClient({
         caCert,
     })
+
+    const httpServer = new Server({
+        baseUrl: new URL(env.APP_BASE_URL),
+        tlsCert: fs.readFileSync(path.resolve(env.TLS_CERT)),
+        tlsKey: fs.readFileSync(path.resolve(env.TLS_KEY)),
+    });
 
     // Generate authorization URL.
     const authorizationUrl = await openIdClient.authorizationUrl();
@@ -46,22 +43,20 @@ async function run() {
     // Call authorization URL.
     console.info(`Calling authorization URL: ${authorizationUrl}`);
     const authorizeResponse = await httpsClient.get(new URL(authorizationUrl));
-    if (authorizeResponse.statusCode !== 301 || !authorizeResponse.headers.location) {
+    const redirectUrl = authorizeResponse.headers.location;
+    if (authorizeResponse.statusCode !== 301 || !redirectUrl) {
         console.error(authorizeResponse.headers)
         throw `Authorization failed: ${authorizeResponse.statusCode} ${authorizeResponse.statusMessage}`;
     }
 
-    // Redirect in a bit, so we give the app time to boot.
+    // Redirect in a bit, so we give the httpServer time to boot.
     setTimeout(() => {
-        httpsClient.get(new URL(authorizeResponse.headers.location));
+        httpsClient.get(new URL(redirectUrl));
     }, 100);
 
-    app.start();
-}
-
-function afterAuthorization(request: http.IncomingMessage, response: http.ServerResponse, terminator: HttpTerminator) {
-    response.end();
-    void terminator.terminate();
+    // Handle the redirect after authorization.
+    const request = httpServer.once();
+    console.debug(request);
 }
 
 void run().catch(error => console.error(error));
