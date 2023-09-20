@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 import {OpenIdClient} from "./src/OpenIdClient";
 import {Server} from "./src/Server";
 import {HttpsClient} from "./src/HttpsClient";
+import crypto from "crypto";
 
 dotenv.config({ path: ".env" });
 if (fs.existsSync(".env.local")) {
@@ -37,11 +38,13 @@ async function run() {
         tlsKey: fs.readFileSync(path.resolve(env.TLS_KEY)),
     });
 
+    const state = crypto.randomBytes(16).toString("hex");
+
     // Generate authorization URL.
-    const authorizationUrl = await openIdClient.authorizationUrl();
+    const authorizationUrl = await openIdClient.authorizationUrl(state);
 
     // Call authorization URL.
-    console.info(`Calling authorization URL: ${authorizationUrl}`);
+    console.info("Calling authorization URL", authorizationUrl);
     const authorizeResponse = await httpsClient.get(new URL(authorizationUrl));
     const redirectUrl = authorizeResponse.headers.location;
     if (authorizeResponse.status !== 302 || !redirectUrl || redirectUrl.includes("error=")) {
@@ -49,13 +52,19 @@ async function run() {
         throw `Authorization failed: ${authorizeResponse.status} ${authorizeResponse.statusText}, ${redirectUrl}`;
     }
 
+    if (redirectUrl.includes("wp-login.php")) {
+        throw `Authorization failed: user is not logged in. ${redirectUrl}`;
+    }
+
+    console.info(`Authorization granted, redirecting to ${redirectUrl}`);
+
     // Redirect in a bit, so we give the httpServer time to boot.
-    setTimeout(() => {
-        httpsClient.get(new URL(redirectUrl));
+    setTimeout(async () => {
+        await httpsClient.get(new URL(redirectUrl));
     }, 100);
 
     // Handle the redirect after authorization.
-    const request = httpServer.once();
+    const request = await httpServer.once();
     console.debug(request);
 }
 

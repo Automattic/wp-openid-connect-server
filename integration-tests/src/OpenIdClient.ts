@@ -22,14 +22,15 @@ export class OpenIdClient {
         this.codeChallenge = generators.codeChallenge(this.codeVerifier);
     }
 
-    async authorizationUrl(): Promise<string> {
+    async authorizationUrl(state: string): Promise<string> {
         await this.init();
         if (!this.client) {
             throw "Something is wrong, client is not defined";
         }
 
         return this.client.authorizationUrl({
-            scope: 'openid profile',
+            scope: "openid profile",
+            state,
         });
     }
 
@@ -45,6 +46,7 @@ export class OpenIdClient {
             client_secret: this.options.clientId,
             redirect_uris: [this.options.redirectUri],
             response_types: ["code"],
+
             // id_token_signed_response_alg (default "RS256")
             // token_endpoint_auth_method (default "client_secret_basic")
         }); // => Client
