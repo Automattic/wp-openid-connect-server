@@ -44,32 +44,47 @@ async function run() {
     const authorizationUrl = await openIdClient.authorizationUrl(state);
 
     // Call authorization URL.
-    console.info("Calling authorization URL", authorizationUrl);
-    const authorizeResponse = await httpsClient.get(new URL(authorizationUrl));
-    const redirectUrl = authorizeResponse.headers.location;
-    if (authorizeResponse.status !== 302 || !redirectUrl || redirectUrl.includes("error=")) {
-        console.error(authorizeResponse.headers)
-        throw `Authorization failed: ${authorizeResponse.status} ${authorizeResponse.statusText}, ${redirectUrl}`;
-    }
+    console.info("Calling authorization URL", authorizationUrl.toString());
+    let response = await httpsClient.get(authorizationUrl);
+    let responseUrl = new URL(response.request.res.responseUrl);
 
-    // Login, if needed.
-    if (redirectUrl.includes("wp-login.php")) {
-        throw `Authorization failed: user is not logged in. ${redirectUrl}`;
+    // Log in, if needed.
+    if (response.status === 200 && responseUrl.toString().includes("wp-login.php")) {
+        response = await httpsClient.post(new URL(`${env.ISSUER_URL}/wp-login.php`), {
+            log: "admin",
+            pwd: "password",
+            "wp-submit": "Log In",
+            redirect_to: responseUrl.searchParams.get("redirect_to"),
+            testcookie: "1",
+        });
+        httpsClient.setCookies(response);
+        console.debug(response.data, response.status, response.statusText);
     }
 
     // Grant authorization, if needed.
-    // TODO
+    // const authorizeButtonMarkup = '<input type="submit" name="authorize" class="button button-primary button-large" value="Authorize">';
+    // if (response.status === 200 && response.data.includes(authorizeButtonMarkup)) {
+    // }
 
-    console.info(`Authorization granted, redirecting to ${redirectUrl}`);
+    // if (response.status === 302) {
+    //     const redirectUrl = response.headers.location;
+    //     if (!redirectUrl || redirectUrl.includes("error=")) {
+    //         throw `Authorization failed: ${response.status} ${response.statusText}, ${redirectUrl}`;
+    //     }
+    // }
 
-    // Redirect in a bit, so we give the httpServer time to boot.
-    setTimeout(async () => {
-        await httpsClient.get(new URL(redirectUrl));
-    }, 100);
 
-    // Handle the redirect after authorization.
-    const request = await httpServer.once();
-    console.debug(request);
+
+    // console.info(`Authorization granted, redirecting to ${redirectUrl}`);
+    //
+    // // Redirect in a bit, so we give the httpServer time to boot.
+    // setTimeout(async () => {
+    //     await httpsClient.get(new URL(redirectUrl));
+    // }, 100);
+    //
+    // // Handle the redirect after authorization.
+    // const request = await httpServer.once();
+    // console.debug(request);
 }
 
 void run().catch(error => {
