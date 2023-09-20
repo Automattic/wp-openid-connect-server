@@ -44,9 +44,9 @@ async function run() {
     console.info(`Calling authorization URL: ${authorizationUrl}`);
     const authorizeResponse = await httpsClient.get(new URL(authorizationUrl));
     const redirectUrl = authorizeResponse.headers.location;
-    if (authorizeResponse.statusCode !== 301 || !redirectUrl) {
+    if (authorizeResponse.status !== 302 || !redirectUrl || redirectUrl.includes("error=")) {
         console.error(authorizeResponse.headers)
-        throw `Authorization failed: ${authorizeResponse.statusCode} ${authorizeResponse.statusMessage}`;
+        throw `Authorization failed: ${authorizeResponse.status} ${authorizeResponse.statusText}, ${redirectUrl}`;
     }
 
     // Redirect in a bit, so we give the httpServer time to boot.
@@ -59,4 +59,7 @@ async function run() {
     console.debug(request);
 }
 
-void run().catch(error => console.error(error));
+void run().catch(error => {
+    console.error(error);
+    process.exit(1);
+});
