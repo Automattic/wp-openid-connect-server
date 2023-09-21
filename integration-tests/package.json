@@ -17,6 +17,7 @@
     "axios": "^1.5.0",
     "dotenv": "^16.3.1",
     "http-terminator": "^3.2.0",
-    "openid-client": "^5.5.0"
+    "openid-client": "^5.5.0",
+    "set-cookie-parser": "^2.6.0"
   }
 }

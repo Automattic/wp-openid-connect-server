@@ -46,18 +46,17 @@ async function run() {
     // Call authorization URL.
     console.info("Calling authorization URL", authorizationUrl.toString());
     let response = await httpsClient.get(authorizationUrl);
-    let responseUrl = new URL(response.request.res.responseUrl);
+    let responseUrl = new URL(response.config.url ?? "");
 
     // Log in, if needed.
     if (response.status === 200 && responseUrl.toString().includes("wp-login.php")) {
         response = await httpsClient.post(new URL(`${env.ISSUER_URL}/wp-login.php`), {
+            testcookie: "1",
             log: "admin",
             pwd: "password",
-            "wp-submit": "Log In",
             redirect_to: responseUrl.searchParams.get("redirect_to"),
-            testcookie: "1",
+
         });
-        httpsClient.setCookies(response);
         console.debug(response.data, response.status, response.statusText);
     }
 
