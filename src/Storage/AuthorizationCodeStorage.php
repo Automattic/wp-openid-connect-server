@@ -19,21 +19,20 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		add_action( 'oidc_cron_hook', array( $this, 'cleanupOldCodes' ) );
 	}
 
-	private function getUserIdByCode( $code, $operation ) {
+	private function getUserIdByCode( $code ) {
 		if ( empty( $code ) ) {
 			return null;
 		}
 
-		$key = self::META_KEY_PREFIX . '_client_id_' . $code;
-
 		$users = get_users(
 			array(
+				'number'       => 1,
 				// Specifying blog_id does nothing for non-MultiSite installs. But for MultiSite installs, it allows you
 				// to customize users of which site is supposed to be available for whatever sites
 				// this plugin is meant to be activated on.
 				'blog_id'      => apply_filters( 'oidc_auth_code_storage_blog_id', get_current_blog_id() ),
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_key'     => $key,
+				'meta_key'     => self::META_KEY_PREFIX . '_client_id_' . $code,
 				// Using a meta_key EXISTS query is not slow, see https://github.com/WordPress/WordPress-Coding-Standards/issues/1871.
 				'meta_compare' => 'EXISTS',
 			)
@@ -43,52 +42,11 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 			return null;
 		}
 
-		if ( count( $users ) > 1 ) {
-			// This should never happen.
-			// If it does, something is wrong, so only return the right user if only one user had the auth code stored.
-			// otherwise not return any user at all.
-			return $this->handleMultipleTokens( $users, $key, $code, $operation );
-		}
-
-		$user = $users[0];
-
-		// Double-check that the user actually has the meta key.
-		if ( '' === get_user_meta( $user, $key, true ) ) {
-			return null;
-		}
-
-		return absint( $user->ID );
-	}
-
-	private function handleMultipleTokens( $users, $key, $code, $operation ) {
-		$debug_log     = "[CONCURRENTLOGINS: $operation] more than 1 user found for code: $code.";
-		$found         = 0;
-		$found_user_id = 0;
-		foreach ( $users as $user ) {
-			if ( '' === get_user_meta( $user->ID, $key, true ) ) {
-				$debug_log .= " ($user->ID empty meta) ";
-			} else {
-				++$found;
-				$found_user_id = $user->ID; // only used when $found is 1, so overwrite is fine.
-				$debug_log    .= " ($user->ID meta exists) ";
-			}
-		}
-
-		if ( 1 === $found ) {
-			$debug_log .= ' RECOVERED ';
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-			error_log( $debug_log . print_r( $users, true ) );
-			return $found_user_id;
-		}
-
-		$debug_log .= " FAILED (found:$found)";
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions
-		error_log( $debug_log . print_r( $users, true ) );
-		return null;
+		return absint( $users[0]->ID );
 	}
 
 	public function getAuthorizationCode( $code ) {
-		$user_id = $this->getUserIdByCode( $code, 'get' );
+		$user_id = $this->getUserIdByCode( $code );
 		if ( empty( $user_id ) ) {
 			return null;
 		}
@@ -127,7 +85,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 	}
 
 	public function expireAuthorizationCode( $code ) {
-		$user_id = $this->getUserIdByCode( $code, 'expire' );
+		$user_id = $this->getUserIdByCode( $code );
 		if ( empty( $user_id ) ) {
 			return null;
 		}
