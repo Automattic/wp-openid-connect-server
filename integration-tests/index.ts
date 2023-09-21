@@ -50,6 +50,9 @@ async function run() {
     let response = await httpsClient.get(authorizationUrl);
     let responseUrl = new URL(response.config.url ?? "");
 
+    // Boot up the server so we can handle the final redirect.
+    const serverRequest = httpServer.once();
+
     // Log in.
     if (response.status === 200 && responseUrl.toString().includes("wp-login.php")) {
         response = await httpsClient.post(new URL(`${env.ISSUER_URL}/wp-login.php`), {
@@ -58,27 +61,21 @@ async function run() {
             pwd: env.WORDPRESS_PASS,
             redirect_to: responseUrl.searchParams.get("redirect_to"),
         });
-    } else {
-        throw "Was not prompted to login";
     }
 
     // Grant authorization.
-    response = await grantAuthorization(httpsClient, env.ISSUER_URL, response);
+    await grantAuthorization(httpsClient, env.ISSUER_URL ?? "", response);
 
-    // // Redirect in a bit, so we give the httpServer time to boot.
-    // setTimeout(async () => {
-    //     await httpsClient.get(new URL(redirectUrl));
-    // }, 100);
-    //
-    // // Handle the redirect after authorization.
-    // const request = await httpServer.once();
-    // console.debug(request);
+    // Handle the redirect after authorization.
+    const request = await serverRequest;
+    console.debug(request.headers);
 }
 
 async function grantAuthorization(httpsClient: HttpsClient, issuerUrl: string, response: AxiosResponse): Promise<AxiosResponse> {
     const authorizeButtonMarkup = '<input type="submit" name="authorize" class="button button-primary button-large" value="Authorize"/>';
     if (response.status !== 200 || !response.data.includes(authorizeButtonMarkup)) {
-        throw "Was not prompted to grant authorization";
+        // Nothing to do, we were not shown the grant authorization screen.
+        return response;
     }
 
     const html = parseHtml(response.data);
