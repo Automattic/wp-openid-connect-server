@@ -1,4 +1,5 @@
-import {Client, custom as openidOptions, generators, Issuer} from "openid-client";
+import {Client, custom as openidOptions, Issuer, TokenSet, UserinfoResponse} from "openid-client";
+import {IncomingMessage} from "node:http";
 
 type Options = {
     issuerUrl: string,
@@ -9,8 +10,6 @@ type Options = {
 };
 
 export class OpenIdClient {
-    private readonly codeVerifier: string;
-    private readonly codeChallenge: string;
     private issuer?: Issuer;
     private client?: Client;
 
@@ -18,23 +17,46 @@ export class OpenIdClient {
         openidOptions.setHttpOptionsDefaults({
             ca: options.caCert,
         });
-        this.codeVerifier = generators.codeVerifier();
-        this.codeChallenge = generators.codeChallenge(this.codeVerifier);
     }
 
     async authorizationUrl(state: string, nonce: string): Promise<URL> {
         await this.init();
-        if (!this.client) {
-            throw "Something is wrong, client is not defined";
-        }
-
-        const url = this.client.authorizationUrl({
+        const url = this.client?.authorizationUrl({
             scope: "openid profile",
             state,
             nonce,
         });
 
-        return new URL(url);
+        return new URL(url ?? "");
+    }
+
+    async callback(request: IncomingMessage, callbackUrl: URL, state: string, nonce: string): Promise<TokenSet> {
+        const params = this.client?.callbackParams(request);
+        if (!params) {
+            throw "Failed to parse callback params";
+        }
+
+        const tokenSet = await this.client?.grant({
+            grant_type: "authorization_code",
+            code: params.code,
+            client_id: this.options.clientId,
+            client_secret: this.options.clientId,
+            redirect_uri: this.options.redirectUri,
+        });
+
+        if (!tokenSet) {
+            throw "Failed to get token set";
+        }
+
+        return tokenSet;
+    }
+
+    async userinfo(token: string): Promise<UserinfoResponse> {
+        const response = this.client?.userinfo(token);
+        if (!response) {
+            throw "Failed to query userinfo";
+        }
+        return response
     }
 
     private async init() {

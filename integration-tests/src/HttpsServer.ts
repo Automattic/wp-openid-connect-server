@@ -22,12 +22,11 @@ export class HttpsServer {
 
     async once(): Promise<IncomingMessage> {
         return new Promise((resolve, reject) => {
-            this.server.on("error", error => reject(error));
-            this.server.on("request", (request, response) => {
-                this.stop(response);
+            this.server.once("error", error => reject(error));
+            this.server.once("request", (request, response) => {
+                response.end();
                 resolve(request);
             });
-            this.start();
         });
     }
 
@@ -38,8 +37,7 @@ export class HttpsServer {
         });
     }
 
-    private async stop(response: ServerResponse) {
-        response.end();
+    async stop() {
         this.server.removeAllListeners();
         void this.terminator.terminate();
     }

@@ -13,6 +13,8 @@ if (fs.existsSync(".env.local")) {
     dotenv.config({ path: ".env.local", override: true });
 }
 
+let httpsServer: HttpsServer;
+
 async function run() {
     const env = process.env;
     if (!env.ISSUER_URL || !env.CLIENT_ID || !env.CLIENT_SECRET || !env.TLS_CA_CERT || !env.TLS_CERT || !env.TLS_KEY || !env.APP_BASE_URL || !env.WORDPRESS_USER || !env.WORDPRESS_PASS) {
@@ -34,11 +36,12 @@ async function run() {
         caCert,
     })
 
-    const httpServer = new HttpsServer({
+    httpsServer = new HttpsServer({
         baseUrl: new URL(env.APP_BASE_URL),
         tlsCert: fs.readFileSync(path.resolve(env.TLS_CERT)),
         tlsKey: fs.readFileSync(path.resolve(env.TLS_KEY)),
     });
+    httpsServer.start();
 
     const state = crypto.randomBytes(16).toString("hex");
     const nonce = crypto.randomBytes(16).toString("hex");
@@ -50,8 +53,8 @@ async function run() {
     let response = await httpsClient.get(authorizationUrl);
     let responseUrl = new URL(response.config.url ?? "");
 
-    // Boot up the server so we can handle the final redirect.
-    const serverRequest = httpServer.once();
+    // Get promise to next server request.
+    let serverRequest = httpsServer.once();
 
     // Log in.
     if (response.status === 200 && responseUrl.toString().includes("wp-login.php")) {
@@ -66,9 +69,15 @@ async function run() {
     // Grant authorization.
     await grantAuthorization(httpsClient, env.ISSUER_URL ?? "", response);
 
-    // Handle the redirect after authorization.
+    // Get the access token.
     const request = await serverRequest;
-    console.debug(request.headers);
+    const requestUrl = new URL(env.APP_BASE_URL + request.url ?? "");
+    serverRequest = httpsServer.once();
+    const tokenSet = await openIdClient.callback(request, new URL(env.APP_BASE_URL), state, nonce);
+    console.debug(tokenSet);
+
+    // serverResponse = openIdClient.userinfo();
+    // console.debug(serverResponse);
 }
 
 async function grantAuthorization(httpsClient: HttpsClient, issuerUrl: string, response: AxiosResponse): Promise<AxiosResponse> {
@@ -95,4 +104,8 @@ async function grantAuthorization(httpsClient: HttpsClient, issuerUrl: string, r
 void run().catch(error => {
     console.error(error);
     process.exit(1);
+}).finally(() => {
+    if (httpsServer) {
+        void httpsServer.stop();
+    }
 });
