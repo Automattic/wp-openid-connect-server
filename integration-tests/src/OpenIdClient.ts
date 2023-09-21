@@ -22,7 +22,7 @@ export class OpenIdClient {
         this.codeChallenge = generators.codeChallenge(this.codeVerifier);
     }
 
-    async authorizationUrl(state: string): Promise<URL> {
+    async authorizationUrl(state: string, nonce: string): Promise<URL> {
         await this.init();
         if (!this.client) {
             throw "Something is wrong, client is not defined";
@@ -31,6 +31,7 @@ export class OpenIdClient {
         const url = this.client.authorizationUrl({
             scope: "openid profile",
             state,
+            nonce,
         });
 
         return new URL(url);

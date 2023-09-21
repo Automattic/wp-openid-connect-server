@@ -5,6 +5,8 @@ import {OpenIdClient} from "./src/OpenIdClient";
 import {HttpsServer} from "./src/HttpsServer";
 import {HttpsClient} from "./src/HttpsClient";
 import crypto from "crypto";
+import { parse as parseHtml } from 'node-html-parser';
+import {AxiosResponse} from "axios";
 
 dotenv.config({ path: ".env" });
 if (fs.existsSync(".env.local")) {
@@ -39,15 +41,16 @@ async function run() {
     });
 
     const state = crypto.randomBytes(16).toString("hex");
+    const nonce = crypto.randomBytes(16).toString("hex");
 
     // Generate authorization URL.
-    const authorizationUrl = await openIdClient.authorizationUrl(state);
+    const authorizationUrl = await openIdClient.authorizationUrl(state, nonce);
 
     // Call authorization URL.
     let response = await httpsClient.get(authorizationUrl);
     let responseUrl = new URL(response.config.url ?? "");
 
-    // Log in, if needed.
+    // Log in.
     if (response.status === 200 && responseUrl.toString().includes("wp-login.php")) {
         response = await httpsClient.post(new URL(`${env.ISSUER_URL}/wp-login.php`), {
             testcookie: "1",
@@ -55,22 +58,13 @@ async function run() {
             pwd: env.WORDPRESS_PASS,
             redirect_to: responseUrl.searchParams.get("redirect_to"),
         });
+    } else {
+        throw "Was not prompted to login";
     }
 
-    // Grant authorization, if needed.
-    // const authorizeButtonMarkup = '<input type="submit" name="authorize" class="button button-primary button-large" value="Authorize">';
-    // if (response.status === 200 && response.data.includes(authorizeButtonMarkup)) {
-    // }
+    // Grant authorization.
+    response = await grantAuthorization(httpsClient, env.ISSUER_URL, response);
 
-    // if (response.status === 302) {
-    //     const redirectUrl = response.headers.location;
-    //     if (!redirectUrl || redirectUrl.includes("error=")) {
-    //         throw `Authorization failed: ${response.status} ${response.statusText}, ${redirectUrl}`;
-    //     }
-    // }
-
-    // console.info(`Authorization granted, redirecting to ${redirectUrl}`);
-    //
     // // Redirect in a bit, so we give the httpServer time to boot.
     // setTimeout(async () => {
     //     await httpsClient.get(new URL(redirectUrl));
@@ -79,6 +73,26 @@ async function run() {
     // // Handle the redirect after authorization.
     // const request = await httpServer.once();
     // console.debug(request);
+}
+
+async function grantAuthorization(httpsClient: HttpsClient, issuerUrl: string, response: AxiosResponse): Promise<AxiosResponse> {
+    const authorizeButtonMarkup = '<input type="submit" name="authorize" class="button button-primary button-large" value="Authorize"/>';
+    if (response.status !== 200 || !response.data.includes(authorizeButtonMarkup)) {
+        throw "Was not prompted to grant authorization";
+    }
+
+    const html = parseHtml(response.data);
+    let inputFields = html.querySelector("form")?.querySelectorAll("input");
+    if (!inputFields || inputFields.length === 0) {
+        throw "Authorization form not found";
+    }
+
+    inputFields = inputFields.filter(field => ["hidden", "submit"].includes(field.attrs.type));
+    const params = {};
+    // @ts-ignore
+    inputFields.forEach(field => params[field.attrs.name] = field.attrs.value);
+
+    return httpsClient.post(new URL(`${issuerUrl}/wp-json/openid-connect/authorize`), params);
 }
 
 void run().catch(error => {
