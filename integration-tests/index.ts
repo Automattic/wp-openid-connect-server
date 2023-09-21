@@ -72,10 +72,11 @@ async function run() {
     // Get access token.
     const request = await serverRequest;
     const tokenSet = await openIdClient.exchangeCodeForToken(request);
+    console.log("JWT token", parseJwt(tokenSet.id_token ?? ""));
 
     // Get userinfo.
     const userinfo = await openIdClient.userinfo(tokenSet.access_token ?? "");
-    console.debug(userinfo);
+    console.debug("userinfo", userinfo);
 }
 
 async function grantAuthorization(httpsClient: HttpsClient, issuerUrl: string, response: AxiosResponse): Promise<AxiosResponse> {
@@ -97,6 +98,15 @@ async function grantAuthorization(httpsClient: HttpsClient, issuerUrl: string, r
     inputFields.forEach(field => params[field.attrs.name] = field.attrs.value);
 
     return httpsClient.post(new URL(`${issuerUrl}/wp-json/openid-connect/authorize`), params);
+}
+
+function parseJwt(token: string) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
 }
 
 void run().catch(error => {
