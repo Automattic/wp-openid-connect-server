@@ -66,6 +66,10 @@ function my_oidc_clients() {
 }
 ~~~
 
+### Exclude URL from caching
+
+- `example.com/wp-json/openid-connect/userinfo`: We implement caching exclusion measures for this endpoint by setting `Cache-Control: 'no-cache'` headers and defining the `DONOTCACHEPAGE` constant. If you have a unique caching configuration, please ensure that you manually exclude this URL from caching.
+
 ### Github Repo
 You can report any issues you encounter directly on [Github repo: Automattic/wp-openid-connect-server](https://github.com/Automattic/wp-openid-connect-server)
 
