@@ -69,15 +69,13 @@ async function run() {
     // Grant authorization.
     await grantAuthorization(httpsClient, env.ISSUER_URL ?? "", response);
 
-    // Get the access token.
+    // Get access token.
     const request = await serverRequest;
-    const requestUrl = new URL(env.APP_BASE_URL + request.url ?? "");
-    serverRequest = httpsServer.once();
-    const tokenSet = await openIdClient.callback(request, new URL(env.APP_BASE_URL), state, nonce);
-    console.debug(tokenSet);
+    const tokenSet = await openIdClient.exchangeCodeForToken(request);
 
-    // serverResponse = openIdClient.userinfo();
-    // console.debug(serverResponse);
+    // Get userinfo.
+    const userinfo = await openIdClient.userinfo(tokenSet.access_token ?? "");
+    console.debug(userinfo);
 }
 
 async function grantAuthorization(httpsClient: HttpsClient, issuerUrl: string, response: AxiosResponse): Promise<AxiosResponse> {

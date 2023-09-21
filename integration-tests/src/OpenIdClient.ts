@@ -30,7 +30,7 @@ export class OpenIdClient {
         return new URL(url ?? "");
     }
 
-    async callback(request: IncomingMessage, callbackUrl: URL, state: string, nonce: string): Promise<TokenSet> {
+    async exchangeCodeForToken(request: IncomingMessage): Promise<TokenSet> {
         const params = this.client?.callbackParams(request);
         if (!params) {
             throw "Failed to parse callback params";
@@ -54,7 +54,7 @@ export class OpenIdClient {
     async userinfo(token: string): Promise<UserinfoResponse> {
         const response = this.client?.userinfo(token);
         if (!response) {
-            throw "Failed to query userinfo";
+            throw "Failed to get userinfo";
         }
         return response
     }
