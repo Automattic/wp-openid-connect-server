@@ -15,6 +15,19 @@ class UserInfoHandler extends RequestHandler {
 	}
 
 	public function handle( Request $request, Response $response ): Response {
-		return $this->server->handleUserInfoRequest( $request );
+		// prevent caching plugins from caching this page.
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
+
+		$response = $this->server->handleUserInfoRequest( $request, $response );
+		$response->addHttpHeaders(
+			array(
+				'Cache-Control' => 'no-store',
+				'Pragma'        => 'no-cache',
+			)
+		);
+
+		return $response;
 	}
 }
