@@ -36,14 +36,8 @@ bin/prepare-release.sh 1.2.3
 
 A new draft PR will now have been created, and its branch checked out locally.
 
-### Test the release
-You can use [`wp-env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) to run a local WordPress instance with the plugin installed:
-
-```shell
-wp-env start
-```
-
-In your browser, navigate to the URL that `wp-env` wrote to the terminal and make sure that the plugin is working as expected.
+### Run the tests
+You must make sure tests pass before publishing a new release. See [End-to-end tests](tests/README.md) for instructions on running the tests.
 
 ### Add a Changelog
 A Changelog must be added to the `Changelog` section of `README.md`. In the PR description, you can find a link to all the commits since the previous release. You should manually go through the list and identify merged PRs that should be included in the Changelog (i.e. PRs that result in user-facing changes).
