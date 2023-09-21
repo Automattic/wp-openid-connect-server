@@ -44,7 +44,6 @@ async function run() {
     const authorizationUrl = await openIdClient.authorizationUrl(state);
 
     // Call authorization URL.
-    console.info("Calling authorization URL", authorizationUrl.toString());
     let response = await httpsClient.get(authorizationUrl);
     let responseUrl = new URL(response.config.url ?? "");
 
@@ -55,9 +54,7 @@ async function run() {
             log: "admin",
             pwd: "password",
             redirect_to: responseUrl.searchParams.get("redirect_to"),
-
         });
-        console.debug(response.data, response.status, response.statusText);
     }
 
     // Grant authorization, if needed.
@@ -71,8 +68,6 @@ async function run() {
     //         throw `Authorization failed: ${response.status} ${response.statusText}, ${redirectUrl}`;
     //     }
     // }
-
-
 
     // console.info(`Authorization granted, redirecting to ${redirectUrl}`);
     //

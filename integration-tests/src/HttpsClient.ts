@@ -20,12 +20,12 @@ export class HttpsClient {
         });
 
         this.axios.interceptors.response.use(response => {
-            console.log("response", response.status, response.config.url, response.headers)
+            console.debug("response", response.status, response.config.url, "\n")
             return response;
         });
 
         this.axios.interceptors.request.use(request => {
-            console.log("request", request.url, request.headers, request.data)
+            console.debug("request", request.url, request.data ?? "", "\n")
             return request;
         });
     }

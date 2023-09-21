@@ -41,16 +41,13 @@ export class OpenIdClient {
             return;
         }
         this.issuer = await Issuer.discover(this.options.issuerUrl);
-        console.debug('Discovered issuer %s %O', this.issuer.issuer, this.issuer.metadata);
+        console.debug('Discovered issuer %s %O', this.issuer.issuer, this.issuer.metadata, "\n");
 
         this.client = new this.issuer.Client({
             client_id: this.options.clientId,
             client_secret: this.options.clientId,
             redirect_uris: [this.options.redirectUri],
             response_types: ["code"],
-
-            // id_token_signed_response_alg (default "RS256")
-            // token_endpoint_auth_method (default "client_secret_basic")
-        }); // => Client
+        });
     }
 }
