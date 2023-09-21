@@ -13,7 +13,7 @@ if (fs.existsSync(".env.local")) {
 
 async function run() {
     const env = process.env;
-    if (!env.ISSUER_URL || !env.CLIENT_ID || !env.CLIENT_SECRET || !env.TLS_CA_CERT || !env.TLS_CERT || !env.TLS_KEY || !env.APP_BASE_URL) {
+    if (!env.ISSUER_URL || !env.CLIENT_ID || !env.CLIENT_SECRET || !env.TLS_CA_CERT || !env.TLS_CERT || !env.TLS_KEY || !env.APP_BASE_URL || !env.WORDPRESS_USER || !env.WORDPRESS_PASS) {
         console.error("Some or all required environment variables were not defined. Set them in the .env file.");
         process.exit(1);
     }
@@ -51,8 +51,8 @@ async function run() {
     if (response.status === 200 && responseUrl.toString().includes("wp-login.php")) {
         response = await httpsClient.post(new URL(`${env.ISSUER_URL}/wp-login.php`), {
             testcookie: "1",
-            log: "admin",
-            pwd: "password",
+            log: env.WORDPRESS_USER,
+            pwd: env.WORDPRESS_PASS,
             redirect_to: responseUrl.searchParams.get("redirect_to"),
         });
     }

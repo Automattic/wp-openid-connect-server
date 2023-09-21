@@ -8,6 +8,8 @@ declare global {
             TLS_CERT: string,
             TLS_KEY: string,
             APP_BASE_URL: string,
+            WORDPRESS_USER: string,
+            WORDPRESS_PASS: string,
         }
     }
 }
