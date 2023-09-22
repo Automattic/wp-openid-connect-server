@@ -17,7 +17,8 @@
     }
   },
   "scripts": {
-    "phpcs": "phpcs --standard=phpcs.xml"
+    "phpcs": "phpcs --standard=phpcs.xml",
+    "test": "cd tests && yarn && yarn start"
   },
   "config": {
     "sort-packages": true,
