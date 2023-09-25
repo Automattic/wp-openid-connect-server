@@ -72,11 +72,33 @@ async function run() {
     // Get access token.
     const request = await serverRequest;
     const tokenSet = await openIdClient.exchangeCodeForToken(request);
-    console.log("JWT token", parseJwt(tokenSet.id_token ?? ""));
+    const jwt = parseJwt(tokenSet.id_token ?? "");
+    console.log("JWT token", jwt);
 
     // Get userinfo.
     const userinfo = await openIdClient.userinfo(tokenSet.access_token ?? "");
     console.debug("userinfo", userinfo);
+
+    // Check JWT token.
+    if (jwt.iss !== env.ISSUER_URL) {
+        throw `JWT token iss doesn't match. Expected '${env.ISSUER_URL}', got '${jwt.iss}'`;
+    }
+    if (jwt.sub !== env.WORDPRESS_USER) {
+        throw `JWT token sub doesn't match. Expected '${env.WORDPRESS_USER}', got '${jwt.sub}'`;
+    }
+    if (jwt.aud !== env.CLIENT_ID) {
+        throw `JWT token aud doesn't match. Expected '${env.CLIENT_ID}', got '${jwt.aud}'`;
+    }
+
+    // Check userinfo response.
+    if (userinfo.scope !== "openid profile") {
+        throw `Userinfo scope doesn't match. Expected 'openid profile', got '${userinfo.scope}'`;
+    }
+    if (userinfo.sub !== env.WORDPRESS_USER) {
+        throw `Userinfo sub doesn't match. Expected ${env.WORDPRESS_USER}, got '${userinfo.sub}'`;
+    }
+
+    console.info("Tests passed");
 }
 
 async function grantAuthorization(httpsClient: HttpsClient, issuerUrl: string, response: AxiosResponse): Promise<AxiosResponse> {
@@ -110,7 +132,7 @@ function parseJwt(token: string) {
 }
 
 void run().catch(error => {
-    console.error(error);
+    console.error("Tests failed:", error);
     process.exit(1);
 }).finally(() => {
     if (httpsServer) {
