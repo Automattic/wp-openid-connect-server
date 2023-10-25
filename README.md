@@ -29,9 +29,9 @@ And make them available to the plugin as follows (this needs to be added before 
 
 ~~~php
 define( 'OIDC_PUBLIC_KEY', <<<OIDC_PUBLIC_KEY
------BEGIN RSA PUBLIC KEY-----
+-----BEGIN PUBLIC KEY-----
 ...
------END RSA PUBLIC KEY-----
+-----END PUBLIC KEY-----
 OIDC_PUBLIC_KEY
 );
 
