@@ -60,7 +60,7 @@ class SiteStatusTests {
 					sprintf(
 					// Translators: %s is a URL.
 						__( "Please see the <a href=%s>plugin's readme file</a> for details.", 'openid-connect-server' ),
-						'"https://github.com/Automattic/wp-openid-connect-server/blob/trunk/README.md"'
+						'"https://github.com/Automattic/wp-openid-connect-server/blob/main/README.md"'
 					)
 				) .
 				'</p>',
