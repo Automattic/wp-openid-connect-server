@@ -27,13 +27,13 @@ class SiteStatusTests {
 	}
 
 	public function site_status_test_public_key(): array {
-		$key_not_defined           = ! defined( 'OIDC_PUBLIC_KEY' );
+		$key_is_defined            = defined( 'OIDC_PUBLIC_KEY' );
 		$key_has_valid_pem_headers = (bool) preg_match(
 			'/^-----BEGIN\s.*PUBLIC KEY-----.*-----END\s.*PUBLIC KEY-----$/s',
 			OIDC_PUBLIC_KEY
 		);
 
-		if ( $key_not_defined ) {
+		if ( ! $key_is_defined ) {
 			$label  = __( 'The public key constant OIDC_PUBLIC_KEY is not defined.', 'openid-connect-server' );
 			$status = 'critical';
 			$badge  = 'red';
@@ -71,13 +71,13 @@ class SiteStatusTests {
 	}
 
 	public function site_status_test_private_key(): array {
-		$key_not_defined           = ! defined( 'OIDC_PRIVATE_KEY' );
+		$key_is_defined            = defined( 'OIDC_PRIVATE_KEY' );
 		$key_has_valid_pem_headers = (bool) preg_match(
 			'/^-----BEGIN\s.*PRIVATE KEY-----.*-----END\s.*PRIVATE KEY-----$/s',
 			OIDC_PRIVATE_KEY
 		);
 
-		if ( $key_not_defined ) {
+		if ( ! $key_is_defined ) {
 			$label  = __( 'The private key constant OIDC_PRIVATE_KEY is not defined.', 'openid-connect-server' );
 			$status = 'critical';
 			$badge  = 'red';
