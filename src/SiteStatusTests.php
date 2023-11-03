@@ -27,15 +27,17 @@ class SiteStatusTests {
 	}
 
 	public function site_status_test_public_key(): array {
-		if ( ! defined( 'OIDC_PUBLIC_KEY' ) ) {
+		$key_is_defined            = defined( 'OIDC_PUBLIC_KEY' );
+		$key_has_valid_pem_headers = (bool) preg_match(
+			'/^-----BEGIN\s.*PUBLIC KEY-----.*-----END\s.*PUBLIC KEY-----$/s',
+			OIDC_PUBLIC_KEY
+		);
+
+		if ( ! $key_is_defined ) {
 			$label  = __( 'The public key constant OIDC_PUBLIC_KEY is not defined.', 'openid-connect-server' );
 			$status = 'critical';
 			$badge  = 'red';
-		} elseif (
-			0 === strpos( OIDC_PUBLIC_KEY, '-----BEGIN PUBLIC KEY-----' )
-			&& '-----END PUBLIC KEY-----' === substr( OIDC_PUBLIC_KEY, - strlen( '-----END PUBLIC KEY-----' ) )
-			&& strlen( OIDC_PUBLIC_KEY ) > 50
-		) {
+		} elseif ( $key_has_valid_pem_headers ) {
 			$label  = __( 'The public key is defined and in the right format', 'openid-connect-server' );
 			$status = 'good';
 			$badge  = 'green';
@@ -60,7 +62,7 @@ class SiteStatusTests {
 					sprintf(
 					// Translators: %s is a URL.
 						__( "Please see the <a href=%s>plugin's readme file</a> for details.", 'openid-connect-server' ),
-						'"https://github.com/Automattic/wp-openid-connect-server/blob/trunk/README.md"'
+						'"https://github.com/Automattic/wp-openid-connect-server/blob/main/README.md"'
 					)
 				) .
 				'</p>',
@@ -69,15 +71,17 @@ class SiteStatusTests {
 	}
 
 	public function site_status_test_private_key(): array {
-		if ( ! defined( 'OIDC_PRIVATE_KEY' ) ) {
+		$key_is_defined            = defined( 'OIDC_PRIVATE_KEY' );
+		$key_has_valid_pem_headers = (bool) preg_match(
+			'/^-----BEGIN\s.*PRIVATE KEY-----.*-----END\s.*PRIVATE KEY-----$/s',
+			OIDC_PRIVATE_KEY
+		);
+
+		if ( ! $key_is_defined ) {
 			$label  = __( 'The private key constant OIDC_PRIVATE_KEY is not defined.', 'openid-connect-server' );
 			$status = 'critical';
 			$badge  = 'red';
-		} elseif (
-			0 === strpos( OIDC_PRIVATE_KEY, '-----BEGIN RSA PRIVATE KEY-----' )
-			&& '-----END RSA PRIVATE KEY-----' === substr( OIDC_PRIVATE_KEY, - strlen( '-----END RSA PRIVATE KEY-----' ) )
-			&& strlen( OIDC_PRIVATE_KEY ) > 70
-		) {
+		} elseif ( $key_has_valid_pem_headers ) {
 			$label  = __( 'The private key is defined and in the right format', 'openid-connect-server' );
 			$status = 'good';
 			$badge  = 'green';
