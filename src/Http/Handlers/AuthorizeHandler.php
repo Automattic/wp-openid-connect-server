@@ -45,7 +45,7 @@ class AuthorizeHandler extends RequestHandler {
 
 		$client_id = $request->query( 'client_id', $request->request( 'client_id' ) );
 		if ( $this->consent_storage->needs_consent( $user->ID, $client_id ) ) {
-			if ( ! isset( $_POST['authorize'] ) || 'Authorize' !== $_POST['authorize'] ) {
+			if ( ! isset( $_POST['authorize'] ) || __( 'Authorize', 'openid-connect-server' ) !== $_POST['authorize'] ) {
 				$response->send();
 				exit;
 			}
