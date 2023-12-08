@@ -75,6 +75,11 @@ You can report any issues you encounter directly on [Github repo: Automattic/wp-
 
 ## Changelog
 
+### 1.3.3
+
+- Fix failing login when Authorize form is non-English [[#108](https://github.com/Automattic/wp-openid-connect-server/pull/108)]
+- Improvements in site health tests for key detection [[#104](https://github.com/Automattic/wp-openid-connect-server/pull/104)][[#105](https://github.com/Automattic/wp-openid-connect-server/pull/105)]
+
 ### 1.3.2
 
 - Prevent userinfo endpoint from being cached [[#99](https://github.com/Automattic/wp-openid-connect-server/pull/99)]
