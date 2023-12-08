@@ -46,8 +46,8 @@ class AuthorizeHandler extends RequestHandler {
 		$client_id = $request->query( 'client_id', $request->request( 'client_id' ) );
 		if ( $this->consent_storage->needs_consent( $user->ID, $client_id ) ) {
 			if ( ! isset( $_POST['authorize'] ) || __( 'Authorize', 'openid-connect-server' ) !== $_POST['authorize'] ) {
-				$response->send();
-				exit;
+				$response->setError( 403, 'user_authorization_required', 'This application requires your consent.' );
+				return $response;
 			}
 
 			$this->consent_storage->update_timestamp( $user->ID, $client_id );
