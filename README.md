@@ -25,7 +25,7 @@ openssl genrsa -out oidc.key 4096
 openssl rsa -in oidc.key -pubout -out public.key
 ~~~
 
-And make them available to the plugin as follows (this needs to be added before WordPress loads):
+And make them available to the plugin as below (this needs to be added before WordPress loads). This should be added to the `wp-config.php` file of your WordPress installation. Note, that it is important to add the `define` statements before the line `require_once ABSPATH . 'wp-settings.php';`. Otherwise, your RSA keys might not be visible to the rest of the WordPress website.
 
 ~~~php
 define( 'OIDC_PUBLIC_KEY', <<<OIDC_PUBLIC_KEY
@@ -50,7 +50,7 @@ define( 'OIDC_PRIVATE_KEY', file_get_contents( '/web-inaccessible/private.key' )
 
 ### Define the clients
 
-Define your clients by adding a filter to `oidc_registered_clients` in a separate plugin file or `functions.php` of your theme or in a MU-plugin like:
+Define your clients by adding a filter to `oidc_registered_clients` in a separate plugin file or `functions.php` of your theme or in a MU-plugin as below. The easiest way would be to add filter through WordPress Admin interface by going to Appearance -> Theme file editor -> choose Theme Functions (functions.php) on the right hand side menu. You can add the code to the end of the file before `?>`.
 ~~~php
 add_filter( 'oidc_registered_clients', 'my_oidc_clients' );
 function my_oidc_clients() {
@@ -65,6 +65,14 @@ function my_oidc_clients() {
 	);
 }
 ~~~
+
+### Check that everything works as expected
+You should be able to go to `https://<your_wordpress_domain>/.well-known/openid-configuration`. This endpoint will list the endpoints of the authorization flow. Namely, three endpoints will be defined:
+- `https://<your_wordpress_domain>/wp-json/openid-connect/authorize` 
+- `https://<your_wordpress_domain>/wp-json/openid-connect/token` 
+- `https://<your_wordpress_domain>/wp-json/openid-connect/userinfo` 
+
+`wp-json` is where the REST routes are defined for your WordPress website.
 
 ### Exclude URL from caching
 
