@@ -75,6 +75,9 @@ You can report any issues you encounter directly on [Github repo: Automattic/wp-
 
 ## Changelog
 
+### 1.3.4
+- Add the autoloader to the uninstall script [#111](https://github.com/Automattic/wp-openid-connect-server/pull/111) props @MariaMozgunova
+
 ### 1.3.3
 
 - Fix failing login when Authorize form is non-English [[#108](https://github.com/Automattic/wp-openid-connect-server/pull/108)]
