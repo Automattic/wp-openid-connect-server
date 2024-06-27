@@ -24,6 +24,14 @@ class OpenIDConnectServer {
 	private Router $router;
 	private ConsentStorage $consent_storage;
 
+	/**
+	 * Constructor for the class.
+	 *
+	 * @param string $public_key  The public key.
+	 * @param string $private_key The private key.
+	 * @param array  $clients     An array of clients.
+	 */
+
 	public function __construct( string $public_key, string $private_key, array $clients ) {
 		$this->public_key      = $public_key;
 		$this->clients         = $clients;
@@ -70,6 +78,13 @@ class OpenIDConnectServer {
 		$this->setup_cron_hook();
 	}
 
+	/**
+	 * Handles authentication requests
+	 *
+	 * @param Request  $request  The request object
+	 * @param Response $response The response object
+	 */
+
 	public function authenticate_handler() {
 		$request  = Request::createFromGlobals();
 		$response = new Response();
@@ -78,6 +93,14 @@ class OpenIDConnectServer {
 		$authenticate_handler->handle( $request, $response );
 		exit;
 	}
+
+	/**
+	 * Specifies the expected arguments for a given route.
+	 *
+	 * @param string $route The route to get the arguments for.
+	 *
+	 * @return array An array of arguments for the given route.
+	 */
 
 	private function expected_arguments_specification( $route ) {
 		switch ( $route ) {
@@ -126,6 +149,12 @@ class OpenIDConnectServer {
 		}
 	}
 
+	/**
+	 * Sets up a cron hook to run weekly
+	 *
+	 * @return void
+	 */
+
 	public function setup_cron_hook() {
 		if ( ! wp_next_scheduled( 'oidc_cron_hook' ) ) {
 			wp_schedule_event( time(), 'weekly', 'oidc_cron_hook' );
@@ -134,7 +163,6 @@ class OpenIDConnectServer {
 
 	/**
 	 * This function is invoked from uninstall.php
-	 *
 	 * As of v1.0 we have two things that are being stored and should be removed on uninstall:
 	 * 1) Consent storage
 	 * 2) Auth code storage
