@@ -106,11 +106,11 @@ class OpenIDConnectServer {
 					),
 					'client_id'     => array(
 						'type'     => 'string',
-						'required' => true,
+						'required' => false,
 					),
 					'client_secret' => array(
 						'type'     => 'string',
-						'required' => true,
+						'required' => false,
 					),
 					'redirect_uri'  => array(
 						'type'     => 'string',
