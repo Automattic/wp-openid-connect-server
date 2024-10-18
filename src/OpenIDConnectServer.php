@@ -100,23 +100,31 @@ class OpenIDConnectServer {
 				);
 			case 'token':
 				return array(
-					'grant_type'    => array(
+					'grant_type'            => array(
 						'type'     => 'string',
 						'required' => true,
 					),
-					'client_id'     => array(
+					'client_id'             => array(
 						'type'     => 'string',
 						'required' => false,
 					),
-					'client_secret' => array(
+					'client_secret'         => array(
 						'type'     => 'string',
 						'required' => false,
 					),
-					'redirect_uri'  => array(
+					'client_assertion'      => array(
+						'type'     => 'string',
+						'required' => false,
+					),
+					'client_assertion_type' => array(
+						'type'     => 'string',
+						'required' => false,
+					),
+					'redirect_uri'          => array(
 						'type'     => 'string',
 						'required' => true,
 					),
-					'code'          => array(
+					'code'                  => array(
 						'type'     => 'string',
 						'required' => true,
 					),
