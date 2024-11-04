@@ -25,6 +25,34 @@ class ClientCredentialsStorage implements ClientCredentialsInterface {
 		);
 	}
 
+	public function getClientName( $client_id ) {
+		if ( ! $this->has( $client_id ) ) {
+			return '';
+		}
+
+		$client = $this->get( $client_id );
+
+		if ( empty( $client['name'] ) ) {
+			return '';
+		}
+
+		return $client['name'];
+	}
+
+	public function clientRequiresConsent( $client_id ): bool {
+		if ( ! $this->has( $client_id ) ) {
+			return true;
+		}
+
+		$client = $this->get( $client_id );
+
+		if ( ! array_key_exists( 'requires_consent', $client ) ) {
+			return true;
+		}
+
+		return true === $client['requires_consent'];
+	}
+
 	public function getClientScope( $client_id ) {
 		if ( ! $this->has( $client_id ) ) {
 			return '';
