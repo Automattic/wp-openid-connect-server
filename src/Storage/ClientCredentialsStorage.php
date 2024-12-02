@@ -50,7 +50,7 @@ class ClientCredentialsStorage implements ClientCredentialsInterface {
 			return true;
 		}
 
-		return true === $client['requires_consent'];
+		return false !== $client['requires_consent'];
 	}
 
 	public function getClientScope( $client_id ) {
