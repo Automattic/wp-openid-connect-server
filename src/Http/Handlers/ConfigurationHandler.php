@@ -28,7 +28,7 @@ class ConfigurationHandler extends RequestHandler {
 			'authorization_endpoint'                => Router::make_rest_url( 'authorize' ),
 			'token_endpoint'                        => Router::make_rest_url( 'token' ),
 			'userinfo_endpoint'                     => Router::make_rest_url( 'userinfo' ),
-			'scopes_supported'                      => array( 'openid', 'profile' ),
+			'scopes_supported'                      => array( 'openid', 'profile', 'email', 'phone' ),
 			'response_types_supported'              => array( 'code' ),
 			'id_token_signing_alg_values_supported' => array( 'RS256' ),
 		);

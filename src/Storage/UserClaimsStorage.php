@@ -38,13 +38,26 @@ class UserClaimsStorage implements UserClaimsInterface {
 			'nickname'    => 'user_nicename',
 		);
 
+		// Is email scope requested?
+		if(in_array('email', $scopes, true)) {
+			$field_map['email'] = 'user_email';
+		}
+
+		// Is phone scope requested?
+		if(in_array('phone', $scopes, true)) {
+			$field_map['phone'] = 'user_phone';
+		}
+
 		foreach ( $field_map as $key => $value ) {
 			if ( $user->$value ) {
 				$claims[ $key ] = $user->$value;
 			}
 		}
 
-		$claims['picture'] = get_avatar_url( $user->user_email );
+		// Is profile scope requested, add picture (user avatar)?
+		if(in_array( 'profile', $scopes, true )) {
+			$claims['picture'] = get_avatar_url( $user->user_email );
+		}
 
 		return apply_filters( 'oidc_user_claims', $claims, $user );
 	}
