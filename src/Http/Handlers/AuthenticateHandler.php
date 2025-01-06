@@ -6,13 +6,14 @@ use OAuth2\Request;
 use OAuth2\Response;
 use OpenIDConnectServer\Http\RequestHandler;
 use OpenIDConnectServer\Http\Router;
+use OpenIDConnectServer\Storage\ClientCredentialsStorage;
 use OpenIDConnectServer\Storage\ConsentStorage;
 
 class AuthenticateHandler extends RequestHandler {
 	private ConsentStorage $consent_storage;
-	private array $clients;
+	private ClientCredentialsStorage $clients;
 
-	public function __construct( ConsentStorage $consent_storage, array $clients ) {
+	public function __construct( ConsentStorage $consent_storage, ClientCredentialsStorage $clients ) {
 		$this->consent_storage = $consent_storage;
 		$this->clients         = $clients;
 	}
@@ -22,15 +23,19 @@ class AuthenticateHandler extends RequestHandler {
 			auth_redirect();
 		}
 
-		$client_name = $this->get_client_name( $request );
+		$client_id = $request->query( 'client_id' );
+
+		$client_name = $this->clients->getClientName( $client_id );
 		if ( empty( $client_name ) ) {
 			$response->setStatusCode( 404 );
 
 			return $response;
 		}
 
-		$client_id = $request->query( 'client_id' );
-		if ( ! $this->consent_storage->needs_consent( get_current_user_id(), $client_id ) ) {
+		if (
+		! $this->clients->clientRequiresConsent( $client_id )
+		|| ! $this->consent_storage->needs_consent( get_current_user_id(), $client_id )
+		) {
 			$this->redirect( $request );
 			// TODO: return response instead of exiting.
 			exit;
@@ -153,25 +158,6 @@ class AuthenticateHandler extends RequestHandler {
 				Router::make_rest_url( 'authorize' )
 			)
 		);
-	}
-
-	/**
-	 * TODO: Remove this function in favour of ClientCredentialsStorage?
-	 */
-	private function get_client_name( Request $request ): string {
-		$client_id = $request->query( 'client_id' );
-
-		if ( ! isset( $this->clients[ $client_id ] ) ) {
-			return '';
-		}
-
-		$client = $this->clients[ $client_id ];
-
-		if ( empty( $client['name'] ) ) {
-			return '';
-		}
-
-		return $client['name'];
 	}
 
 	private function get_cancel_url( Request $request ) {
