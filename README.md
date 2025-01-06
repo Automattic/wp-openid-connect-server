@@ -77,9 +77,9 @@ You can report any issues you encounter directly on [Github repo: Automattic/wp-
 
 ### 2.0.0
 
+- [Breaking] Add a configuration option to support clients that don't require consent [#118](https://github.com/Automattic/wp-openid-connect-server/pull/118) props @lart2150
 - Make client_id and client_secret optional for the token endpoint [#116](https://github.com/Automattic/wp-openid-connect-server/pull/116) props @lart2150
 - Update expected args specs for token endpoint as per OIDC spec [#117](https://github.com/Automattic/wp-openid-connect-server/pull/117)
-- [Breaking] Add a configuration option to support clients that don't require consent [#118](https://github.com/Automattic/wp-openid-connect-server/pull/118) props @lart2150
 
 ### 1.3.4
 
