@@ -6,7 +6,7 @@
 - Tested up to: 6.5
 - Requires PHP: 7.4
 - License: [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html)
-- Stable tag: 1.3.4
+- Stable tag: 2.0.0
 - GitHub Plugin URI: https://github.com/Automattic/wp-openid-connect-server
 
 Use OpenID Connect to log in to other webservices using your own WordPress.
@@ -75,7 +75,14 @@ You can report any issues you encounter directly on [Github repo: Automattic/wp-
 
 ## Changelog
 
+### 2.0.0
+
+- [Breaking] Add a configuration option to support clients that don't require consent [#118](https://github.com/Automattic/wp-openid-connect-server/pull/118) props @lart2150
+- Make client_id and client_secret optional for the token endpoint [#116](https://github.com/Automattic/wp-openid-connect-server/pull/116) props @lart2150
+- Update expected args specs for token endpoint as per OIDC spec [#117](https://github.com/Automattic/wp-openid-connect-server/pull/117)
+
 ### 1.3.4
+
 - Add the autoloader to the uninstall script [#111](https://github.com/Automattic/wp-openid-connect-server/pull/111) props @MariaMozgunova
 
 ### 1.3.3
