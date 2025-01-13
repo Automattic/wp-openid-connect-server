@@ -1,3 +1,13 @@
+# UKM Norge Modifications
+
+## Permissions Are Not Checked
+
+The purpose of using OpenID Connect is to link Arrsys users with users from other platforms (e.g., delta.ukm.no). Given the absence of a verification process in Arrsys and the fact that users are added by other users, along with the use of multisite functionality where users may have different permissions across multiple sites, permission checks are unnecessary. It's important to note that the user __data from Arrsys is not trustworthy__ due to the lack of verification. 
+
+__IMPORTANT: Other platforms are required to verify users through email or mobile number before establishing connections.__
+
+
+
 # OpenID Connect Server
 
 - Contributors: wordpressdotorg, akirk, ashfame, psrpinto
