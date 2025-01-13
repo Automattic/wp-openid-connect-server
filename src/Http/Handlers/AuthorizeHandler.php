@@ -10,7 +10,7 @@ use OAuth2\Server as OAuth2Server;
 use OpenIDConnectServer\Http\RequestHandler;
 use OpenIDConnectServer\Storage\ConsentStorage;
 
-const OIDC_DEFAULT_MINIMAL_CAPABILITY = 'edit_posts';
+const OIDC_DEFAULT_MINIMAL_CAPABILITY = 'edit_posts'; // This feature is not used by UKM. Read the information in README.md for more information.
 
 class AuthorizeHandler extends RequestHandler {
 	private OAuth2Server $server;

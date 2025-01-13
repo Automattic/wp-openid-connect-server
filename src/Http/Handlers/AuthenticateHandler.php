@@ -45,6 +45,13 @@ class AuthenticateHandler extends RequestHandler {
 			'form_fields'     => $request->getAllQueryParameters(),
 		);
 
+		// IMPORTANT NOTE - UKM Norge: We are not checking permissions here.
+		// The goal is to connect Arrsys users with users from other platforms (like delta.ukm.no). 
+		// Since there is no verification process and users are added by other users, 
+		// along with the use of multisite functionality and users may have different permissions across various sites, 
+		// we do not need to check permissions. 
+		// The user data from Arrsys are not trusted because of no verification process. Other platforms MUST verify the users via email or mobile number before connecting them.
+		/*
 		$has_permission = current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) );
 		if ( ! $has_permission ) {
 			login_header( 'OIDC Connect', null, new \WP_Error( 'OIDC_NO_PERMISSION', __( "You don't have permission to use OpenID Connect.", 'openid-connect-server' ) ) );
@@ -53,6 +60,10 @@ class AuthenticateHandler extends RequestHandler {
 			login_header( 'OIDC Connect' );
 			$this->render_consent_screen( $data );
 		}
+		*/
+		// Therefore we will always render the consent screen when the user is logged in.
+		login_header( 'OIDC Connect' );
+		$this->render_consent_screen( $data );
 
 		login_footer();
 
