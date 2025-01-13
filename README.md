@@ -6,7 +6,25 @@ The purpose of using OpenID Connect is to link Arrsys users with users from othe
 
 __IMPORTANT: Other platforms are required to verify users through email or mobile number before establishing connections.__
 
+## Add new client
+file: `functions.php`
+~~~php
+add_filter('oidc_registered_clients', 'my_oidc_clients');
+function my_oidc_clients() {
+    return array(
+        FSS_OIDC_USER => array(
+            'name'         => 'FSS - Festival Styring System',
+            'secret'       => FSS_OIDC_SECRET,
+            'redirect_uri' => FSS_OIDC_CALLBACK,
+            'grant_types'  => array('authorization_code'),
+            'scope'        => 'openid profile email phone',
+        ),
+	... // new client
+    );
+}
+~~~
 
+---
 
 # OpenID Connect Server
 
