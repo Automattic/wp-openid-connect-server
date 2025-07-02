@@ -50,7 +50,10 @@ class AuthenticateHandler extends RequestHandler {
 			'form_fields'     => $request->getAllQueryParameters(),
 		);
 
-		$has_permission = current_user_can( apply_filters( 'oidc_minimal_capability', OIDC_DEFAULT_MINIMAL_CAPABILITY ) );
+		$cap = current_user_can( OIDC_DEFAULT_MINIMAL_CAPABILITY );
+
+		$has_permission = apply_filters( 'oidc_minimal_capability', $cap );
+
 		if ( ! $has_permission ) {
 			login_header( 'OIDC Connect', null, new \WP_Error( 'OIDC_NO_PERMISSION', __( "You don't have permission to use OpenID Connect.", 'openid-connect-server' ) ) );
 			$this->render_no_permission_screen( $data );
