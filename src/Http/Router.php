@@ -58,8 +58,10 @@ class Router {
 	}
 
 	private function get_current_route(): string {
-		$wp_url        = get_site_url();
-		$installed_dir = wp_parse_url( $wp_url, PHP_URL_PATH );
+		$wp_url = get_site_url();
+
+		// wp_parse_url() can return null when site_url is root of the domain and doesn't have a trailing slash.
+		$installed_dir = wp_parse_url( $wp_url, PHP_URL_PATH ) ?? '';
 
 		// Requested URI relative to WP install.
 		$uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
