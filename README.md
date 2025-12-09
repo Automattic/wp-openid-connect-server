@@ -44,8 +44,8 @@ OIDC_PRIVATE_KEY
 ~~~
 Alternatively, you can also put them outside the webroot and load them from the files like this:
 ~~~php
-define( 'OIDC_PUBLIC_KEY', file_get_contents( '/web-inaccessible/oidc.key' ) );
-define( 'OIDC_PRIVATE_KEY', file_get_contents( '/web-inaccessible/private.key' ) );
+define( 'OIDC_PRIVATE_KEY', file_get_contents( '/web-inaccessible/oidc.key' ) );
+define( 'OIDC_PUBLIC_KEY', file_get_contents( '/web-inaccessible/public.key' ) );
 ~~~
 
 ### Define the clients
