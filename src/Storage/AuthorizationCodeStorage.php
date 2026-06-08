@@ -64,7 +64,7 @@ class AuthorizationCodeStorage implements AuthorizationCodeInterface {
 		return $authorization_code;
 	}
 
-	public function setAuthorizationCode( $code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null ) {
+	public function setAuthorizationCode( $code, $client_id, $user_id, $redirect_uri, $expires, $scope = null, $id_token = null, $code_challenge = null, $code_challenge_method = null ) {
 		if ( empty( $code ) ) {
 			return;
 		}
