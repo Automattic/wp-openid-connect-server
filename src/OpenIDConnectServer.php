@@ -2,8 +2,11 @@
 
 namespace OpenIDConnectServer;
 
+use OpenIDConnectServer\Crypto\JwtWithKid;
+use OpenIDConnectServer\Crypto\PublicKeyJwk;
 use OAuth2\Request;
 use OAuth2\Response;
+use OAuth2\ResponseType\JwtAccessToken;
 use OpenIDConnectServer\Http\Handlers\AuthenticateHandler;
 use OpenIDConnectServer\Http\Handlers\AuthorizeHandler;
 use OpenIDConnectServer\Http\Handlers\ConfigurationHandler;
@@ -16,6 +19,9 @@ use OpenIDConnectServer\Storage\ClientCredentialsStorage;
 use OpenIDConnectServer\Storage\ConsentStorage;
 use OpenIDConnectServer\Storage\PublicKeyStorage;
 use OpenIDConnectServer\Storage\UserClaimsStorage;
+use OAuth2\OpenID\ResponseType\AuthorizationCode as OpenIDAuthorizationCodeResponseType;
+use OAuth2\OpenID\ResponseType\CodeIdToken;
+use OAuth2\OpenID\ResponseType\IdToken;
 use OAuth2\Server;
 
 class OpenIDConnectServer {
@@ -36,10 +42,19 @@ class OpenIDConnectServer {
 			'issuer'                => home_url( '/' ),
 		);
 
-		$server = new Server( new AuthorizationCodeStorage(), $config );
-		$server->addStorage( new PublicKeyStorage( $public_key, $private_key ), 'public_key' );
+		$authorization_code_storage = new AuthorizationCodeStorage();
+		$public_key_storage = new PublicKeyStorage( $public_key, $private_key );
+		$jwt_with_kid       = new JwtWithKid( PublicKeyJwk::from_public_key( $public_key )['kid'] );
+
+		$server = new Server( $authorization_code_storage, $config );
+		$server->addStorage( $public_key_storage, 'public_key' );
 		$server->addStorage( $this->clients, 'client_credentials' );
 		$server->addStorage( new UserClaimsStorage(), 'user_claims' );
+		$server->addResponseType( new OpenIDAuthorizationCodeResponseType( $authorization_code_storage, $config ), 'code' );
+		$server->addResponseType( new JwtAccessToken( $public_key_storage, null, null, $config, $jwt_with_kid ), 'token' );
+		$id_token_response_type = new IdToken( new UserClaimsStorage(), $public_key_storage, $config, $jwt_with_kid );
+		$server->addResponseType( $id_token_response_type, 'id_token' );
+		$server->addResponseType( new CodeIdToken( $server->getResponseType( 'code' ), $id_token_response_type ), 'code id_token' );
 
 		// Declare rest routes.
 		$this->router->add_rest_route(
