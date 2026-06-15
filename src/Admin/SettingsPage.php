@@ -40,11 +40,12 @@ class SettingsPage {
 			'.oidc-settings textarea{font-family:monospace;width:100%;max-width:900px}.oidc-settings .regular-text{max-width:100%}.oidc-settings-table{max-width:1100px}.oidc-settings-table th{white-space:nowrap}.oidc-settings-table input[type=text],.oidc-settings-table textarea{width:100%}.oidc-settings-table .column-actions{width:100px}.oidc-settings-source{display:inline-block;margin-top:4px;color:#646970}.oidc-settings-code-clients{margin-top:2em}.oidc-provider-urls code{display:block;white-space:normal;word-break:break-all}'
 		);
 
-		wp_register_script( 'openid-connect-server-settings', false, array(), '2.0.0', true );
-		wp_enqueue_script( 'openid-connect-server-settings' );
-		wp_add_inline_script(
+		wp_enqueue_script(
 			'openid-connect-server-settings',
-			"(function(){var rows=document.getElementById('oidc-client-rows');var template=document.getElementById('oidc-client-row-template');var add=document.getElementById('oidc-add-client');function randomString(length){var chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';var values=new Uint32Array(length);window.crypto.getRandomValues(values);var output='';for(var i=0;i<length;i++){output+=chars[values[i]%chars.length];}return output;}function enableFields(row){row.querySelectorAll('[disabled]').forEach(function(field){field.disabled=false;});}if(rows&&template&&add){var nextIndex=parseInt(rows.dataset.nextIndex,10)||0;add.addEventListener('click',function(event){event.preventDefault();var wrapper=document.createElement('tbody');wrapper.innerHTML=template.innerHTML.replace(/__INDEX__/g,String(nextIndex++)).trim();var row=wrapper.firstElementChild;enableFields(row);row.querySelector('[data-field=\"client_id\"]').value=randomString(32);row.querySelector('[data-field=\"secret\"]').value=randomString(48);rows.appendChild(row);row.querySelector('[data-field=\"name\"]').focus();});}document.addEventListener('click',function(event){var button=event.target.closest('.oidc-remove-client,.oidc-generate-client-id,.oidc-generate-secret');if(!button){return;}event.preventDefault();var row=button.closest('tr');if(!row){return;}if(button.classList.contains('oidc-remove-client')){row.remove();return;}if(button.classList.contains('oidc-generate-client-id')){row.querySelector('[data-field=\"client_id\"]').value=randomString(32);return;}if(button.classList.contains('oidc-generate-secret')){row.querySelector('[data-field=\"secret\"]').value=randomString(48);}});})();"
+			plugins_url( 'assets/js/settings.js', dirname( __DIR__, 2 ) . '/openid-connect-server.php' ),
+			array(),
+			'2.0.0',
+			true
 		);
 	}
 
