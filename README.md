@@ -15,7 +15,7 @@ Use OpenID Connect to log in to other webservices using your own WordPress.
 
 With this plugin you can use your own WordPress install to authenticate with a webservice that provides [OpenID Connect](https://openid.net/connect/) to implement Single-Sign On (SSO) for your users.
 
-The plugin is currently only configured using constants and hooks as follows:
+You can configure the plugin from **Settings > OpenID Connect** in wp-admin, or by using constants and hooks as follows. Constant-defined keys and hook-defined clients take precedence over saved settings and are shown as locked in the admin page.
 
 ### Define the RSA keys
 
