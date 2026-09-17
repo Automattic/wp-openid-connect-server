@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6.0.2
 
       - name: Build release
         # We don't use the release artifacts here, but the script will also create the release directory, and that's
