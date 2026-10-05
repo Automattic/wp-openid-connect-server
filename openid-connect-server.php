@@ -13,22 +13,31 @@
  * Text Domain:       openid-connect-server
  */
 
+use OpenIDConnectServer\Admin\SettingsPage;
+use OpenIDConnectServer\Configuration;
 use OpenIDConnectServer\OpenIDConnectServer;
 use OpenIDConnectServer\SiteStatusTests;
 
 require_once __DIR__ . '/vendor/autoload.php';
+
+if ( is_admin() ) {
+	new SettingsPage();
+}
 
 add_action(
 	'wp_loaded',
 	function () {
 		new SiteStatusTests();
 
-		if ( ! defined( 'OIDC_PUBLIC_KEY' ) || ! defined( 'OIDC_PRIVATE_KEY' ) ) {
-			// Please follow instructions in readme.txt for defining the keys.
+		if ( ! Configuration::has_required_keys() ) {
+			// Please follow instructions in readme.txt or configure the keys in wp-admin.
 			return;
 		}
 
-		$clients = apply_filters( 'oidc_registered_clients', array() ); // Currently the only way to add clients is to use this filter.
-		new OpenIDConnectServer( OIDC_PUBLIC_KEY, OIDC_PRIVATE_KEY, $clients );
+		new OpenIDConnectServer(
+			Configuration::get_public_key(),
+			Configuration::get_private_key(),
+			Configuration::get_clients()
+		);
 	}
 );

@@ -155,5 +155,6 @@ class OpenIDConnectServer {
 	public static function uninstall() {
 		ConsentStorage::uninstall();
 		AuthorizationCodeStorage::uninstall();
+		Configuration::uninstall();
 	}
 }

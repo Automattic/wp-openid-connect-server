@@ -27,22 +27,20 @@ class SiteStatusTests {
 	}
 
 	public function site_status_test_public_key(): array {
-		$key_is_defined            = defined( 'OIDC_PUBLIC_KEY' );
-		$key_has_valid_pem_headers = (bool) preg_match(
-			'/^-----BEGIN\s.*PUBLIC KEY-----.*-----END\s.*PUBLIC KEY-----$/s',
-			OIDC_PUBLIC_KEY
-		);
+		$public_key                = Configuration::get_public_key();
+		$key_is_defined            = '' !== trim( $public_key );
+		$key_has_valid_pem_headers = $key_is_defined && Configuration::has_valid_public_key( $public_key );
 
 		if ( ! $key_is_defined ) {
-			$label  = __( 'The public key constant OIDC_PUBLIC_KEY is not defined.', 'openid-connect-server' );
+			$label  = __( 'The public key is not configured.', 'openid-connect-server' );
 			$status = 'critical';
 			$badge  = 'red';
 		} elseif ( $key_has_valid_pem_headers ) {
-			$label  = __( 'The public key is defined and in the right format', 'openid-connect-server' );
+			$label  = __( 'The public key is configured and in the right format', 'openid-connect-server' );
 			$status = 'good';
 			$badge  = 'green';
 		} else {
-			$label  = __( 'The public key constant OIDC_PUBLIC_KEY is malformed.', 'openid-connect-server' );
+			$label  = __( 'The public key is malformed.', 'openid-connect-server' );
 			$status = 'critical';
 			$badge  = 'red';
 		}
@@ -71,22 +69,20 @@ class SiteStatusTests {
 	}
 
 	public function site_status_test_private_key(): array {
-		$key_is_defined            = defined( 'OIDC_PRIVATE_KEY' );
-		$key_has_valid_pem_headers = (bool) preg_match(
-			'/^-----BEGIN\s.*PRIVATE KEY-----.*-----END\s.*PRIVATE KEY-----$/s',
-			OIDC_PRIVATE_KEY
-		);
+		$private_key               = Configuration::get_private_key();
+		$key_is_defined            = '' !== trim( $private_key );
+		$key_has_valid_pem_headers = $key_is_defined && Configuration::has_valid_private_key( $private_key );
 
 		if ( ! $key_is_defined ) {
-			$label  = __( 'The private key constant OIDC_PRIVATE_KEY is not defined.', 'openid-connect-server' );
+			$label  = __( 'The private key is not configured.', 'openid-connect-server' );
 			$status = 'critical';
 			$badge  = 'red';
 		} elseif ( $key_has_valid_pem_headers ) {
-			$label  = __( 'The private key is defined and in the right format', 'openid-connect-server' );
+			$label  = __( 'The private key is configured and in the right format', 'openid-connect-server' );
 			$status = 'good';
 			$badge  = 'green';
 		} else {
-			$label  = __( 'The private key constant OIDC_PRIVATE_KEY is malformed.', 'openid-connect-server' );
+			$label  = __( 'The private key is malformed.', 'openid-connect-server' );
 			$status = 'critical';
 			$badge  = 'red';
 		}
@@ -115,7 +111,7 @@ class SiteStatusTests {
 	}
 
 	public function site_status_test_clients(): array {
-		$clients = apply_filters( 'oidc_registered_clients', array() );
+		$clients = Configuration::get_clients();
 		if ( empty( $clients ) ) {
 			$label  = __( 'No clients have been defined.', 'openid-connect-server' );
 			$status = 'critical';
@@ -123,14 +119,16 @@ class SiteStatusTests {
 		} else {
 			$all_clients_ok = true;
 			foreach ( $clients as $client_id => $client ) {
-				$error = false;
+				$client       = is_array( $client ) ? $client : array();
+				$error        = false;
+				$redirect_uri = isset( $client['redirect_uri'] ) ? (string) $client['redirect_uri'] : '';
 				if ( strlen( $client_id ) < 10 ) {
 					$error = __( 'The client id (array key) needs to be a random string.', 'openid-connect-server' );
 				}
-				if ( empty( $client['redirect_uri'] ) ) {
+				if ( empty( $redirect_uri ) ) {
 					$error = __( 'You need to specify a redirect_uri.', 'openid-connect-server' );
 				}
-				if ( ! preg_match( '#^https://#', $client['redirect_uri'] ) ) {
+				if ( ! preg_match( '#^https://#', $redirect_uri ) ) {
 					$error = __( 'The redirect_uri needs to be a HTTPS URL.', 'openid-connect-server' );
 				}
 				if ( empty( $client['name'] ) ) {
